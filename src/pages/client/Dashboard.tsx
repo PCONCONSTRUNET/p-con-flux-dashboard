@@ -3,6 +3,8 @@ import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radi
 import { mockSignals, mockBlazeRounds, type Signal, type BlazeColor } from '@/data/mockData';
 import flameIcon from '@/assets/flame-icon.png';
 import BlazeRouletteStrip from '@/components/BlazeRouletteStrip';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import LockedFeature from '@/components/LockedFeature';
 
 type AnalysisState = 'scanning' | 'pattern_found' | 'confirmed' | 'idle';
 
