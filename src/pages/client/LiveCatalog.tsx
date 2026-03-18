@@ -382,8 +382,8 @@ const LiveCatalog = () => {
             <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 108px)' }}>
               {Array.from({ length: 10 }, (_, col) => (
                 <div key={`empty-row-${col}`} className="flex gap-1 items-stretch">
-                  <div className="rounded-md border border-border/20 bg-muted/8" style={{ width: '52px', height: '50px' }} />
-                  <div className="rounded-md border border-border/20 bg-muted/8" style={{ width: '52px', height: '50px' }} />
+                  <div className="rounded-lg border border-border/20 bg-muted/8" style={{ width: '52px', height: '50px' }} />
+                  <div className="rounded-lg border border-border/20 bg-muted/8" style={{ width: '52px', height: '50px' }} />
                 </div>
               ))}
             </div>
