@@ -64,6 +64,16 @@ const LiveCatalog = () => {
     };
   }, [rounds, limit]);
 
+  // Group rounds by roll number for column view (0-14)
+  const columnData = useMemo(() => {
+    const columns: Record<number, BlazeRound[]> = {};
+    for (let i = 0; i <= 14; i++) columns[i] = [];
+    displayed.forEach(r => {
+      columns[r.roll].push(r);
+    });
+    return columns;
+  }, [displayed]);
+
   const handleClickRound = useCallback((round: BlazeRound) => {
     if (highlighted === round.id) {
       setHighlighted(null);
