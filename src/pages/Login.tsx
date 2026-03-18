@@ -58,7 +58,7 @@ const Login = () => {
           <img src={logo} alt="P-CON FLUX" className="w-40 h-40 object-contain mb-2" />
         </div>
 
-        <div className="card-glass rounded-lg p-8">
+        <div className="rounded-2xl p-8 border border-foreground/10 backdrop-blur-xl shadow-2xl" style={{ background: 'linear-gradient(135deg, hsla(345, 100%, 50%, 0.08) 0%, hsla(240, 6%, 10%, 0.75) 40%, hsla(187, 100%, 50%, 0.05) 100%)' }}>
           {/* Tabs */}
           <div className="flex mb-6 border-b border-border">
             <button
