@@ -64,24 +64,24 @@ const LiveCatalog = () => {
     };
   }, [rounds, limit]);
 
-  const FIXED_ROWS = 22;
+  const MAX_PER_MINUTE = 2; // ~2 results per minute column
 
-  // Group rounds into 10-minute blocks (e.g. 03:00-03:09, 03:10-03:19...)
-  // Each block has 10 columns (digits 0-9), blocks go side by side horizontally
+  // Group rounds into 10-minute blocks, each block = horizontal strip
+  // Newest block on top, older blocks push down
   const minuteBlocks = useMemo(() => {
     type Block = { key: string; label: string; columns: BlazeRound[][] };
 
     const blockMap = new Map<string, Block>();
 
-    // Process chronologically (oldest first so they stack top-down)
+    // Process oldest first so they fill top-down within each column
     const chronological = [...displayed].reverse();
 
     chronological.forEach(round => {
       const d = new Date(round.timestamp);
       const hour = d.getHours();
       const minute = d.getMinutes();
-      const decade = Math.floor(minute / 10); // 0,1,2,3,4,5
-      const digitInBlock = minute % 10; // 0-9
+      const decade = Math.floor(minute / 10);
+      const digitInBlock = minute % 10;
 
       const blockKey = `${String(hour).padStart(2, '0')}:${decade}`;
       const blockLabel = `${String(hour).padStart(2, '0')}:${decade}0`;
@@ -95,12 +95,10 @@ const LiveCatalog = () => {
       }
 
       const block = blockMap.get(blockKey)!;
-      if (block.columns[digitInBlock].length < FIXED_ROWS) {
-        block.columns[digitInBlock].push(round);
-      }
+      block.columns[digitInBlock].push(round);
     });
 
-    // Sort blocks chronologically (newest first for display)
+    // Newest first
     return Array.from(blockMap.values()).reverse();
   }, [displayed]);
 
@@ -313,64 +311,73 @@ const LiveCatalog = () => {
 
       {/* Rounds display */}
       {columnView ? (
-        /* Column view — fixed 22 slots per column */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto overflow-y-auto max-h-[600px]">
-          <div className="flex gap-3 min-w-fit">
-            {minuteBlocks.map((block) => (
-              <div key={block.key} className="shrink-0">
-                {/* Block label (e.g. 03:10) */}
-                <div className="text-center text-[9px] font-bold text-primary/60 mb-1 font-mono tracking-wider">
-                  {block.label}
-                </div>
-                {/* 10 column headers: 0-9 */}
-                <div className="grid grid-cols-10 gap-0.5">
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <div key={`hdr-${i}`} className="text-center text-[9px] font-bold text-muted-foreground/50 pb-1 font-mono w-10">
-                      {String(i).padStart(2, '0')}
-                    </div>
-                  ))}
-                </div>
-                {/* Fixed rows */}
-                <div className="grid grid-cols-10 gap-0.5">
-                  {Array.from({ length: FIXED_ROWS }, (_, row) =>
-                    Array.from({ length: 10 }, (_, col) => {
-                      const r = block.columns[col][row];
+        /* Column view — blocks stack vertically, newest on top, each block is a horizontal strip */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px] space-y-1">
+          {minuteBlocks.map((block) => {
+            // Find the max rows needed for this block
+            const maxInBlock = Math.max(...block.columns.map(c => c.length), 0);
+            const rows = Math.max(maxInBlock, MAX_PER_MINUTE);
 
-                      if (r) {
-                        const style = colorStyles[r.color];
-                        const dimmed = highlighted && !isHighlighted(r);
+            return (
+              <div key={block.key}>
+                {/* Block header with label + minute columns */}
+                <div className="flex items-end gap-0 mb-0.5">
+                  {/* Block time label */}
+                  <div className="w-12 shrink-0 text-[9px] font-bold text-primary/70 font-mono text-right pr-2 pb-0.5">
+                    {block.label}
+                  </div>
+                  {/* 10 minute column headers: 00-09 */}
+                  <div className="flex-1 grid grid-cols-10 gap-0.5">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div key={`hdr-${i}`} className="text-center text-[9px] font-bold text-muted-foreground/50 font-mono">
+                        {String(i).padStart(2, '0')}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Rows for this block */}
+                {Array.from({ length: rows }, (_, row) => (
+                  <div key={`row-${row}`} className="flex gap-0 mb-0.5">
+                    <div className="w-12 shrink-0" />
+                    <div className="flex-1 grid grid-cols-10 gap-0.5">
+                      {Array.from({ length: 10 }, (_, col) => {
+                        const r = block.columns[col][row];
+
+                        if (r) {
+                          const style = colorStyles[r.color];
+                          const dimmed = highlighted && !isHighlighted(r);
+
+                          return (
+                            <div key={`${block.key}-${col}-${row}`} className="flex flex-col items-center">
+                              <div
+                                onClick={() => handleClickRound(r)}
+                                className={`w-full aspect-square max-w-[42px] rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                                  dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                                } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                              >
+                                {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
+                              </div>
+                              {showTimestamps && (
+                                <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                                  {formatTime(r.timestamp)}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        }
 
                         return (
-                          <div key={`${block.key}-${col}-${row}`} className="flex flex-col items-center">
-                            <div
-                              onClick={() => handleClickRound(r)}
-                              className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                                dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                              } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                            >
-                              {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
-                              {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
-                            </div>
-                            {showTimestamps && (
-                              <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                                {formatTime(r.timestamp)}
-                              </span>
-                            )}
+                          <div key={`${block.key}-${col}-${row}`} className="flex items-center justify-center">
+                            <div className="w-full aspect-square max-w-[42px] rounded-lg border border-border/15 bg-muted/5" />
                           </div>
                         );
-                      }
-
-                      return (
-                        <div key={`${block.key}-${col}-${row}`} className="flex items-center justify-center">
-                          <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       ) : (
         /* Grid view — 22 per row */
