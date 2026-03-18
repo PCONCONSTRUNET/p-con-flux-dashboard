@@ -121,6 +121,14 @@
     animation: slide-up 0.3s ease-out;
   }
 
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-area-inset {
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  }
+
   @keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }

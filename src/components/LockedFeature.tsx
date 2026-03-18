@@ -9,7 +9,7 @@ export default function LockedFeature({ feature }: LockedFeatureProps) {
   const { setShowUpgradeModal } = useSubscription();
 
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-6 animate-fade-in">
+    <div className="flex flex-col items-center justify-center py-12 sm:py-20 px-6 animate-fade-in">
       <div className="w-20 h-20 rounded-3xl bg-muted/20 border border-border/30 flex items-center justify-center mb-6 shadow-lg shadow-muted/5">
         <Lock size={36} className="text-muted-foreground/50" />
       </div>
