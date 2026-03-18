@@ -27,6 +27,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [userDismissed, setUserDismissed] = useState(false);
+  const userDismissedRef = useRef(false);
 
   const handleSetShowUpgradeModal = (show: boolean) => {
     if (!show) setUserDismissed(true);
