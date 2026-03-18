@@ -268,18 +268,7 @@ const Patterns = () => {
                             : 'border-border/30 hover:border-border/60'
                         }`}
                       >
-                        {ct.split ? (
-                          <div className="w-full h-full rounded-full overflow-hidden flex">
-                            <div className={`w-1/2 h-full ${ct.split[0]}`} />
-                            <div className={`w-1/2 h-full ${ct.split[1]}`} />
-                          </div>
-                        ) : ct.inner ? (
-                          <div className={`w-full h-full rounded-full ${ct.bg} flex items-center justify-center text-sm`}>
-                            {ct.inner}
-                          </div>
-                        ) : (
-                          <div className={`w-7 h-7 rounded-full ${ct.bg}`} />
-                        )}
+                        <div className={`w-7 h-7 rounded-full ${ct.bg}`} />
                       </button>
                     );
                   })}
