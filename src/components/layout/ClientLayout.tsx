@@ -124,25 +124,31 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
           </div>
 
           <nav className="space-y-1 flex-1 min-h-0">
-            {navItems.map(item => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                title={desktopCollapsed ? item.label : undefined}
-                className={`flex items-center w-full py-3 rounded-xl text-sm transition-all ${
-                  desktopCollapsed ? 'justify-center px-2' : 'gap-3 px-3'
-                } ${
-                  isActive(item.path)
-                    ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-              >
-                <item.icon size={18} className="shrink-0" />
-                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${desktopCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
-                  {item.label}
-                </span>
-              </button>
-            ))}
+            {navItems.map(item => {
+              const locked = item.requiresSub && !hasActiveSubscription;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => handleNavClick(item)}
+                  title={desktopCollapsed ? (locked ? `${item.label} (Bloqueado)` : item.label) : undefined}
+                  className={`flex items-center w-full py-3 rounded-xl text-sm transition-all ${
+                    desktopCollapsed ? 'justify-center px-2' : 'gap-3 px-3'
+                  } ${
+                    locked
+                      ? 'text-muted-foreground/30 cursor-not-allowed'
+                      : isActive(item.path)
+                        ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  <item.icon size={18} className="shrink-0" />
+                  <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${desktopCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                    {item.label}
+                  </span>
+                  {locked && !desktopCollapsed && <Lock size={12} className="ml-auto text-muted-foreground/30 shrink-0" />}
+                </button>
+              );
+            })}
           </nav>
 
           <div className="border-t border-border/50 pt-4 mt-auto shrink-0">
