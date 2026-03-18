@@ -16,6 +16,8 @@ export default {
       fontFamily: {
         display: ["Rajdhani", "sans-serif"],
         body: ["Plus Jakarta Sans", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "sans-serif"],
+        mono: ["Plus Jakarta Sans", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
