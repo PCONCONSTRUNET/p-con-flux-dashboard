@@ -372,40 +372,7 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background glows */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] rounded-full opacity-[0.06] blur-[180px]" style={{ background: 'hsl(187, 100%, 50%)' }} />
-        <div className="absolute bottom-[-10%] right-[20%] w-[500px] h-[500px] rounded-full opacity-[0.04] blur-[150px]" style={{ background: 'hsl(345, 100%, 50%)' }} />
-        <div className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full opacity-[0.03] blur-[120px]" style={{ background: 'hsl(260, 100%, 60%)' }} />
-      </div>
-
-      {/* Floating FLUX icons */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(12)].map((_, i) => (
-          <img
-            key={i}
-            src={pconLogo}
-            alt=""
-            className="absolute opacity-[0.04] select-none"
-            style={{
-              width: `${28 + (i % 4) * 12}px`,
-              height: `${28 + (i % 4) * 12}px`,
-              top: `${8 + (i * 7.5) % 85}%`,
-              left: `${5 + (i * 13.7) % 88}%`,
-              transform: `rotate(${i * 30}deg)`,
-              animation: `float-icon ${6 + (i % 3) * 2}s ease-in-out ${i * 0.5}s infinite alternate`,
-              filter: 'drop-shadow(0 0 6px hsla(187, 100%, 50%, 0.3))',
-            }}
-          />
-        ))}
-        <style>{`
-          @keyframes float-icon {
-            0% { transform: translateY(0px) rotate(0deg); opacity: 0.03; }
-            50% { opacity: 0.06; }
-            100% { transform: translateY(-20px) rotate(15deg); opacity: 0.03; }
-          }
-        `}</style>
-      </div>
+      <LoginBackground />
 
       <div className="w-full max-w-lg relative z-10">
         <button
