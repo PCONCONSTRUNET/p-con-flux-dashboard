@@ -400,7 +400,7 @@ const LiveCatalog = () => {
                     {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                   </div>
                   {showTimestamps && (
-                    <span className={`text-[8px] mt-0.5 font-mono transition-opacity ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                    <span className={`text-[8px] mt-0.5 font-mono transition-opacity ${dimmed ? 'opacity-10' : 'text-muted-foreground/80'}`}>
                       {time}
                     </span>
                   )}
