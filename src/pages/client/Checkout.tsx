@@ -456,7 +456,7 @@ export default function Checkout() {
           <div className="h-[2px] w-full" style={{ background: 'linear-gradient(90deg, hsl(345, 100%, 50%), hsl(187, 100%, 50%), hsl(260, 100%, 60%))' }} />
 
           {/* Subtle inner gradient overlay */}
-          <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{ background: 'radial-gradient(ellipse at top center, hsla(187,100%,50%,0.04) 0%, transparent 60%)' }} />
+          <div className="absolute inset-0 pointer-events-none rounded-[28px]" style={{ background: 'radial-gradient(ellipse at top center, hsla(187,100%,50%,0.04) 0%, transparent 60%)' }} />
 
           {/* Header */}
           <div className="px-6 pt-6 pb-4 text-center border-b border-white/[0.08] relative">
