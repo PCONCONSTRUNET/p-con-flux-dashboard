@@ -64,14 +64,16 @@ const LiveCatalog = () => {
     };
   }, [rounds, limit]);
 
-  const FIXED_ROWS = 15;
+  const FIXED_ROWS = 16;
+  const FIXED_COLUMN_WIDTH = 70;
+  const FIXED_SLOT_HEIGHT = 52;
 
   const fixedColumnSource = useMemo(() => {
     if (colorFilter === 'all') return rounds;
     return rounds.filter((round) => round.color === colorFilter);
   }, [rounds, colorFilter]);
 
-  // Build fixed 00-09 columns in arrival order (top -> bottom)
+  // Build 00-09 columns in chronological order so each new result fills the next empty slot
   const minuteDigitColumns = useMemo(() => {
     const columns: BlazeRound[][] = Array.from({ length: 10 }, () => []);
 
@@ -84,10 +86,10 @@ const LiveCatalog = () => {
     return columns;
   }, [fixedColumnSource]);
 
-  const fixedRowsCount = useMemo(
-    () => Math.max(FIXED_ROWS, ...minuteDigitColumns.map((column) => column.length)),
-    [minuteDigitColumns]
-  );
+  const fixedRowsCount = useMemo(() => {
+    const maxFilledRows = Math.max(...minuteDigitColumns.map((column) => column.length), 0);
+    return Math.max(FIXED_ROWS, maxFilledRows + 1);
+  }, [minuteDigitColumns]);
 
   const handleClickRound = useCallback((round: BlazeRound) => {
     if (highlighted === round.id) {
