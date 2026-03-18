@@ -314,57 +314,62 @@ const LiveCatalog = () => {
       {/* Rounds display */}
       {columnView ? (
         /* Column view — fixed 22 slots per column */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto overflow-y-auto max-h-[500px]">
-          <div
-            className="grid gap-x-1 gap-y-1 min-w-fit"
-            style={{ gridTemplateColumns: `repeat(${minuteColumns.length}, minmax(42px, 1fr))` }}
-          >
-            {/* Headers: minute labels */}
-            {minuteColumns.map((column) => (
-              <div
-                key={`h-${column.label}`}
-                className="text-center text-[10px] font-bold text-muted-foreground/70 pb-1 font-mono sticky top-0 z-10 bg-card/90 backdrop-blur-sm"
-              >
-                {column.label}
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto overflow-y-auto max-h-[600px]">
+          <div className="flex gap-3 min-w-fit">
+            {minuteBlocks.map((block) => (
+              <div key={block.key} className="shrink-0">
+                {/* Block label (e.g. 03:10) */}
+                <div className="text-center text-[9px] font-bold text-primary/60 mb-1 font-mono tracking-wider">
+                  {block.label}
+                </div>
+                {/* 10 column headers: 0-9 */}
+                <div className="grid grid-cols-10 gap-0.5">
+                  {Array.from({ length: 10 }, (_, i) => (
+                    <div key={`hdr-${i}`} className="text-center text-[9px] font-bold text-muted-foreground/50 pb-1 font-mono w-10">
+                      {String(i).padStart(2, '0')}
+                    </div>
+                  ))}
+                </div>
+                {/* Fixed rows */}
+                <div className="grid grid-cols-10 gap-0.5">
+                  {Array.from({ length: FIXED_ROWS }, (_, row) =>
+                    Array.from({ length: 10 }, (_, col) => {
+                      const r = block.columns[col][row];
+
+                      if (r) {
+                        const style = colorStyles[r.color];
+                        const dimmed = highlighted && !isHighlighted(r);
+
+                        return (
+                          <div key={`${block.key}-${col}-${row}`} className="flex flex-col items-center">
+                            <div
+                              onClick={() => handleClickRound(r)}
+                              className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                                dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                              } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                            >
+                              {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
+                              {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+                            </div>
+                            {showTimestamps && (
+                              <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                                {formatTime(r.timestamp)}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={`${block.key}-${col}-${row}`} className="flex items-center justify-center">
+                          <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             ))}
-
-            {/* Fixed rows (22) per minute column */}
-            {Array.from({ length: FIXED_ROWS }, (_, row) =>
-              minuteColumns.map((column, colIndex) => {
-                const r = column.rounds[row];
-
-                if (r) {
-                  const style = colorStyles[r.color];
-                  const dimmed = highlighted && !isHighlighted(r);
-
-                  return (
-                    <div key={`${column.label}-${row}-${colIndex}`} className="flex flex-col items-center">
-                      <div
-                        onClick={() => handleClickRound(r)}
-                        className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                          dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                        } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                      >
-                        {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
-                        {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
-                      </div>
-                      {showTimestamps && (
-                        <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                          {formatTime(r.timestamp)}
-                        </span>
-                      )}
-                    </div>
-                  );
-                }
-
-                return (
-                  <div key={`${column.label}-${row}-${colIndex}`} className="flex items-center justify-center">
-                    <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/10" />
-                  </div>
-                );
-              })
-            )}
           </div>
         </div>
       ) : (
