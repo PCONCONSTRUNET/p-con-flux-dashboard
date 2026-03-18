@@ -17,7 +17,7 @@ const LiveCatalog = () => {
   const [limit, setLimit] = useState<number>(200);
   const [colorFilter, setColorFilter] = useState<BlazeColor | 'all'>('all');
   const [showFilters, setShowFilters] = useState(true);
-  const [realtime, setRealtime] = useState(true);
+  
   const [showTimestamps, setShowTimestamps] = useState(true);
   const [showNumbers, setShowNumbers] = useState(true);
   const [highlighted, setHighlighted] = useState<string | null>(null);
