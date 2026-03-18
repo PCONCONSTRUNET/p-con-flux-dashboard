@@ -188,20 +188,21 @@ const AdminDashboard = () => {
             }}
           />
 
-        <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.8)' }}>
-          {(['today', 'weekly', 'monthly', 'custom'] as FilterType[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-display font-semibold tracking-wider transition-all ${
-                filter === f
-                  ? 'bg-primary/15 text-primary border border-primary/25'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent'
-              }`}
-            >
-              {filterLabels[f]}
-            </button>
-          ))}
+          <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.8)' }}>
+            {(['today', 'weekly', 'monthly', 'custom'] as FilterType[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-display font-semibold tracking-wider transition-all ${
+                  filter === f
+                    ? 'bg-primary/15 text-primary border border-primary/25'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent'
+                }`}
+              >
+                {filterLabels[f]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
