@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radio, Lock, Shield } from 'lucide-react';
 import { mockBlazeRounds, type Signal, type BlazeColor } from '@/data/mockData';
+import { useBlazeDouble } from '@/hooks/useBlazeDouble';
 import flameIcon from '@/assets/flame-icon.png';
 import BlazeRouletteStrip from '@/components/BlazeRouletteStrip';
 import { useSubscription } from '@/contexts/SubscriptionContext';
@@ -26,6 +27,9 @@ const ClientDashboard = () => {
   const [showGaleDropdown, setShowGaleDropdown] = useState(false);
   const [showAssertDropdown, setShowAssertDropdown] = useState(false);
 
+  // Integração API em tempo real para os "Giros anteriores"
+  const { results: apiResults } = useBlazeDouble();
+
   // Load today's signals from DB
   useEffect(() => {
     const loadSignals = async () => {
@@ -48,11 +52,50 @@ const ClientDashboard = () => {
         }));
         setSignals(mapped);
       }
+        setSignals(mapped);
+
+        // Se o sinal mais recente ainda estiver como pending, ativa a telinha de "Entrada confirmada"
+        if (mapped.length > 0 && mapped[0].result === 'pending') {
+          setAnalysisState('confirmed');
+          setCurrentEntry(mapped[0].entry);
+          setMaxGale(mapped[0].protection.includes('Sem') ? 0 : parseInt(mapped[0].protection.match(/\d+/)?.[0] || '1'));
+        }
+      }
     };
     loadSignals();
-  }, []);
 
-  // Save signal to DB
+    const channel = supabase.channel('realtime_signals')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'signals' }, (payload) => {
+        const s = payload.new;
+        const newSig: Signal = {
+          id: s.id, type: s.signal_type, entry: s.entry, protection: s.protection,
+          result: s.result, timestamp: s.created_at, rounds: s.rounds, target: s.target
+        };
+        
+        setSignals(prev => [newSig, ...prev]);
+        
+        if (s.result === 'pending') {
+          setAnalysisState('confirmed');
+          setCurrentEntry(s.entry);
+          setMaxGale(s.protection.includes('Sem') ? 0 : parseInt(s.protection.match(/\d+/)?.[0] || '1'));
+        }
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'signals' }, (payload) => {
+        const s = payload.new;
+        setSignals(prev => prev.map(sig => sig.id === s.id ? { ...sig, result: s.result, rounds: s.rounds } : sig));
+        
+        // Se o sinal atualizado (foi resolvido green/loss) e era nosso "currentEntry" pendente
+        if (s.result !== 'pending') {
+            setAnalysisState('idle');
+            setCurrentEntry(null);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   const saveSignalToDB = useCallback(async (signal: Signal) => {
     await supabase.from('signals').insert({
       signal_type: signal.type,
@@ -68,55 +111,15 @@ const ClientDashboard = () => {
   const losses = signals.filter((s) => s.result === 'loss').length;
   const assertRate = greens + losses > 0 ? Math.round(greens / (greens + losses) * 100) : 100;
 
-  // Simulate real-time analysis cycle
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
-
-    const cycle = () => {
-      // Phase 1: Scanning
-      setAnalysisState('scanning');
-      setCurrentEntry(null);
-
-      const scanDuration = 6000 + Math.random() * 8000;
-
-      timeout = setTimeout(() => {
-        // Phase 2: Pattern found
-        const entries = ['3x Vermelho → Preto', '2x Preto → Vermelho', '4x Vermelho → Preto', '5x Preto → Vermelho', '3x Preto → Branco'];
-        const entry = entries[Math.floor(Math.random() * entries.length)];
-        setCurrentEntry(entry);
-        setAnalysisState('pattern_found');
-
-          timeout = setTimeout(() => {
-            // Phase 3: Confirmed
-            setAnalysisState('confirmed');
-
-            timeout = setTimeout(() => {
-              // Phase 4: Resolve and add to history + save to DB
-              const isGreen = Math.random() > 0.25;
-              const newSignal: Signal = {
-                id: `s-${Date.now()}`,
-                type: 'Auto',
-                entry,
-                protection: `${maxGale} Gale${maxGale > 1 ? 's' : ''}`,
-                result: isGreen ? 'green' : 'loss',
-                timestamp: new Date().toISOString(),
-                rounds: Math.ceil(Math.random() * (maxGale + 1)),
-                target: 'Double'
-              };
-              setSignals((prev) => [newSignal, ...prev]);
-              saveSignalToDB(newSignal);
-              setAnalysisState('idle');
-
-            // Restart cycle
-            timeout = setTimeout(cycle, 2000);
-          }, 3000);
-        }, 2000);
-      }, scanDuration);
-    };
-
-    cycle();
-    return () => clearTimeout(timeout);
-  }, [maxGale, saveSignalToDB]);
+    // Mantém o escanner girando se a api cair
+    if (apiResults.length === 0) {
+       setAnalysisState('scanning');
+    } else {
+       // Só derruba pra 'idle' se não houver tela confirmada pendente 
+       setAnalysisState(prev => prev === 'confirmed' ? 'confirmed' : 'idle');
+    }
+  }, [apiResults]);
 
   const isLocked = !hasActiveSubscription;
 
@@ -154,7 +157,7 @@ const ClientDashboard = () => {
         <div className="mb-4">
           <h3 className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-2">Giros anteriores</h3>
           <div className="flex gap-1.5 overflow-hidden">
-            {mockBlazeRounds.slice(0, 15).map((r) => {
+            {apiResults.slice(0, 15).map((r) => {
               const bg = r.color === 'red' ? 'bg-secondary' : r.color === 'white' ? 'bg-[hsl(0_0%_88%)]' : 'bg-[hsl(240_6%_15%)]';
               const border = r.color === 'red' ? 'border-secondary/40' : r.color === 'white' ? 'border-[hsl(0_0%_75%)]/40' : 'border-[hsl(240_6%_25%)]/40';
               const text = r.color === 'red' ? 'text-white' : r.color === 'white' ? 'text-[hsl(240_6%_10%)]' : 'text-muted-foreground';
@@ -276,12 +279,19 @@ const ClientDashboard = () => {
             <div
               key={signal.id}
               className={`rounded-2xl px-4 py-3.5 border backdrop-blur-sm transition-all ${
-              isGreen ? 'border-emerald-500/15 bg-emerald-500/[0.04]' : 'border-secondary/15 bg-secondary/[0.04]'}`
+              isGreen ? 'border-emerald-500/15 bg-emerald-500/[0.04]' : 
+              signal.result === 'pending' ? 'border-primary/15 bg-primary/[0.04]' : 
+              'border-secondary/15 bg-secondary/[0.04]'}`
               }>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${isGreen ? 'bg-emerald-500/15 border border-emerald-500/20' : 'bg-secondary/15 border border-secondary/20'}`}>
-                      {isGreen ? <CheckCircle2 size={16} className="text-emerald-400" /> : <XCircle size={16} className="text-secondary" />}
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                        isGreen ? 'bg-emerald-500/15 border border-emerald-500/20' : 
+                        signal.result === 'pending' ? 'bg-primary/15 border border-primary/20' : 
+                        'bg-secondary/15 border border-secondary/20'}`}>
+                      {isGreen ? <CheckCircle2 size={16} className="text-emerald-400" /> : 
+                       signal.result === 'pending' ? <Loader2 size={16} className="text-primary animate-spin" /> : 
+                       <XCircle size={16} className="text-secondary" />}
                     </div>
                     <div>
                       <div className="text-[13px] font-bold text-foreground">{signal.entry}</div>
@@ -293,8 +303,11 @@ const ClientDashboard = () => {
                     </div>
                   </div>
                   <div className="text-right flex flex-col items-end gap-0.5">
-                    <span className={`text-[11px] font-bold tracking-wide ${isGreen ? 'text-emerald-400' : 'text-secondary'}`}>
-                      {isGreen ? 'WIN' : 'LOSS'} {isGreen ? '✅' : '✕'}
+                    <span className={`text-[11px] font-bold tracking-wide ${
+                        isGreen ? 'text-emerald-400' : 
+                        signal.result === 'pending' ? 'text-primary' : 
+                        'text-secondary'}`}>
+                      {isGreen ? 'WIN ✅' : signal.result === 'pending' ? 'PENDENTE ⏳' : 'LOSS ✕'}
                     </span>
                     <span className="text-[9px] text-muted-foreground/40 font-mono">{time}</span>
                   </div>

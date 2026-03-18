@@ -1,8 +1,18 @@
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Filter, Clock, Trash2, Lock } from 'lucide-react';
-import { mockBlazeRounds, type BlazeColor, type BlazeRound } from '@/data/mockData';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Filter, Clock, Trash2, Lock, Wifi, WifiOff, Loader2 } from 'lucide-react';
+import { type BlazeColor } from '@/data/mockData';
 import blazeIcon from '@/assets/blaze-icon.png';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useBlazeDouble, type BlazeResult } from '@/hooks/useBlazeDouble';
+
+// Adapts BlazeResult (from API) to the shape LiveCatalog expects internally
+type BlazeRound = {
+  id: string;
+  number: number;
+  color: BlazeColor;
+  timestamp: string;
+  roll: number;
+};
 
 const colorStyles: Record<BlazeColor, { bg: string; ring: string; text: string; label: string }> = {
   red: { bg: 'bg-secondary', ring: 'ring-secondary/40', text: 'text-white', label: 'Vermelho' },
@@ -64,7 +74,6 @@ const Stone = ({
 
 const LiveCatalog = () => {
   const { hasActiveSubscription, setShowUpgradeModal } = useSubscription();
-  const [rounds, setRounds] = useState<BlazeRound[]>(mockBlazeRounds);
   const [limit, setLimit] = useState<number>(200);
   const [colorFilter, setColorFilter] = useState<BlazeColor | 'all'>('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -73,36 +82,32 @@ const LiveCatalog = () => {
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
   const [fixedColumns, setFixedColumns] = useState(false);
-  const [clock, setClock] = useState(() => new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
 
+  // ── Real-time API integration ──────────────────────────────────
+  const { results: apiResults, isConnected, isLoading, error, lastUpdate } = useBlazeDouble();
+
+  // Map API results to internal BlazeRound format
+  const rounds = useMemo<BlazeRound[]>(() =>
+    apiResults.map((r: BlazeResult, idx: number) => ({
+      id: r.id,
+      number: apiResults.length - idx,
+      color: r.color,
+      timestamp: r.createdAt,
+      roll: r.roll,
+    })),
+  [apiResults]);
+
+  // ── Live clock — ticks every second ──────────────────────────
+  const [clock, setClock] = useState(() =>
+    new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  );
   useEffect(() => {
-    const timer = setInterval(() => {
+    const id = setInterval(() => {
       setClock(new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     }, 1000);
-    return () => clearInterval(timer);
+    return () => clearInterval(id);
   }, []);
-
-  const roundsRef = useRef(rounds);
-  roundsRef.current = rounds;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const roll = Math.floor(Math.random() * 15);
-      let color: BlazeColor = 'black';
-      if (roll === 0) color = 'white';
-      else if (roll <= 7) color = 'red';
-
-      const newRound: BlazeRound = {
-        id: `br-rt-${Date.now()}`,
-        number: roundsRef.current.length + 1,
-        color,
-        timestamp: new Date().toISOString(),
-        roll,
-      };
-      setRounds(prev => [newRound, ...prev].slice(0, 600));
-    }, 8000 + Math.random() * 12000);
-    return () => clearInterval(interval);
-  }, []);
+  // ──────────────────────────────────────────────────────────────
 
   const displayed = useMemo(() => {
     let data = rounds.slice(0, limit);
@@ -130,6 +135,7 @@ const LiveCatalog = () => {
   const fixedGrid = useMemo(() => {
     const blockMap = new Map<string, { rounds: (BlazeRound | null)[][]; blockLabel: string }>();
     const ordered = [...fixedColumnSource].reverse();
+    
     ordered.forEach((round) => {
       const d = new Date(round.timestamp);
       const minute = d.getMinutes();
@@ -147,6 +153,7 @@ const LiveCatalog = () => {
       const emptyIdx = cell.indexOf(null);
       if (emptyIdx !== -1) cell[emptyIdx] = round;
     });
+    
     return Array.from(blockMap.values()).reverse();
   }, [fixedColumnSource]);
 
@@ -177,21 +184,29 @@ const LiveCatalog = () => {
           <div className="p-1 lg:p-1.5 rounded-xl bg-secondary/10 border border-secondary/20">
             <img src={blazeIcon} alt="Blaze" className="w-5 h-5 lg:w-6 lg:h-6 object-contain" />
           </div>
-          <div>
-            <h1 className="text-base lg:text-lg font-bold text-foreground tracking-tight">Catalogador</h1>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[9px] lg:text-[10px] text-muted-foreground tracking-widest uppercase font-semibold">
-                Tempo real
-              </span>
+            <div>
+              <h1 className="text-base lg:text-lg font-bold text-foreground tracking-tight">Catalogador</h1>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                {isLoading ? (
+                  <Loader2 size={10} className="animate-spin text-muted-foreground" />
+                ) : isConnected ? (
+                  <Wifi size={10} className="text-emerald-400" />
+                ) : (
+                  <WifiOff size={10} className="text-red-400" />
+                )}
+                <span className={`text-[9px] lg:text-[10px] tracking-widest uppercase font-semibold ${
+                  isLoading ? 'text-muted-foreground' : isConnected ? 'text-emerald-400' : 'text-red-400'
+                }`}>
+                  {isLoading ? 'Conectando...' : isConnected ? 'Tempo real' : 'API offline'}
+                </span>
+              </div>
             </div>
-          </div>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Mobile clock inline */}
           <div className="lg:hidden flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border/30 bg-card/60">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
             <span className="text-xs font-bold text-primary">{clock}</span>
           </div>
           <button
@@ -213,6 +228,17 @@ const LiveCatalog = () => {
           </button>
         </div>
       </div>
+
+      {/* API offline banner */}
+      {!isLoading && !isConnected && error && (
+        <div className="rounded-xl px-3 py-2 border border-red-500/30 bg-red-500/10 flex items-center gap-2">
+          <WifiOff size={14} className="text-red-400 flex-shrink-0" />
+          <div>
+            <p className="text-[11px] font-semibold text-red-300">API desconectada</p>
+            <p className="text-[10px] text-red-300/70">{error}</p>
+          </div>
+        </div>
+      )}
 
       {/* Filters - only for active subscriptions */}
       {showFilters && hasActiveSubscription && (
