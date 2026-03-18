@@ -81,7 +81,7 @@ const ClientDashboard = () => {
   const isLocked = !hasActiveSubscription;
 
   return (
-    <div className="space-y-4 animate-fade-in max-w-lg mx-auto relative">
+    <div className="space-y-4 animate-fade-in max-w-lg mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
