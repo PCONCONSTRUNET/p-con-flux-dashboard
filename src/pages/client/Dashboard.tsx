@@ -141,42 +141,17 @@ const ClientDashboard = () => {
       </div>
 
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
-          <Trophy size={18} className="text-emerald-400 mb-1" />
-          <span className="text-xl font-bold text-foreground">{greens}</span>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Wins</span>
-        </div>
-        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
-          <XCircle size={18} className="text-secondary mb-1" />
-          <span className="text-xl font-bold text-foreground">{losses}</span>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Losses</span>
-        </div>
-        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
-          <Percent size={18} className="text-primary mb-1" />
-          <span className="text-xl font-bold text-foreground">{assertRate}%</span>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Assert.</span>
-        </div>
-      </div>
-
       {/* Analysis area */}
       <div className="rounded-3xl p-6 border border-border/50 relative overflow-hidden"
         style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.9) 0%, hsla(240,6%,8%,0.95) 100%)' }}>
-        
-        {/* Top accent */}
         <div className={`absolute top-0 left-1/4 right-1/4 h-1 rounded-b-full transition-all duration-700 ${
           analysisState === 'confirmed' ? 'bg-gradient-to-r from-transparent via-emerald-400 to-transparent' :
           analysisState === 'pattern_found' ? 'bg-gradient-to-r from-transparent via-primary to-transparent' :
           'bg-gradient-to-r from-transparent via-secondary/60 to-transparent'
         }`} />
-
-        {/* Roulette Strip */}
         <div className="mb-4">
           <BlazeRouletteStrip spinning={analysisState === 'scanning'} />
         </div>
-
-        {/* Status */}
         <div className="text-center mb-2">
           <h2 className="text-lg font-bold text-foreground tracking-wide">
             SINAIS FLUX <span className="text-primary">2.0</span>
@@ -190,8 +165,6 @@ const ClientDashboard = () => {
             {stateLabels[analysisState]}
           </p>
         </div>
-
-        {/* Entry info - shows when pattern found or confirmed */}
         {currentEntry && (analysisState === 'pattern_found' || analysisState === 'confirmed') && (
           <div className={`mt-4 rounded-2xl p-4 border backdrop-blur-sm animate-slide-up transition-all ${
             analysisState === 'confirmed'
@@ -212,8 +185,6 @@ const ClientDashboard = () => {
             <div className="text-[10px] text-muted-foreground mt-1">Proteção: {maxGale} Gale{maxGale > 1 ? 's' : ''}</div>
           </div>
         )}
-
-        {/* Scanning indicator */}
         {analysisState === 'scanning' && (
           <div className="mt-4 flex items-center justify-center gap-2">
             <div className="flex gap-1">
@@ -224,6 +195,25 @@ const ClientDashboard = () => {
             <span className="text-[10px] text-muted-foreground/60">Monitorando rodadas em tempo real</span>
           </div>
         )}
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
+          <Trophy size={18} className="text-emerald-400 mb-1" />
+          <span className="text-xl font-bold text-foreground">{greens}</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Wins</span>
+        </div>
+        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
+          <XCircle size={18} className="text-secondary mb-1" />
+          <span className="text-xl font-bold text-foreground">{losses}</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Losses</span>
+        </div>
+        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
+          <Percent size={18} className="text-primary mb-1" />
+          <span className="text-xl font-bold text-foreground">{assertRate}%</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Assert.</span>
+        </div>
       </div>
 
       {/* Recent signals */}
