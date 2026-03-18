@@ -27,7 +27,6 @@ export default function Integrations() {
   const [config, setConfig] = useState({
     accessToken: '',
     publicKey: '',
-    webhookUrl: '',
     monthlyPrice: '',
     annualPrice: '',
   });
