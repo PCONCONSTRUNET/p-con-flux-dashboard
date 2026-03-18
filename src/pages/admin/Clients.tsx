@@ -355,12 +355,20 @@ const ClientsPage = () => {
 
       {/* Edit Plan Modal */}
       {editingClient && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditingClient(null)}>
-          <div className="w-full max-w-md bg-card/95 backdrop-blur-xl rounded-3xl p-6 border border-border/30 animate-fade-in shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-foreground mb-1">Alterar Plano</h3>
-            <p className="text-xs text-muted-foreground/60 mb-5">{editingClient.name} — {editingClient.email}</p>
+        <div className="fixed inset-0 z-50 bg-background/70 backdrop-blur-md flex items-center justify-center p-4" onClick={() => setEditingClient(null)}>
+          <div
+            className="w-full max-w-lg rounded-2xl border border-border/20 overflow-hidden animate-fade-in"
+            style={{ background: 'linear-gradient(160deg, hsl(240 5% 12%) 0%, hsl(240 5% 7%) 100%)', boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), 0 0 40px hsla(187, 100%, 50%, 0.05)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b border-border/10">
+              <h3 className="text-lg font-display font-bold text-foreground tracking-wide">Alterar Plano</h3>
+              <p className="text-sm text-muted-foreground mt-1">{editingClient.name} — {editingClient.email}</p>
+            </div>
 
-            <div className="space-y-2.5">
+            {/* Plan Options */}
+            <div className="p-6 space-y-3">
               {(['trial', 'monthly', 'annual'] as const).map(p => {
                 const cfg = planConfig[p];
                 const PIcon = cfg.icon;
@@ -370,37 +378,44 @@ const ClientsPage = () => {
                   <button
                     key={p}
                     onClick={() => setEditPlan(p)}
-                    className={`w-full flex items-center gap-3 p-4 rounded-2xl border transition-all duration-200 text-left ${
+                    className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl border-2 transition-all duration-200 text-left group ${
                       isSelected
-                        ? `${cfg.bg} ${cfg.border} ${cfg.color}`
-                        : 'border-border/20 bg-card/30 text-muted-foreground hover:border-border/40'
+                        ? 'border-primary/50 bg-primary/5'
+                        : 'border-border/15 bg-muted/5 hover:border-border/30 hover:bg-muted/10'
                     }`}
+                    style={isSelected ? { boxShadow: '0 0 20px hsla(187, 100%, 50%, 0.08)' } : {}}
                   >
-                    <PIcon size={20} className={isSelected ? cfg.color : 'text-muted-foreground/40'} />
-                    <div className="flex-1">
-                      <p className={`text-sm font-bold ${isSelected ? 'text-foreground' : ''}`}>{cfg.label}</p>
-                      <p className="text-[10px] text-muted-foreground/50">{duration}</p>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      isSelected ? `${cfg.border} ${cfg.bg}` : 'border-border/30'
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                      isSelected ? 'bg-primary/15' : 'bg-muted/15'
                     }`}>
-                      {isSelected && <div className={`w-2.5 h-2.5 rounded-full ${cfg.color === 'text-amber-400' ? 'bg-amber-400' : cfg.color === 'text-primary' ? 'bg-primary' : 'bg-emerald-400'}`} />}
+                      <PIcon size={20} className={isSelected ? cfg.color : 'text-muted-foreground/50'} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-display font-bold tracking-wide ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>{cfg.label}</p>
+                      <p className={`text-xs mt-0.5 ${isSelected ? 'text-muted-foreground' : 'text-muted-foreground/40'}`}>{duration}</p>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                      isSelected ? 'border-primary bg-primary/10' : 'border-border/30'
+                    }`}>
+                      {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                     </div>
                   </button>
                 );
               })}
             </div>
 
-            <div className="flex gap-2.5 mt-6">
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-border/10 flex gap-3" style={{ background: 'hsla(240, 5%, 5%, 0.5)' }}>
               <button
                 onClick={() => setEditingClient(null)}
-                className="flex-1 py-3 rounded-2xl border border-border/30 text-muted-foreground text-sm font-semibold hover:bg-muted/20 transition-all"
+                className="flex-1 py-3 rounded-xl border border-border/20 text-muted-foreground text-sm font-display font-semibold tracking-wide hover:bg-muted/15 transition-all"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleUpdatePlan}
-                className="flex-1 py-3 rounded-2xl bg-primary/20 border border-primary/30 text-primary text-sm font-bold hover:bg-primary/30 transition-all shadow-lg shadow-primary/10"
+                className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-display font-bold tracking-wide hover:bg-primary/90 transition-all"
+                style={{ boxShadow: '0 4px 15px hsla(187, 100%, 50%, 0.25)' }}
               >
                 Salvar
               </button>
