@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import LoginBackground from '@/components/LoginBackground';
+import SocialIcons from '@/components/SocialIcons';
 
 type Mode = 'login' | 'register';
 
