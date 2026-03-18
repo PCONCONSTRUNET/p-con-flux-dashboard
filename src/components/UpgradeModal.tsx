@@ -1,4 +1,4 @@
-import { Crown, Zap, Shield, X } from 'lucide-react';
+import { Crown, Zap, Shield, X, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 
 export default function UpgradeModal() {
@@ -6,70 +6,113 @@ export default function UpgradeModal() {
 
   if (!showUpgradeModal) return null;
 
-  // If plan is expired, don't allow dismissal
   const canDismiss = subscription && !subscription.isExpired;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background/90 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-card/95 backdrop-blur-xl rounded-3xl p-8 border border-border/30 animate-fade-in shadow-2xl relative">
+    <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center p-4">
+      <div
+        className="w-full max-w-md rounded-3xl border border-border/20 animate-scale-in relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(180deg, hsla(240,6%,13%,0.99) 0%, hsla(240,6%,7%,1) 100%)',
+          boxShadow: '0 0 80px hsla(187,100%,50%,0.06), 0 25px 60px hsla(0,0%,0%,0.6)',
+        }}
+      >
+        {/* Top glow line */}
+        <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
+
+        {/* Subtle radial glow behind icon */}
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-40 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at center, hsla(187,100%,50%,0.06) 0%, transparent 70%)' }}
+        />
+
         {canDismiss && (
-          <button onClick={() => setShowUpgradeModal(false)} className="absolute top-4 right-4 text-muted-foreground/40 hover:text-foreground transition-colors">
-            <X size={20} />
+          <button
+            onClick={() => setShowUpgradeModal(false)}
+            className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-muted/10 border border-border/20 flex items-center justify-center text-muted-foreground/40 hover:text-foreground hover:bg-muted/20 transition-all z-10"
+          >
+            <X size={16} />
           </button>
         )}
 
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-primary/15 border border-primary/25 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/10">
-            <Shield size={32} className="text-primary" />
+        <div className="relative z-10 px-7 pt-8 pb-7">
+          {/* Icon */}
+          <div className="flex justify-center mb-5">
+            <div
+              className="w-14 h-14 rounded-2xl border border-primary/30 flex items-center justify-center relative"
+              style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.12) 0%, hsla(187,100%,50%,0.04) 100%)' }}
+            >
+              <Shield size={26} className="text-primary" />
+              <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ boxShadow: '0 0 20px hsla(187,100%,50%,0.12)' }} />
+            </div>
           </div>
-          <h2 className="text-2xl font-bold text-foreground">
+
+          {/* Title */}
+          <h2 className="text-xl font-bold text-foreground text-center mb-1.5">
             {subscription?.isExpired ? 'Seu período de teste expirou' : 'Faça upgrade do seu plano'}
           </h2>
-          <p className="text-sm text-muted-foreground/60 mt-2">
+          <p className="text-[12px] text-muted-foreground/50 text-center mb-7">
             {subscription?.isExpired
-              ? 'Para continuar acessando a plataforma, escolha um plano.'
+              ? 'Para continuar acessando, escolha um plano abaixo.'
               : 'Desbloqueie todos os recursos da plataforma.'}
           </p>
-        </div>
 
-        <div className="space-y-3">
-          {/* Monthly */}
-          <div className="flex items-center gap-4 p-5 rounded-2xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all cursor-pointer group">
-            <div className="w-12 h-12 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center">
-              <Zap size={22} className="text-primary" />
-            </div>
-            <div className="flex-1">
-              <p className="text-base font-bold text-foreground">P-CON FLUX MENSAL</p>
-              <p className="text-[11px] text-muted-foreground/50 mt-0.5">Acesso completo por 30 dias</p>
-            </div>
-            <div className="text-right">
-              <span className="text-xs font-bold text-primary tracking-wider">ASSINAR</span>
-            </div>
+          {/* Plans */}
+          <div className="space-y-3">
+            {/* Monthly */}
+            <button
+              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-primary/15 transition-all hover:border-primary/35 group text-left"
+              style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.04) 0%, hsla(187,100%,50%,0.01) 100%)' }}
+            >
+              <div
+                className="w-11 h-11 shrink-0 rounded-xl border border-primary/25 flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.15) 0%, hsla(187,100%,50%,0.05) 100%)' }}
+              >
+                <Zap size={20} className="text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-bold text-foreground tracking-wide">P-CON FLUX MENSAL</p>
+                <p className="text-[10px] text-muted-foreground/40 mt-0.5">Acesso completo por 30 dias</p>
+              </div>
+              <span className="text-[11px] font-bold text-primary tracking-widest shrink-0 group-hover:translate-x-0.5 transition-transform">
+                ASSINAR →
+              </span>
+            </button>
+
+            {/* Annual */}
+            <button
+              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-emerald-400/20 transition-all hover:border-emerald-400/40 group text-left relative overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, hsla(155,80%,50%,0.05) 0%, hsla(155,80%,50%,0.01) 100%)' }}
+            >
+              {/* Best option badge */}
+              <div className="absolute top-2.5 right-3 flex items-center gap-1 bg-emerald-400/15 border border-emerald-400/20 px-2 py-[2px] rounded-lg">
+                <Sparkles size={9} className="text-emerald-400" />
+                <span className="text-[8px] font-bold tracking-widest text-emerald-400">MELHOR OPÇÃO</span>
+              </div>
+
+              <div
+                className="w-11 h-11 shrink-0 rounded-xl border border-emerald-400/25 flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, hsla(155,80%,50%,0.15) 0%, hsla(155,80%,50%,0.05) 100%)' }}
+              >
+                <Crown size={20} className="text-emerald-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-bold text-foreground tracking-wide">P-CON FLUX ANUAL</p>
+                <p className="text-[10px] text-muted-foreground/40 mt-0.5">Acesso completo por 365 dias</p>
+              </div>
+              <span className="text-[11px] font-bold text-emerald-400 tracking-widest shrink-0 group-hover:translate-x-0.5 transition-transform">
+                ASSINAR →
+              </span>
+            </button>
           </div>
 
-          {/* Annual */}
-          <div className="flex items-center gap-4 p-5 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 hover:bg-emerald-400/10 transition-all cursor-pointer group relative overflow-hidden">
-            <div className="absolute top-2 right-2 text-[9px] font-bold tracking-widest bg-emerald-400/20 text-emerald-400 px-2 py-0.5 rounded-lg border border-emerald-400/20">
-              MELHOR OPÇÃO
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-emerald-400/15 border border-emerald-400/25 flex items-center justify-center">
-              <Crown size={22} className="text-emerald-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-base font-bold text-foreground">P-CON FLUX ANUAL</p>
-              <p className="text-[11px] text-muted-foreground/50 mt-0.5">Acesso completo por 365 dias</p>
-            </div>
-            <div className="text-right">
-              <span className="text-xs font-bold text-emerald-400 tracking-wider">ASSINAR</span>
-            </div>
-          </div>
+          {/* Footer */}
+          {!subscription?.isExpired && subscription?.timeRemaining && (
+            <p className="text-[10px] text-center text-muted-foreground/30 mt-5">
+              Você ainda tem <span className="text-muted-foreground/50 font-semibold">{subscription.timeRemaining}</span> de teste grátis
+            </p>
+          )}
         </div>
-
-        {!subscription?.isExpired && (
-          <p className="text-[10px] text-center text-muted-foreground/30 mt-6">
-            Você ainda tem {subscription?.timeRemaining} de teste grátis
-          </p>
-        )}
       </div>
     </div>
   );
