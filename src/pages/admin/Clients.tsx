@@ -253,13 +253,41 @@ const ClientsPage = () => {
                     <ChevronRight size={16} className="text-muted-foreground/20" />
                   </div>
                 </div>
-                <div className="flex items-center gap-3 mt-2.5 text-[10px] text-muted-foreground/40">
+                <div className="flex items-center flex-wrap gap-3 mt-2.5 text-[10px] text-muted-foreground/40">
                   <span className="flex items-center gap-1">
                     <Calendar size={10} />
                     Cadastro: {createdDate.toLocaleDateString('pt-BR')}
                   </span>
                   <span className="opacity-30">•</span>
                   <span>Expira: {new Date(client.expires_at).toLocaleDateString('pt-BR')} {new Date(client.expires_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                  {client.whatsapp && (
+                    <>
+                      <span className="opacity-30">•</span>
+                      <a
+                        href={`https://wa.me/${client.whatsapp.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors"
+                      >
+                        <Phone size={10} /> {client.whatsapp}
+                      </a>
+                    </>
+                  )}
+                  {client.telegram && (
+                    <>
+                      <span className="opacity-30">•</span>
+                      <a
+                        href={`https://t.me/${client.telegram.replace('@', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        <Send size={10} /> {client.telegram}
+                      </a>
+                    </>
+                  )}
                 </div>
               </div>
             );
