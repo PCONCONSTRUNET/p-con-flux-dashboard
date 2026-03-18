@@ -385,34 +385,38 @@ export default function Checkout() {
 
         {/* Glassmorphism Card */}
         <div
-          className="rounded-2xl border border-white/[0.08] overflow-hidden backdrop-blur-xl"
+          className="rounded-2xl border border-white/[0.12] overflow-hidden backdrop-blur-xl relative"
           style={{
-            background: 'linear-gradient(160deg, hsla(240, 5%, 15%, 0.6) 0%, hsla(240, 5%, 8%, 0.7) 100%)',
-            boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), inset 0 1px 0 hsla(0,0%,100%,0.05), 0 0 80px hsla(187, 100%, 50%, 0.03)',
+            background: 'linear-gradient(160deg, hsla(187, 80%, 20%, 0.25) 0%, hsla(240, 10%, 12%, 0.7) 40%, hsla(345, 60%, 15%, 0.15) 100%)',
+            boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), inset 0 1px 0 hsla(187,100%,70%,0.1), 0 0 100px hsla(187, 100%, 50%, 0.05)',
           }}
         >
-          <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
+          {/* Top gradient line */}
+          <div className="h-[2px] w-full" style={{ background: 'linear-gradient(90deg, hsl(345, 100%, 50%), hsl(187, 100%, 50%), hsl(260, 100%, 60%))' }} />
+
+          {/* Subtle inner gradient overlay */}
+          <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{ background: 'radial-gradient(ellipse at top center, hsla(187,100%,50%,0.04) 0%, transparent 60%)' }} />
 
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 text-center border-b border-white/[0.05]">
-            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3 drop-shadow-[0_0_12px_hsla(187,100%,50%,0.3)]" />
-            <h1 className="text-lg font-display font-bold text-foreground">Checkout Seguro</h1>
-            <p className="text-sm text-muted-foreground/50 mt-1">Finalize sua assinatura</p>
+          <div className="px-6 pt-6 pb-4 text-center border-b border-white/[0.08] relative">
+            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3 drop-shadow-[0_0_16px_hsla(187,100%,50%,0.4)]" />
+            <h1 className="text-xl font-display font-bold text-white">Checkout Seguro</h1>
+            <p className="text-sm text-white/60 mt-1">Finalize sua assinatura</p>
           </div>
 
           {/* Plan Summary */}
-          <div className="px-6 py-4 border-b border-white/[0.05]" style={{ background: 'hsla(187, 100%, 50%, 0.02)' }}>
+          <div className="px-6 py-4 border-b border-white/[0.08] relative" style={{ background: 'linear-gradient(90deg, hsla(187, 100%, 50%, 0.04), transparent)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/10 border border-primary/20' : 'bg-emerald-400/10 border border-emerald-400/20'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/15 border border-primary/30' : 'bg-emerald-400/15 border border-emerald-400/30'}`}>
                   <PlanIcon size={18} className={planColor} />
                 </div>
                 <div>
-                  <p className="text-sm font-display font-bold text-foreground">{planLabel}</p>
-                  <p className="text-xs text-muted-foreground/40">{planDuration}</p>
+                  <p className="text-sm font-display font-bold text-white">{planLabel}</p>
+                  <p className="text-xs text-white/40">{planDuration}</p>
                 </div>
               </div>
-              <p className={`text-xl font-display font-bold ${planColor}`}>
+              <p className={`text-xl font-display font-bold ${planColor} drop-shadow-[0_0_8px_hsla(187,100%,50%,0.3)]`}>
                 R$ {price}
               </p>
             </div>
@@ -420,25 +424,27 @@ export default function Checkout() {
 
           {/* Payment Method Tabs */}
           <div className="px-6 pt-5">
-            <div className="flex gap-2 p-1.5 rounded-xl border border-white/[0.06] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.5)' }}>
+            <div className="flex gap-2 p-1.5 rounded-xl border border-white/[0.08] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.4)' }}>
               <button
                 onClick={() => { setPaymentMethod('pix'); setPixGenerated(false); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-semibold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
                   paymentMethod === 'pix'
-                    ? 'bg-primary/15 text-primary border border-primary/25'
-                    : 'text-muted-foreground/50 hover:text-muted-foreground/70'
+                    ? 'text-white border border-primary/30'
+                    : 'text-white/40 hover:text-white/60'
                 }`}
+                style={paymentMethod === 'pix' ? { background: 'linear-gradient(135deg, hsla(187,100%,50%,0.2), hsla(187,100%,50%,0.08))', boxShadow: '0 0 15px hsla(187,100%,50%,0.1)' } : {}}
               >
                 <img src={iconPix} alt="PIX" className="w-5 h-5" />
                 PIX
               </button>
               <button
                 onClick={() => setPaymentMethod('card')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-semibold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
                   paymentMethod === 'card'
-                    ? 'bg-primary/15 text-primary border border-primary/25'
-                    : 'text-muted-foreground/50 hover:text-muted-foreground/70'
+                    ? 'text-white border border-primary/30'
+                    : 'text-white/40 hover:text-white/60'
                 }`}
+                style={paymentMethod === 'card' ? { background: 'linear-gradient(135deg, hsla(187,100%,50%,0.2), hsla(187,100%,50%,0.08))', boxShadow: '0 0 15px hsla(187,100%,50%,0.1)' } : {}}
               >
                 <img src={iconCard} alt="Cartão" className="w-5 h-5" />
                 Cartão
@@ -453,27 +459,30 @@ export default function Checkout() {
                 <>
                   {/* CPF */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-display font-semibold text-muted-foreground/60">CPF do Titular</label>
+                    <label className="text-xs font-display font-semibold text-white/70">CPF do Titular</label>
                     <input
                       type="text"
                       inputMode="numeric"
                       placeholder="000.000.000-00"
                       value={docNumber}
                       onChange={(e) => setDocNumber(formatCPF(e.target.value))}
-                      className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                      className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                     />
                   </div>
 
                   <div className="flex items-center gap-2 py-2">
-                    <Shield size={14} className="text-emerald-400/60" />
-                    <p className="text-[11px] text-muted-foreground/40">Pagamento instantâneo via PIX • Mercado Pago</p>
+                    <Shield size={14} className="text-emerald-400/80" />
+                    <p className="text-[11px] text-white/50">Pagamento instantâneo via PIX • Mercado Pago</p>
                   </div>
 
                   <button
                     onClick={handleGeneratePix}
                     disabled={processing}
-                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-display font-bold tracking-wide text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                    style={{ boxShadow: '0 4px 20px hsla(187, 100%, 50%, 0.25)' }}
+                    className="w-full h-12 rounded-xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+                    style={{
+                      background: 'linear-gradient(135deg, hsl(187, 100%, 45%), hsl(187, 100%, 35%))',
+                      boxShadow: '0 4px 25px hsla(187, 100%, 50%, 0.35), inset 0 1px 0 hsla(0,0%,100%,0.15)',
+                    }}
                   >
                     {processing ? (
                       <>
@@ -551,45 +560,45 @@ export default function Checkout() {
           {paymentMethod === 'card' && (
             <form onSubmit={handleCardSubmit} className="px-6 py-5 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-display font-semibold text-muted-foreground/60">Número do Cartão</label>
+                <label className="text-xs font-display font-semibold text-white/70">Número do Cartão</label>
                 <div className="relative">
-                  <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/30" />
+                  <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
                   <input
                     type="text"
                     inputMode="numeric"
                     placeholder="0000 0000 0000 0000"
                     value={cardNumber}
                     onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-display font-semibold text-muted-foreground/60">Nome no Cartão</label>
+                <label className="text-xs font-display font-semibold text-white/70">Nome no Cartão</label>
                 <input
                   type="text"
                   placeholder="NOME COMO ESTÁ NO CARTÃO"
                   value={cardName}
                   onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                  className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                  className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-display font-semibold text-muted-foreground/60">Validade</label>
+                  <label className="text-xs font-display font-semibold text-white/70">Validade</label>
                   <input
                     type="text"
                     inputMode="numeric"
                     placeholder="MM/AA"
                     value={expiry}
                     onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                    className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                    className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-display font-semibold text-muted-foreground/60">CVV</label>
+                  <label className="text-xs font-display font-semibold text-white/70">CVV</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -598,35 +607,38 @@ export default function Checkout() {
                       maxLength={4}
                       value={cvv}
                       onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                      className="w-full h-11 px-4 pr-10 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                      className="w-full h-11 px-4 pr-10 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                     />
-                    <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/20" />
+                    <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25" />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-display font-semibold text-muted-foreground/60">CPF do Titular</label>
+                <label className="text-xs font-display font-semibold text-white/70">CPF do Titular</label>
                 <input
                   type="text"
                   inputMode="numeric"
                   placeholder="000.000.000-00"
                   value={docNumber}
                   onChange={(e) => setDocNumber(formatCPF(e.target.value))}
-                  className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                  className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                 />
               </div>
 
               <div className="flex items-center gap-2 py-2">
-                <Shield size={14} className="text-emerald-400/60" />
-                <p className="text-[11px] text-muted-foreground/40">Pagamento seguro processado pelo Mercado Pago</p>
+                <Shield size={14} className="text-emerald-400/80" />
+                <p className="text-[11px] text-white/50">Pagamento seguro processado pelo Mercado Pago</p>
               </div>
 
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-display font-bold tracking-wide text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                style={{ boxShadow: '0 4px 20px hsla(187, 100%, 50%, 0.25)' }}
+                className="w-full h-12 rounded-xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(187, 100%, 45%), hsl(187, 100%, 35%))',
+                  boxShadow: '0 4px 25px hsla(187, 100%, 50%, 0.35), inset 0 1px 0 hsla(0,0%,100%,0.15)',
+                }}
               >
                 {processing ? (
                   <>
