@@ -485,7 +485,7 @@ export default function Checkout() {
 
           {/* Payment Method Tabs */}
           <div className="px-6 pt-5">
-            <div className="flex gap-2 p-1.5 rounded-xl border border-white/[0.08] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.4)' }}>
+            <div className="flex gap-2 p-1.5 rounded-2xl border border-white/[0.08] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.4)' }}>
               <button
                 onClick={() => { setPaymentMethod('pix'); setPixGenerated(false); }}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
