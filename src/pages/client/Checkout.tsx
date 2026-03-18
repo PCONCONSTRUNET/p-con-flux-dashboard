@@ -630,7 +630,7 @@ export default function Checkout() {
                     placeholder="0000 0000 0000 0000"
                     value={cardNumber}
                     onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                    className="w-full h-12 pl-10 pr-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
