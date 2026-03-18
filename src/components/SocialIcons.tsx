@@ -26,6 +26,7 @@ const socials = [
   {
     name: 'Telegram',
     key: 'telegram',
+    link: 'https://t.me/+K-C9AWoh3cI4Yzcx',
     color: 'rgba(0, 136, 204, 0.6)',
     gradient: 'linear-gradient(135deg, #0a1f2d, #0f4a66, #0088cc, #0a2e44)',
     icon: (
