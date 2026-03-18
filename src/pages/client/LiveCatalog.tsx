@@ -262,8 +262,8 @@ const LiveCatalog = () => {
       </div>
 
       {/* Rounds grid — like Blaze cataloger */}
-      <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[500px]">
-        <div className="flex flex-wrap gap-1.5">
+      <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[500px] overflow-x-auto">
+        <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(22, minmax(0, 1fr))' }}>
           {displayed.map((r) => {
             const style = colorStyles[r.color];
             const active = highlighted ? isHighlighted(r) : true;
@@ -277,7 +277,7 @@ const LiveCatalog = () => {
                 className="flex flex-col items-center cursor-pointer group"
               >
                 <div
-                  className={`w-9 h-9 rounded-full ${style.bg} ring-2 ${style.ring} flex items-center justify-center transition-all duration-200 ${
+                  className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
                     dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                   } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                 >
