@@ -100,7 +100,6 @@ export default function Integrations() {
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-white/10">
                   <img src={mercadoPagoIcon} alt="Mercado Pago" className="w-8 h-8" />
                 </div>
-                </div>
                 <div>
                   <h3 className="text-base font-display font-bold text-foreground">Mercado Pago</h3>
                   <p className="text-[10px] text-muted-foreground/40 font-display tracking-[0.15em] mt-0.5">API DE ASSINATURA • PRODUÇÃO</p>
