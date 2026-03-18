@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, CreditCard, CheckCircle2, XCircle, Clock, Crown, Zap, ChevronDown } from 'lucide-react';
+import { Search, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, CreditCard, CheckCircle2, XCircle, Clock, Crown, Zap, ChevronDown, Copy, Building2, Hash, Receipt, User, Mail, FileText, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
 import ExportImportBar from '@/components/ExportImportBar';
