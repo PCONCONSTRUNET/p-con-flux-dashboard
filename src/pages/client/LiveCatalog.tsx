@@ -66,19 +66,28 @@ const LiveCatalog = () => {
 
   const FIXED_ROWS = 15;
 
-  // Group rounds by last digit of minute (00-09), unlimited per column
+  const fixedColumnSource = useMemo(() => {
+    if (colorFilter === 'all') return rounds;
+    return rounds.filter((round) => round.color === colorFilter);
+  }, [rounds, colorFilter]);
+
+  // Build fixed 00-09 columns in arrival order (top -> bottom)
   const minuteDigitColumns = useMemo(() => {
     const columns: BlazeRound[][] = Array.from({ length: 10 }, () => []);
 
-    // Oldest first so they fill top-to-bottom in order
-    const sorted = [...displayed].reverse();
-    sorted.forEach(round => {
+    const ordered = [...fixedColumnSource].reverse();
+    ordered.forEach((round) => {
       const digit = new Date(round.timestamp).getMinutes() % 10;
       columns[digit].push(round);
     });
 
     return columns;
-  }, [displayed]);
+  }, [fixedColumnSource]);
+
+  const fixedRowsCount = useMemo(
+    () => Math.max(FIXED_ROWS, ...minuteDigitColumns.map((column) => column.length)),
+    [minuteDigitColumns]
+  );
 
   const handleClickRound = useCallback((round: BlazeRound) => {
     if (highlighted === round.id) {
