@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Users, Crown, Clock, Shield, ChevronRight, Calendar, Zap } from 'lucide-react';
+import { Search, Users, Crown, Clock, Shield, ChevronRight, Calendar, Zap, Phone, Send, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ClientData {
@@ -11,6 +11,8 @@ interface ClientData {
   started_at: string;
   expires_at: string;
   is_active: boolean;
+  whatsapp: string;
+  telegram: string;
 }
 
 const planConfig = {
