@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          is_active: boolean
+          plan: Database["public"]["Enums"]["plan_type"]
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          plan?: Database["public"]["Enums"]["plan_type"]
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          plan?: Database["public"]["Enums"]["plan_type"]
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -74,6 +107,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      plan_type: "trial" | "monthly" | "annual"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -202,6 +236,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      plan_type: ["trial", "monthly", "annual"],
     },
   },
 } as const

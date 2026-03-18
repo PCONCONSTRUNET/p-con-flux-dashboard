@@ -18,7 +18,10 @@ import Profile from "@/pages/client/Profile";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import Patterns from "@/pages/admin/Patterns";
 import UsersPage from "@/pages/admin/Users";
+import ClientsPage from "@/pages/admin/Clients";
 import NotFound from "@/pages/NotFound";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import UpgradeModal from "@/components/UpgradeModal";
 
 const queryClient = new QueryClient();
 
@@ -42,10 +45,10 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
 
             {/* Client routes */}
-            <Route path="/client" element={<ProtectedRoute role="client"><ClientLayout><ClientDashboard /></ClientLayout></ProtectedRoute>} />
-            <Route path="/client/catalog" element={<ProtectedRoute role="client"><ClientLayout><LiveCatalog /></ClientLayout></ProtectedRoute>} />
-            <Route path="/client/history" element={<ProtectedRoute role="client"><ClientLayout><History /></ClientLayout></ProtectedRoute>} />
-            <Route path="/client/profile" element={<ProtectedRoute role="client"><ClientLayout><Profile /></ClientLayout></ProtectedRoute>} />
+            <Route path="/client" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><ClientDashboard /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
+            <Route path="/client/catalog" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><LiveCatalog /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
+            <Route path="/client/history" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><History /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
+            <Route path="/client/profile" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><Profile /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
 
             {/* Admin routes */}
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout><AdminDashboard /></AdminLayout></ProtectedRoute>} />
@@ -53,6 +56,7 @@ const App = () => (
             <Route path="/admin/catalog" element={<ProtectedRoute role="admin"><AdminLayout><LiveCatalog /></AdminLayout></ProtectedRoute>} />
             <Route path="/admin/history" element={<ProtectedRoute role="admin"><AdminLayout><History /></AdminLayout></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute role="admin"><AdminLayout><UsersPage /></AdminLayout></ProtectedRoute>} />
+            <Route path="/admin/clients" element={<ProtectedRoute role="admin"><AdminLayout><ClientsPage /></AdminLayout></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
