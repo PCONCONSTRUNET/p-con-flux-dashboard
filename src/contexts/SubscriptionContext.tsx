@@ -30,7 +30,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const userDismissedRef = useRef(false);
 
   const handleSetShowUpgradeModal = (show: boolean) => {
-    if (!show) setUserDismissed(true);
+    if (!show) {
+      userDismissedRef.current = true;
+      setUserDismissed(true);
+    }
     setShowUpgradeModal(show);
   };
 
