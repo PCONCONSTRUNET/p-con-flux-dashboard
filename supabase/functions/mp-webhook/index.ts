@@ -56,6 +56,12 @@ async function getAccessToken(supabase: any): Promise<string | null> {
 }
 
 function parseExternalReference(ref: string): { user_id?: string; plan?: string } {
+  // New format: "user_id|plan|planTitle"
+  if (ref.includes("|")) {
+    const [user_id, plan] = ref.split("|");
+    return { user_id, plan };
+  }
+  // Legacy JSON format
   try {
     return JSON.parse(ref);
   } catch {
