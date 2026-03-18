@@ -1,5 +1,6 @@
 import { Crown, Zap, Shield, X, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import pconLogo from '@/assets/pcon-flux-logo.png';
 
 export default function UpgradeModal() {
   const { showUpgradeModal, setShowUpgradeModal, subscription } = useSubscription();
@@ -36,15 +37,9 @@ export default function UpgradeModal() {
         )}
 
         <div className="relative z-10 px-7 pt-8 pb-7">
-          {/* Icon */}
+          {/* Logo */}
           <div className="flex justify-center mb-5">
-            <div
-              className="w-14 h-14 rounded-2xl border border-primary/30 flex items-center justify-center relative"
-              style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.12) 0%, hsla(187,100%,50%,0.04) 100%)' }}
-            >
-              <Shield size={26} className="text-primary" />
-              <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ boxShadow: '0 0 20px hsla(187,100%,50%,0.12)' }} />
-            </div>
+            <img src={pconLogo} alt="P-CON FLUX" className="w-32 h-32 object-contain drop-shadow-lg" />
           </div>
 
           {/* Title */}
