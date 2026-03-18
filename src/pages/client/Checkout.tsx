@@ -668,7 +668,7 @@ export default function Checkout() {
                       maxLength={4}
                       value={cvv}
                       onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                      className="w-full h-11 px-4 pr-10 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                      className="w-full h-12 px-4 pr-10 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                     />
                     <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25" />
                   </div>
