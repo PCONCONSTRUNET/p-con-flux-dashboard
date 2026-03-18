@@ -64,18 +64,17 @@ const LiveCatalog = () => {
     };
   }, [rounds, limit]);
 
-  const MAX_PER_MINUTE = 2;
+  const FIXED_ROWS = 15;
 
-  // Group rounds by last digit of minute (00-09) with max 2 stones per minute column
+  // Group rounds by last digit of minute (00-09), unlimited per column
   const minuteDigitColumns = useMemo(() => {
     const columns: BlazeRound[][] = Array.from({ length: 10 }, () => []);
 
-    // Newest first, keeping only the last 2 for each minute digit column
-    displayed.forEach(round => {
+    // Oldest first so they fill top-to-bottom in order
+    const sorted = [...displayed].reverse();
+    sorted.forEach(round => {
       const digit = new Date(round.timestamp).getMinutes() % 10;
-      if (columns[digit].length < MAX_PER_MINUTE) {
-        columns[digit].push(round);
-      }
+      columns[digit].push(round);
     });
 
     return columns;
@@ -293,47 +292,50 @@ const LiveCatalog = () => {
       </div>
 
       {fixedColumns ? (
-        /* Fixed columns — 10 columns (00-09), 2 stones per minute side by side */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px]">
-          <div className="inline-flex items-start gap-0">
-            {minuteDigitColumns.map((colRounds, col) => (
-              <div key={`minute-col-${col}`} className="flex flex-col items-center flex-shrink-0">
-                <div className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono mb-1" style={{ width: `${MAX_PER_MINUTE * 36}px` }}>
-                  {String(col).padStart(2, '0')}
-                </div>
-                <div className="flex items-start gap-0">
-                  {Array.from({ length: MAX_PER_MINUTE }, (_, slot) => {
-                    const r = colRounds[slot];
-                    if (r) {
-                      const style = colorStyles[r.color];
-                      const dimmed = highlighted && !isHighlighted(r);
-                      return (
-                        <div key={`${col}-${slot}`} className="flex flex-col items-center flex-shrink-0">
-                          <div
-                            onClick={() => handleClickRound(r)}
-                            className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                              dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                            } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                          >
-                            {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
+        /* Fixed columns — 10 columns (00-09), slots fill top-to-bottom */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
+          <div className="inline-flex items-start gap-1">
+            {minuteDigitColumns.map((colRounds, col) => {
+              const totalRows = Math.max(FIXED_ROWS, colRounds.length);
+              return (
+                <div key={`minute-col-${col}`} className="flex flex-col items-center flex-shrink-0">
+                  <div className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono mb-1 w-9">
+                    {String(col).padStart(2, '0')}
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    {Array.from({ length: totalRows }, (_, row) => {
+                      const r = colRounds[row];
+                      if (r) {
+                        const style = colorStyles[r.color];
+                        const dimmed = highlighted && !isHighlighted(r);
+                        return (
+                          <div key={`${col}-${row}`} className="flex flex-col items-center">
+                            <div
+                              onClick={() => handleClickRound(r)}
+                              className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                                dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                              } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                            >
+                              {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
+                            </div>
+                            {showTimestamps && (
+                              <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                                {formatTime(r.timestamp)}
+                              </span>
+                            )}
                           </div>
-                          {showTimestamps && (
-                            <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                              {formatTime(r.timestamp)}
-                            </span>
-                          )}
+                        );
+                      }
+                      return (
+                        <div key={`${col}-${row}`}>
+                          <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
                         </div>
                       );
-                    }
-                    return (
-                      <div key={`${col}-${slot}`} className="flex items-center justify-center flex-shrink-0">
-                        <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
-                      </div>
-                    );
-                  })}
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ) : (
