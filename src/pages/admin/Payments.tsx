@@ -24,6 +24,14 @@ interface PaymentRecord {
   amount: number;
   date: string;
   method: string;
+  transaction_id: string;
+  bank: string;
+  card_last4?: string;
+  ip_address: string;
+  currency: string;
+  fee: number;
+  net_amount: number;
+  description: string;
 }
 
 // Mock payment data
