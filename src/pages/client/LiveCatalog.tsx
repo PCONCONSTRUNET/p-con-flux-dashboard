@@ -37,7 +37,6 @@ const LiveCatalog = () => {
   roundsRef.current = rounds;
 
   useEffect(() => {
-    if (!realtime) return;
     const interval = setInterval(() => {
       const roll = Math.floor(Math.random() * 15);
       let color: BlazeColor = 'black';
@@ -54,7 +53,7 @@ const LiveCatalog = () => {
       setRounds(prev => [newRound, ...prev].slice(0, 600));
     }, 8000 + Math.random() * 12000);
     return () => clearInterval(interval);
-  }, [realtime]);
+  }, []);
 
   const displayed = useMemo(() => {
     let data = rounds.slice(0, limit);
