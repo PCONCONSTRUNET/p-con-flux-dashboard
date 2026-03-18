@@ -98,10 +98,7 @@ Deno.serve(async (req) => {
             number: doc_number || "",
           },
         },
-        external_reference: JSON.stringify({
-          user_id: user.id,
-          plan: plan,
-        }),
+        external_reference: `${user.id}|${plan}|${planTitle}`,
         notification_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/mp-webhook`,
       }),
     });
