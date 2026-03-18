@@ -26,6 +26,12 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [userDismissed, setUserDismissed] = useState(false);
+
+  const handleSetShowUpgradeModal = (show: boolean) => {
+    if (!show) setUserDismissed(true);
+    setShowUpgradeModal(show);
+  };
 
   useEffect(() => {
     if (!user || user.role === 'admin') {
@@ -69,12 +75,13 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
         setSubscription(sub);
 
-        if (isExpired) {
+        if (isExpired && !userDismissed) {
           setShowUpgradeModal(true);
         }
       } else {
-        // No subscription found — show upgrade
-        setShowUpgradeModal(true);
+        if (!userDismissed) {
+          setShowUpgradeModal(true);
+        }
       }
 
       setLoading(false);
@@ -86,7 +93,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const hasActiveSubscription = !!subscription && !subscription.isExpired && subscription.is_active;
 
   return (
-    <SubscriptionContext.Provider value={{ subscription, loading, showUpgradeModal, setShowUpgradeModal, hasActiveSubscription }}>
+    <SubscriptionContext.Provider value={{ subscription, loading, showUpgradeModal, setShowUpgradeModal: handleSetShowUpgradeModal, hasActiveSubscription }}>
       {children}
     </SubscriptionContext.Provider>
   );
