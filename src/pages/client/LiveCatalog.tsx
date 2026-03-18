@@ -318,7 +318,7 @@ const LiveCatalog = () => {
         /* Fixed columns — horizontal grid: rows = 10-min blocks, cols = 00-09, 2 stones per cell */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
           {/* Header row */}
-          <div className="inline-grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 72px)' }}>
+          <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
             {Array.from({ length: 10 }, (_, col) => (
               <div key={`head-${col}`} className="text-center text-[11px] font-bold text-muted-foreground/70 font-mono py-1.5 border border-border/30 bg-muted/15">
                 {String(col).padStart(2, '0')}
