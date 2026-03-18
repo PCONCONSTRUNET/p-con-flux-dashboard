@@ -342,9 +342,8 @@ const LiveCatalog = () => {
                   {cell.map((r, slot) => {
                     if (!r) {
                       return (
-                        <div key={`empty-${rowIdx}-${col}-${slot}`} className="flex-1">
-                          <div className="w-full rounded-md border border-border/20 bg-muted/8" style={{ height: '65px' }} />
-                          {showTimestamps && <div className="h-[18px]" />}
+                        <div key={`empty-${rowIdx}-${col}-${slot}`} style={{ width: '52px', height: '78px' }}>
+                          <div className="w-full rounded-md border border-border/20 bg-muted/8" style={{ height: '50px' }} />
                         </div>
                       );
                     }
@@ -353,13 +352,13 @@ const LiveCatalog = () => {
                     const dimmed = highlighted && !isHighlighted(r);
 
                     return (
-                      <div key={r.id} className="flex-1 flex flex-col items-center">
+                      <div key={r.id} className="flex flex-col items-center" style={{ width: '52px', height: '78px' }}>
                         <div
                           onClick={() => handleClickRound(r)}
                           className={`w-full rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
                             dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                           } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                          style={{ height: '65px' }}
+                          style={{ height: '50px' }}
                         >
                           {showNumbers && <span className={`text-sm font-bold ${style.text}`}>{r.roll}</span>}
                           {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
