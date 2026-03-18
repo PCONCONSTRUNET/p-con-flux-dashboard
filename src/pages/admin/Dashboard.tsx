@@ -7,47 +7,47 @@ import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContaine
 
 // Revenue mock data (last 7 days)
 const revenueData = [
-  { day: 'Seg', revenue: 1200, clients: 3 },
-  { day: 'Ter', revenue: 1800, clients: 5 },
-  { day: 'Qua', revenue: 2400, clients: 4 },
-  { day: 'Qui', revenue: 1600, clients: 6 },
-  { day: 'Sex', revenue: 3200, clients: 8 },
-  { day: 'Sáb', revenue: 2800, clients: 7 },
-  { day: 'Dom', revenue: 2100, clients: 4 },
-];
+{ day: 'Seg', revenue: 1200, clients: 3 },
+{ day: 'Ter', revenue: 1800, clients: 5 },
+{ day: 'Qua', revenue: 2400, clients: 4 },
+{ day: 'Qui', revenue: 1600, clients: 6 },
+{ day: 'Sex', revenue: 3200, clients: 8 },
+{ day: 'Sáb', revenue: 2800, clients: 7 },
+{ day: 'Dom', revenue: 2100, clients: 4 }];
+
 
 // Signal performance data
 const signalPerformanceData = [
-  { hour: '00h', greens: 12, losses: 2 },
-  { hour: '04h', greens: 8, losses: 3 },
-  { hour: '08h', greens: 18, losses: 4 },
-  { hour: '12h', greens: 24, losses: 5 },
-  { hour: '16h', greens: 20, losses: 3 },
-  { hour: '20h', greens: 15, losses: 2 },
-];
+{ hour: '00h', greens: 12, losses: 2 },
+{ hour: '04h', greens: 8, losses: 3 },
+{ hour: '08h', greens: 18, losses: 4 },
+{ hour: '12h', greens: 24, losses: 5 },
+{ hour: '16h', greens: 20, losses: 3 },
+{ hour: '20h', greens: 15, losses: 2 }];
+
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-card border border-border/30 rounded-xl px-3 py-2 shadow-xl" style={{ background: 'hsl(240, 6%, 10%)' }}>
         <p className="text-[10px] text-muted-foreground/60 font-semibold mb-1">{label}</p>
-        {payload.map((p: any, i: number) => (
-          <p key={i} className="text-xs font-bold" style={{ color: p.color }}>
+        {payload.map((p: any, i: number) =>
+        <p key={i} className="text-xs font-bold" style={{ color: p.color }}>
             {p.name}: {typeof p.value === 'number' && p.name === 'Receita' ? `R$ ${p.value.toLocaleString('pt-BR')}` : p.value}
           </p>
-        ))}
-      </div>
-    );
+        )}
+      </div>);
+
   }
   return null;
 };
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const activePatterns = mockPatterns.filter(p => p.status === 'active').length;
-  const greens = mockSignals.filter(s => s.result === 'green').length;
-  const losses = mockSignals.filter(s => s.result === 'loss').length;
-  const winRate = greens + losses > 0 ? Math.round((greens / (greens + losses)) * 100) : 0;
+  const activePatterns = mockPatterns.filter((p) => p.status === 'active').length;
+  const greens = mockSignals.filter((s) => s.result === 'green').length;
+  const losses = mockSignals.filter((s) => s.result === 'loss').length;
+  const winRate = greens + losses > 0 ? Math.round(greens / (greens + losses) * 100) : 0;
 
   const [clientStats, setClientStats] = useState({ total: 0, trial: 0, monthly: 0, annual: 0, active: 0, expired: 0 });
 
@@ -57,12 +57,12 @@ const AdminDashboard = () => {
       const { data: subs } = await supabase.from('subscriptions').select('plan, expires_at, is_active');
 
       const total = profiles?.length || 0;
-      const trial = subs?.filter(s => s.plan === 'trial').length || 0;
-      const monthly = subs?.filter(s => s.plan === 'monthly').length || 0;
-      const annual = subs?.filter(s => s.plan === 'annual').length || 0;
+      const trial = subs?.filter((s) => s.plan === 'trial').length || 0;
+      const monthly = subs?.filter((s) => s.plan === 'monthly').length || 0;
+      const annual = subs?.filter((s) => s.plan === 'annual').length || 0;
       const now = new Date();
-      const active = subs?.filter(s => new Date(s.expires_at) > now && s.is_active).length || 0;
-      const expired = subs?.filter(s => new Date(s.expires_at) <= now).length || 0;
+      const active = subs?.filter((s) => new Date(s.expires_at) > now && s.is_active).length || 0;
+      const expired = subs?.filter((s) => new Date(s.expires_at) <= now).length || 0;
 
       setClientStats({ total, trial, monthly, annual, active, expired });
     };
@@ -71,10 +71,10 @@ const AdminDashboard = () => {
 
   const totalRevenue = revenueData.reduce((acc, d) => acc + d.revenue, 0);
   const pieData = [
-    { name: 'Trial', value: clientStats.trial || 2, color: 'hsl(45, 93%, 58%)' },
-    { name: 'Mensal', value: clientStats.monthly || 5, color: 'hsl(187, 100%, 50%)' },
-    { name: 'Anual', value: clientStats.annual || 3, color: 'hsl(152, 69%, 55%)' },
-  ];
+  { name: 'Trial', value: clientStats.trial || 2, color: 'hsl(45, 93%, 58%)' },
+  { name: 'Mensal', value: clientStats.monthly || 5, color: 'hsl(187, 100%, 50%)' },
+  { name: 'Anual', value: clientStats.annual || 3, color: 'hsl(152, 69%, 55%)' }];
+
 
   return (
     <div className="space-y-6 animate-fade-in pb-8">
@@ -91,8 +91,8 @@ const AdminDashboard = () => {
         <div
           className="rounded-2xl p-4 border border-emerald-500/20 backdrop-blur-xl relative overflow-hidden cursor-pointer hover:scale-[1.02] transition-all"
           onClick={() => navigate('/admin/clients')}
-          style={{ background: 'linear-gradient(135deg, hsla(152,69%,55%,0.08) 0%, hsla(240,6%,8%,0.9) 100%)' }}
-        >
+          style={{ background: 'linear-gradient(135deg, hsla(152,69%,55%,0.08) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
+          
           <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-10 blur-2xl" style={{ background: 'hsl(152, 69%, 55%)' }} />
           <div className="flex items-center justify-between mb-3">
             <DollarSign size={18} className="text-emerald-400" />
@@ -108,8 +108,8 @@ const AdminDashboard = () => {
         <div
           className="rounded-2xl p-4 border border-primary/20 backdrop-blur-xl relative overflow-hidden cursor-pointer hover:scale-[1.02] transition-all"
           onClick={() => navigate('/admin/clients')}
-          style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.08) 0%, hsla(240,6%,8%,0.9) 100%)' }}
-        >
+          style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.08) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
+          
           <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-10 blur-2xl" style={{ background: 'hsl(187, 100%, 50%)' }} />
           <div className="flex items-center justify-between mb-3">
             <Users size={18} className="text-primary" />
@@ -124,8 +124,8 @@ const AdminDashboard = () => {
 
         <div
           className="rounded-2xl p-4 border border-emerald-500/20 backdrop-blur-xl relative overflow-hidden cursor-pointer hover:scale-[1.02] transition-all"
-          style={{ background: 'linear-gradient(135deg, hsla(152,69%,55%,0.08) 0%, hsla(240,6%,8%,0.9) 100%)' }}
-        >
+          style={{ background: 'linear-gradient(135deg, hsla(152,69%,55%,0.08) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
+          
           <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-10 blur-2xl" style={{ background: 'hsl(152, 69%, 55%)' }} />
           <div className="flex items-center justify-between mb-3">
             <TrendingUp size={18} className="text-emerald-400" />
@@ -136,8 +136,8 @@ const AdminDashboard = () => {
 
         <div
           className="rounded-2xl p-4 border border-amber-400/20 backdrop-blur-xl relative overflow-hidden cursor-pointer hover:scale-[1.02] transition-all"
-          style={{ background: 'linear-gradient(135deg, hsla(45,93%,58%,0.08) 0%, hsla(240,6%,8%,0.9) 100%)' }}
-        >
+          style={{ background: 'linear-gradient(135deg, hsla(45,93%,58%,0.08) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
+          
           <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-10 blur-2xl" style={{ background: 'hsl(45, 93%, 58%)' }} />
           <div className="flex items-center justify-between mb-3">
             <Activity size={18} className="text-amber-400" />
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Revenue Chart */}
         <div className="lg:col-span-2 rounded-2xl p-5 border border-border/30 backdrop-blur-xl"
-          style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.6) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
+        style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.6) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-bold text-foreground">Receita Semanal</h3>
@@ -173,7 +173,7 @@ const AdminDashboard = () => {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsla(240,6%,30%,0.2)" />
               <XAxis dataKey="day" tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+              <YAxis tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v}`} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsla(240,6%,50%,0.1)' }} />
               <Area type="monotone" dataKey="revenue" name="Receita" stroke="hsl(187, 100%, 50%)" strokeWidth={2.5} fill="url(#revenueGradient)" />
             </AreaChart>
@@ -182,7 +182,7 @@ const AdminDashboard = () => {
 
         {/* Plan Distribution */}
         <div className="rounded-2xl p-5 border border-border/30 backdrop-blur-xl"
-          style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.6) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
+        style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.6) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
           <h3 className="text-sm font-bold text-foreground mb-1">Distribuição de Planos</h3>
           <p className="text-[10px] text-muted-foreground/50 mb-3">Clientes por tipo</p>
           <ResponsiveContainer width="100%" height={160}>
@@ -195,24 +195,24 @@ const AdminDashboard = () => {
                 outerRadius={70}
                 paddingAngle={4}
                 dataKey="value"
-                strokeWidth={0}
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
+                strokeWidth={0}>
+                
+                {pieData.map((entry, index) =>
+                <Cell key={`cell-${index}`} fill={entry.color} />
+                )}
               </Pie>
             </PieChart>
           </ResponsiveContainer>
           <div className="space-y-2 mt-2">
-            {pieData.map(p => (
-              <div key={p.name} className="flex items-center justify-between">
+            {pieData.map((p) =>
+            <div key={p.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ background: p.color }} />
                   <span className="text-[11px] text-muted-foreground/70">{p.name}</span>
                 </div>
                 <span className="text-xs font-bold text-foreground">{p.value}</span>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -221,7 +221,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Signal Performance */}
         <div className="rounded-2xl p-5 border border-border/30 backdrop-blur-xl"
-          style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.6) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
+        style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.6) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-bold text-foreground">Performance de Sinais</h3>
@@ -253,7 +253,7 @@ const AdminDashboard = () => {
         {/* Plan Stats Cards */}
         <div className="space-y-3">
           <div className="rounded-2xl p-4 border border-primary/20 backdrop-blur-xl flex items-center gap-4"
-            style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.06) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
+          style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.06) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
             <div className="w-12 h-12 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center shadow-lg shadow-primary/10">
               <Zap size={22} className="text-primary" />
             </div>
@@ -265,7 +265,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="rounded-2xl p-4 border border-emerald-500/20 backdrop-blur-xl flex items-center gap-4"
-            style={{ background: 'linear-gradient(135deg, hsla(152,69%,55%,0.06) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
+          style={{ background: 'linear-gradient(135deg, hsla(152,69%,55%,0.06) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
             <div className="w-12 h-12 rounded-xl bg-emerald-400/15 border border-emerald-400/25 flex items-center justify-center shadow-lg shadow-emerald-400/10">
               <Crown size={22} className="text-emerald-400" />
             </div>
@@ -277,7 +277,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="rounded-2xl p-4 border border-amber-400/20 backdrop-blur-xl flex items-center gap-4"
-            style={{ background: 'linear-gradient(135deg, hsla(45,93%,58%,0.06) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
+          style={{ background: 'linear-gradient(135deg, hsla(45,93%,58%,0.06) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
             <div className="w-12 h-12 rounded-xl bg-amber-400/15 border border-amber-400/25 flex items-center justify-center shadow-lg shadow-amber-400/10">
               <Clock size={22} className="text-amber-400" />
             </div>
@@ -289,7 +289,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="rounded-2xl p-4 border border-secondary/20 backdrop-blur-xl flex items-center gap-4"
-            style={{ background: 'linear-gradient(135deg, hsla(345,100%,50%,0.06) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
+          style={{ background: 'linear-gradient(135deg, hsla(345,100%,50%,0.06) 0%, hsla(240,6%,8%,0.9) 100%)' }}>
             <div className="w-12 h-12 rounded-xl bg-secondary/15 border border-secondary/25 flex items-center justify-center">
               <BarChart3 size={22} className="text-secondary" />
             </div>
@@ -303,64 +303,64 @@ const AdminDashboard = () => {
       </div>
 
       {/* Recent Events */}
-      <div className="rounded-2xl p-5 border border-border/30 backdrop-blur-xl"
-        style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.6) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-foreground">Eventos Recentes</h3>
-          <button onClick={() => navigate('/admin/catalog')} className="text-[10px] text-primary font-semibold flex items-center gap-1 hover:underline">
-            Ver todos <ArrowRight size={10} />
-          </button>
-        </div>
-        <div className="space-y-2">
-          {mockAlerts.slice(0, 5).map(alert => {
-            const time = new Date(alert.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            const statusColor = alert.status === 'detected' ? 'bg-primary' : alert.status === 'analyzing' ? 'bg-amber-400' : 'bg-emerald-400';
-            return (
-              <div
-                key={alert.id}
-                className="rounded-xl p-3.5 flex items-center justify-between border border-border/20 hover:border-border/40 transition-all backdrop-blur-sm"
-                style={{ background: 'hsla(240,6%,10%,0.5)' }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${statusColor}`} />
-                  <div>
-                    <span className="text-sm font-semibold text-foreground">{alert.patternName}</span>
-                    <p className="text-[10px] text-muted-foreground/50 line-clamp-1 max-w-[300px]">{alert.details}</p>
-                  </div>
-                </div>
-                <span className="text-[10px] text-muted-foreground/40 font-mono shrink-0 ml-3">{time}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         <button
           onClick={() => navigate('/admin/patterns')}
           className="py-3.5 rounded-2xl font-semibold text-sm tracking-wide transition-all border border-primary/25 text-primary flex items-center justify-center gap-2 hover:bg-primary/10"
-          style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.08) 0%, hsla(240,6%,8%,0.8) 100%)' }}
-        >
+          style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.08) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
+          
           Padrões <ArrowRight size={14} />
         </button>
         <button
           onClick={() => navigate('/admin/clients')}
           className="py-3.5 rounded-2xl font-semibold text-sm tracking-wide transition-all border border-emerald-500/25 text-emerald-400 flex items-center justify-center gap-2 hover:bg-emerald-500/10"
-          style={{ background: 'linear-gradient(135deg, hsla(152,69%,55%,0.08) 0%, hsla(240,6%,8%,0.8) 100%)' }}
-        >
+          style={{ background: 'linear-gradient(135deg, hsla(152,69%,55%,0.08) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
+          
           Clientes <ArrowRight size={14} />
         </button>
         <button
           onClick={() => navigate('/admin/users')}
           className="py-3.5 rounded-2xl font-semibold text-sm tracking-wide transition-all border border-secondary/25 text-secondary flex items-center justify-center gap-2 hover:bg-secondary/10 col-span-2 lg:col-span-1"
-          style={{ background: 'linear-gradient(135deg, hsla(345,100%,50%,0.08) 0%, hsla(240,6%,8%,0.8) 100%)' }}
-        >
+          style={{ background: 'linear-gradient(135deg, hsla(345,100%,50%,0.08) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
+          
           Usuários <ArrowRight size={14} />
         </button>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminDashboard;
