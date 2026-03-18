@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Search, CheckCircle2, XCircle, Clock, TrendingUp } from 'lucide-react';
 import { mockSignals, mockBlazeRounds, type SignalResult } from '@/data/mockData';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import LockedFeature from '@/components/LockedFeature';
 
 const History = () => {
   const [tab, setTab] = useState<'signals' | 'rounds'>('signals');

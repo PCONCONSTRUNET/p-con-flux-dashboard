@@ -16,6 +16,7 @@ const stateLabels: Record<AnalysisState, string> = {
 };
 
 const ClientDashboard = () => {
+  const { hasActiveSubscription } = useSubscription();
   const [maxGale, setMaxGale] = useState(1);
   const [minAssert, setMinAssert] = useState(95);
   const [signals, setSignals] = useState<Signal[]>(mockSignals.filter((s) => s.result !== 'pending'));

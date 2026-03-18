@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Filter, Clock, Trash2 } from 'lucide-react';
+import { Filter, Clock, Trash2, Lock } from 'lucide-react';
 import { mockBlazeRounds, type BlazeColor, type BlazeRound } from '@/data/mockData';
 import blazeIcon from '@/assets/blaze-icon.png';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 const colorStyles: Record<BlazeColor, { bg: string; ring: string; text: string; label: string }> = {
   red: { bg: 'bg-secondary', ring: 'ring-secondary/40', text: 'text-white', label: 'Vermelho' },
