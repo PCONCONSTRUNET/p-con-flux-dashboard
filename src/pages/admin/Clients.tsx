@@ -374,33 +374,60 @@ const ClientsPage = () => {
                 const cfg = planConfig[p];
                 const PIcon = cfg.icon;
                 const isSelected = editPlan === p;
-                const duration = p === 'trial' ? '3 horas' : p === 'monthly' ? '30 dias' : '365 dias';
+                const duration = p === 'trial' ? `${editDays} dia${editDays !== 1 ? 's' : ''}` : p === 'monthly' ? '30 dias' : '365 dias';
                 return (
-                  <button
-                    key={p}
-                    onClick={() => setEditPlan(p)}
-                    className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl border-2 transition-all duration-200 text-left group ${
-                      isSelected
-                        ? 'border-primary/50 bg-primary/5'
-                        : 'border-border/15 bg-muted/5 hover:border-border/30 hover:bg-muted/10'
-                    }`}
-                    style={isSelected ? { boxShadow: '0 0 20px hsla(187, 100%, 50%, 0.08)' } : {}}
-                  >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                      isSelected ? 'bg-primary/15' : 'bg-muted/15'
-                    }`}>
-                      <PIcon size={20} className={isSelected ? cfg.color : 'text-muted-foreground/50'} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-display font-bold tracking-wide ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>{cfg.label}</p>
-                      <p className={`text-xs mt-0.5 ${isSelected ? 'text-muted-foreground' : 'text-muted-foreground/40'}`}>{duration}</p>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                      isSelected ? 'border-primary bg-primary/10' : 'border-border/30'
-                    }`}>
-                      {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                    </div>
-                  </button>
+                  <div key={p}>
+                    <button
+                      onClick={() => setEditPlan(p)}
+                      className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl border-2 transition-all duration-200 text-left group ${
+                        isSelected
+                          ? 'border-primary/50 bg-primary/5'
+                          : 'border-border/15 bg-muted/5 hover:border-border/30 hover:bg-muted/10'
+                      }`}
+                      style={isSelected ? { boxShadow: '0 0 20px hsla(187, 100%, 50%, 0.08)' } : {}}
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                        isSelected ? 'bg-primary/15' : 'bg-muted/15'
+                      }`}>
+                        <PIcon size={20} className={isSelected ? cfg.color : 'text-muted-foreground/50'} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-display font-bold tracking-wide ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>{cfg.label}</p>
+                        <p className={`text-xs mt-0.5 ${isSelected ? 'text-muted-foreground' : 'text-muted-foreground/40'}`}>{duration}</p>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        isSelected ? 'border-primary bg-primary/10' : 'border-border/30'
+                      }`}>
+                        {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                      </div>
+                    </button>
+
+                    {/* Editable days for trial */}
+                    {p === 'trial' && isSelected && (
+                      <div className="mt-2 ml-14 flex items-center gap-3">
+                        <button
+                          onClick={() => setEditDays(Math.max(1, editDays - 1))}
+                          className="w-8 h-8 rounded-lg border border-border/20 bg-muted/10 text-foreground font-bold text-sm flex items-center justify-center hover:bg-muted/20 transition-colors"
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          min={1}
+                          value={editDays}
+                          onChange={(e) => setEditDays(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-16 h-8 rounded-lg border border-border/20 bg-background/40 text-center text-sm font-bold text-foreground focus:border-primary/40 outline-none transition-colors"
+                        />
+                        <button
+                          onClick={() => setEditDays(editDays + 1)}
+                          className="w-8 h-8 rounded-lg border border-border/20 bg-muted/10 text-foreground font-bold text-sm flex items-center justify-center hover:bg-muted/20 transition-colors"
+                        >
+                          +
+                        </button>
+                        <span className="text-xs text-muted-foreground/50">dias</span>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
