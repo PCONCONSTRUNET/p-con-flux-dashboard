@@ -330,11 +330,14 @@ const LiveCatalog = () => {
           {fixedGrid.map((block, rowIdx) => (
             <div key={`block-${rowIdx}`} className="grid gap-1 mt-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
               {block.rounds.map((cell, col) => (
-                <div key={`cell-${rowIdx}-${col}`} className="flex gap-1 items-stretch">
+                <div key={`cell-${rowIdx}-${col}`} className="flex gap-1 items-start">
                   {cell.map((r, slot) => {
                     if (!r) {
                       return (
-                        <div key={`empty-${rowIdx}-${col}-${slot}`} className="flex-1 aspect-square rounded-lg border border-border/20 bg-muted/8" />
+                        <div key={`empty-${rowIdx}-${col}-${slot}`} className="flex-1">
+                          <div className="w-full aspect-square rounded-lg border border-border/20 bg-muted/8" />
+                          {showTimestamps && <div className="h-[14px]" />}
+                        </div>
                       );
                     }
 
@@ -353,7 +356,7 @@ const LiveCatalog = () => {
                           {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                         </div>
                         {showTimestamps && (
-                          <span className="text-[9px] font-sans font-semibold text-muted-foreground tracking-tight">
+                          <span className="text-[9px] font-sans font-semibold text-muted-foreground tracking-tight leading-[14px]">
                             {formatTime(r.timestamp)}
                           </span>
                         )}
