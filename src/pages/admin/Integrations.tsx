@@ -39,7 +39,6 @@ export default function Integrations() {
         setConfig({
           accessToken: parsed.accessToken || '',
           publicKey: parsed.publicKey || '',
-          webhookUrl: parsed.webhookUrl || '',
           monthlyPrice: parsed.monthlyPrice || '',
           annualPrice: parsed.annualPrice || '',
         });
