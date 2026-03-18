@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { CreditCard, Eye, EyeOff, Save, ShieldCheck, ExternalLink, CheckCircle2, AlertCircle, RefreshCw, Key, Link2, FileText } from 'lucide-react';
+import { CreditCard, Eye, EyeOff, Save, ShieldCheck, ExternalLink, CheckCircle2, AlertCircle, RefreshCw, Key, Link2, FileText, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Integrations() {
