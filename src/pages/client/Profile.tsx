@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { User, Mail, LogOut, Phone, Send, Save, Check, Clock, Crown, Zap, Calendar } from 'lucide-react';
+import { User, Mail, LogOut, Phone, Send, Save, Check, Clock, Crown, Zap, Calendar, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
