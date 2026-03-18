@@ -114,13 +114,17 @@ const LiveCatalog = () => {
     }
   }, [highlighted]);
 
+  // Build a lookup map for highlighted target to avoid O(n) .find() per stone
+  const highlightedTarget = useMemo(() => {
+    if (!highlighted) return null;
+    return rounds.find(r => r.id === highlighted) || null;
+  }, [highlighted, rounds]);
+
   const isHighlighted = useCallback((round: BlazeRound) => {
-    if (!highlighted) return false;
-    const target = rounds.find(r => r.id === highlighted);
-    if (!target) return false;
-    if (highlightMode === 'same_color') return round.color === target.color;
-    return round.roll === target.roll;
-  }, [highlighted, highlightMode, rounds]);
+    if (!highlightedTarget) return false;
+    if (highlightMode === 'same_color') return round.color === highlightedTarget.color;
+    return round.roll === highlightedTarget.roll;
+  }, [highlightedTarget, highlightMode]);
 
   const formatTime = (ts: string) => {
     return new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
