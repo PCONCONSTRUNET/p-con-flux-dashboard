@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import pconLogo from '@/assets/pcon-flux-logo.png';
 import iconPix from '@/assets/icon-pix.png';
 import iconCard from '@/assets/icon-card.png';
+import LoginBackground from '@/components/LoginBackground';
 
 declare global {
   interface Window {
