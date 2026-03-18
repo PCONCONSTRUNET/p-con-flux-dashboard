@@ -352,7 +352,7 @@ const LiveCatalog = () => {
 
       {fixedColumns ? (
         /* Fixed columns — scrollable on mobile */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-2 lg:p-3 overflow-auto max-h-[500px] lg:max-h-[600px]">
+        <div className="overflow-x-auto">
           {/* Header row — responsive column widths */}
           <div className="grid gap-1 lg:gap-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 108px))' }}>
             {Array.from({ length: 10 }, (_, col) => (
