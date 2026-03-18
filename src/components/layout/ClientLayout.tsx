@@ -170,17 +170,17 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-4 lg:p-6 pb-20 lg:pb-6 overflow-auto relative">
+        <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 overflow-auto relative min-h-0">
           <div className="absolute inset-0 pointer-events-none opacity-30"
             style={{ background: 'radial-gradient(ellipse at 80% 20%, hsla(187,100%,50%,0.04) 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, hsla(345,100%,50%,0.04) 0%, transparent 50%)' }}
           />
-          <div className="relative z-10">{children}</div>
+          <div className="relative z-10 pb-safe">{children}</div>
         </main>
       </div>
 
       {/* Bottom nav - mobile */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-border/50 flex justify-around py-1.5 z-40 backdrop-blur-xl"
-        style={{ background: 'linear-gradient(180deg, hsla(240,6%,7%,0.92) 0%, hsla(240,6%,5%,0.98) 100%)' }}>
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-border/50 flex justify-around py-2 z-40 backdrop-blur-xl"
+        style={{ background: 'linear-gradient(180deg, hsla(240,6%,7%,0.95) 0%, hsla(240,6%,5%,0.98) 100%)', paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         {navItems.map(item => {
           const locked = item.requiresSub && !hasActiveSubscription;
