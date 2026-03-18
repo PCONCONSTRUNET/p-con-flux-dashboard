@@ -1,135 +1,249 @@
-import { useState, useEffect } from 'react';
-import { Zap, CheckCircle, XCircle, Clock, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Zap, Trophy, XCircle, Percent, ChevronDown, ExternalLink, Loader2 } from 'lucide-react';
 import { mockSignals, type Signal, type SignalResult } from '@/data/mockData';
-
-const resultConfig: Record<SignalResult, { label: string; color: string; bg: string; icon: typeof CheckCircle }> = {
-  green: { label: 'GREEN ✅', color: 'text-emerald-400', bg: 'border-emerald-500/30 bg-emerald-500/5', icon: CheckCircle },
-  loss: { label: 'LOSS ❌', color: 'text-secondary', bg: 'border-secondary/30 bg-secondary/5', icon: XCircle },
-  pending: { label: 'AGUARDANDO...', color: 'text-primary', bg: 'border-primary/30 bg-primary/5', icon: Loader2 },
-};
+import flameIcon from '@/assets/flame-icon.png';
 
 const ClientDashboard = () => {
+  const [maxGale, setMaxGale] = useState(1);
+  const [minAssert, setMinAssert] = useState(95);
   const [signals, setSignals] = useState<Signal[]>(mockSignals);
-  const [filter, setFilter] = useState<'all' | SignalResult>('all');
+  const [analyzing, setAnalyzing] = useState(false);
+  const [showGaleDropdown, setShowGaleDropdown] = useState(false);
+  const [showAssertDropdown, setShowAssertDropdown] = useState(false);
 
   const greens = signals.filter(s => s.result === 'green').length;
   const losses = signals.filter(s => s.result === 'loss').length;
-  const pending = signals.filter(s => s.result === 'pending').length;
-  const winRate = greens + losses > 0 ? Math.round((greens / (greens + losses)) * 100) : 0;
+  const assertRate = greens + losses > 0 ? Math.round((greens / (greens + losses)) * 100) : 100;
+  const pending = signals.filter(s => s.result === 'pending');
+  const lastSignal = signals[0];
 
-  const filtered = filter === 'all' ? signals : signals.filter(s => s.result === filter);
-
-  // Simulate live signal arrival
+  // Simulate auto signals
   useEffect(() => {
     const interval = setInterval(() => {
       setSignals(prev => prev.map(s =>
-        s.result === 'pending' ? { ...s, result: Math.random() > 0.3 ? 'green' as const : 'loss' as const } : s
+        s.result === 'pending'
+          ? { ...s, result: Math.random() > 0.25 ? 'green' as const : 'loss' as const }
+          : s
       ));
-    }, 15000);
+    }, 12000);
     return () => clearInterval(interval);
   }, []);
 
+  const handleAnalyze = useCallback(() => {
+    setAnalyzing(true);
+    setTimeout(() => {
+      const newSignal: Signal = {
+        id: `s-${Date.now()}`,
+        type: 'Auto',
+        entry: `${Math.random() > 0.5 ? 'Vermelho' : 'Preto'} → ${Math.random() > 0.5 ? 'Preto' : 'Vermelho'}`,
+        protection: `${maxGale} Gale${maxGale > 1 ? 's' : ''}`,
+        result: 'pending',
+        timestamp: new Date().toISOString(),
+        rounds: 0,
+        target: 'Double',
+      };
+      setSignals(prev => [newSignal, ...prev]);
+      setAnalyzing(false);
+    }, 2500);
+  }, [maxGale]);
+
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-4 animate-fade-in max-w-lg mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 glow-primary">
-          <Zap size={20} className="text-primary" />
-        </div>
-        <div>
-          <h1 className="text-xl lg:text-2xl font-display font-bold text-foreground tracking-wide">Sinais Flux</h1>
-          <div className="flex items-center gap-2 mt-0.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">Ao vivo</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <img src={flameIcon} alt="" className="w-7 h-7" />
+          <div>
+            <h1 className="text-lg font-bold text-foreground tracking-tight">
+              SINAIS <span className="text-primary">FLUX</span>
+            </h1>
           </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">Online</span>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="rounded-xl p-4 border border-emerald-500/20 bg-emerald-500/5 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-emerald-500/40 to-transparent" />
-          <TrendingUp size={16} className="text-emerald-400 mb-1" />
-          <div className="text-2xl font-display font-bold text-emerald-400">{greens}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">Greens</div>
-        </div>
-        <div className="rounded-xl p-4 border border-secondary/20 bg-secondary/5 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-secondary/40 to-transparent" />
-          <TrendingDown size={16} className="text-secondary mb-1" />
-          <div className="text-2xl font-display font-bold text-secondary">{losses}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">Losses</div>
-        </div>
-        <div className="rounded-xl p-4 border border-primary/20 bg-primary/5 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-primary/40 to-transparent" />
-          <Clock size={16} className="text-primary mb-1" />
-          <div className="text-2xl font-display font-bold text-primary">{pending}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">Pendentes</div>
-        </div>
-        <div className="rounded-xl p-4 border border-foreground/10 bg-foreground/5 relative overflow-hidden col-span-2 lg:col-span-1">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-foreground/20 to-transparent" />
-          <div className="text-2xl font-display font-bold text-foreground">{winRate}%</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">Win Rate</div>
-          {/* Mini bar */}
-          <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all" style={{ width: `${winRate}%` }} />
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {(['all', 'green', 'loss', 'pending'] as const).map(f => (
+      {/* Controls row */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Max Gale */}
+        <div className="relative">
           <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-display tracking-wider whitespace-nowrap transition-all ${
-              filter === f
-                ? 'bg-primary/15 text-primary border border-primary/30'
-                : 'bg-muted/50 text-muted-foreground border border-transparent hover:text-foreground'
-            }`}
+            onClick={() => { setShowGaleDropdown(!showGaleDropdown); setShowAssertDropdown(false); }}
+            className="w-full rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center gap-1 active:scale-[0.97] transition-all"
           >
-            {f === 'all' ? 'TODOS' : f === 'green' ? '✅ GREEN' : f === 'loss' ? '❌ LOSS' : '⏳ PENDENTE'}
+            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Max Gale</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xl font-bold text-foreground">{maxGale}</span>
+              <ChevronDown size={14} className="text-muted-foreground" />
+            </div>
           </button>
-        ))}
+          {showGaleDropdown && (
+            <div className="absolute top-full left-0 right-0 mt-1 z-30 rounded-xl border border-border/50 bg-card shadow-lg overflow-hidden animate-slide-up">
+              {[0, 1, 2, 3].map(g => (
+                <button key={g} onClick={() => { setMaxGale(g); setShowGaleDropdown(false); }}
+                  className={`w-full py-2.5 text-sm text-center transition-colors ${maxGale === g ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/50'}`}
+                >{g}</button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Filter Assert */}
+        <div className="relative">
+          <button
+            onClick={() => { setShowAssertDropdown(!showAssertDropdown); setShowGaleDropdown(false); }}
+            className="w-full rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center gap-1 active:scale-[0.97] transition-all"
+          >
+            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Filtro Assert.</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xl font-bold text-foreground">{minAssert}%</span>
+              <ChevronDown size={14} className="text-muted-foreground" />
+            </div>
+          </button>
+          {showAssertDropdown && (
+            <div className="absolute top-full left-0 right-0 mt-1 z-30 rounded-xl border border-border/50 bg-card shadow-lg overflow-hidden animate-slide-up">
+              {[80, 85, 90, 95, 100].map(a => (
+                <button key={a} onClick={() => { setMinAssert(a); setShowAssertDropdown(false); }}
+                  className={`w-full py-2.5 text-sm text-center transition-colors ${minAssert === a ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/50'}`}
+                >{a}%</button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Signals list */}
-      <div className="space-y-2.5">
-        {filtered.map((signal, idx) => {
-          const cfg = resultConfig[signal.result];
-          const Icon = cfg.icon;
-          const time = new Date(signal.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      {/* Open platform link */}
+      <button className="w-full rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex items-center justify-between active:scale-[0.98] transition-all hover:border-primary/30">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-muted/50 flex items-center justify-center">
+            <img src={flameIcon} alt="" className="w-5 h-5" />
+          </div>
+          <div className="text-left">
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Plataforma Oficial</div>
+            <div className="text-sm font-bold text-foreground">Abrir Jogo Double</div>
+          </div>
+        </div>
+        <ExternalLink size={16} className="text-muted-foreground" />
+      </button>
 
-          return (
-            <div
-              key={signal.id}
-              className={`rounded-xl p-4 border ${cfg.bg} transition-all hover:scale-[1.01] relative overflow-hidden`}
-              style={{ animationDelay: `${idx * 50}ms` }}
-            >
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-display bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-md tracking-wider">{signal.type}</span>
-                    <span className="text-[10px] text-muted-foreground/60 font-mono">{time}</span>
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
+          <Trophy size={18} className="text-emerald-400 mb-1" />
+          <span className="text-xl font-bold text-foreground">{greens}</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Wins</span>
+        </div>
+        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
+          <XCircle size={18} className="text-secondary mb-1" />
+          <span className="text-xl font-bold text-foreground">{losses}</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Losses</span>
+        </div>
+        <div className="rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center">
+          <Percent size={18} className="text-primary mb-1" />
+          <span className="text-xl font-bold text-foreground">{assertRate}%</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Assert.</span>
+        </div>
+      </div>
+
+      {/* Signal area */}
+      <div className="rounded-3xl p-6 border border-border/50 relative overflow-hidden"
+        style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.9) 0%, hsla(240,6%,8%,0.95) 100%)' }}>
+        {/* Top accent line */}
+        <div className="absolute top-0 left-1/4 right-1/4 h-1 rounded-b-full bg-gradient-to-r from-transparent via-secondary to-transparent" />
+
+        {/* Signal circle */}
+        <div className="flex justify-center mb-5">
+          <div className={`w-28 h-28 rounded-full border-[3px] flex items-center justify-center transition-all ${
+            analyzing
+              ? 'border-primary/50 animate-pulse'
+              : pending.length > 0
+                ? 'border-primary/40 shadow-[0_0_30px_hsla(187,100%,50%,0.15)]'
+                : lastSignal?.result === 'green'
+                  ? 'border-emerald-500/40 shadow-[0_0_30px_hsla(145,80%,50%,0.15)]'
+                  : lastSignal?.result === 'loss'
+                    ? 'border-secondary/40 shadow-[0_0_30px_hsla(345,100%,50%,0.15)]'
+                    : 'border-border/30'
+          }`}>
+            {analyzing ? (
+              <Loader2 size={36} className="text-primary animate-spin" />
+            ) : (
+              <Zap size={36} className={
+                pending.length > 0 ? 'text-primary' :
+                lastSignal?.result === 'green' ? 'text-emerald-400' :
+                lastSignal?.result === 'loss' ? 'text-secondary' : 'text-muted-foreground'
+              } />
+            )}
+          </div>
+        </div>
+
+        {/* Status text */}
+        <div className="text-center mb-5">
+          <h2 className="text-lg font-bold text-foreground tracking-wide">
+            SINAIS FLUX <span className="text-primary">2.0</span>
+          </h2>
+          <p className="text-[11px] text-muted-foreground mt-1 uppercase tracking-widest">
+            {analyzing ? 'Analisando padrões...' :
+             pending.length > 0 ? 'Sinal ativo — aguardando resultado' :
+             'Toque para analisar'}
+          </p>
+        </div>
+
+        {/* Analyze button */}
+        <button
+          onClick={handleAnalyze}
+          disabled={analyzing}
+          className="w-full py-3.5 rounded-2xl font-bold text-sm tracking-wider active:scale-[0.97] transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+          style={{
+            background: analyzing
+              ? 'linear-gradient(135deg, hsla(240,6%,20%,1), hsla(240,6%,15%,1))'
+              : 'linear-gradient(135deg, hsl(345, 100%, 50%), hsl(345, 80%, 40%))',
+            boxShadow: analyzing ? 'none' : '0 8px 32px hsla(345, 100%, 50%, 0.3)',
+          }}
+        >
+          {analyzing ? (
+            <><Loader2 size={16} className="animate-spin" /> ANALISANDO...</>
+          ) : (
+            <><Zap size={16} /> GERAR SINAL AGORA</>
+          )}
+        </button>
+      </div>
+
+      {/* Recent signals */}
+      {signals.filter(s => s.result !== 'pending').length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold px-1">Sinais recentes</h3>
+          {signals.filter(s => s.result !== 'pending').slice(0, 6).map(signal => {
+            const time = new Date(signal.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const isGreen = signal.result === 'green';
+            return (
+              <div
+                key={signal.id}
+                className={`rounded-2xl px-4 py-3 border backdrop-blur-sm flex items-center justify-between transition-all ${
+                  isGreen ? 'border-emerald-500/15 bg-emerald-500/5' : 'border-secondary/15 bg-secondary/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isGreen ? 'bg-emerald-500/15' : 'bg-secondary/15'}`}>
+                    {isGreen ? <Trophy size={14} className="text-emerald-400" /> : <XCircle size={14} className="text-secondary" />}
                   </div>
-                  <div className="text-sm font-semibold text-foreground">{signal.entry}</div>
-                  <div className="text-xs text-muted-foreground mt-1">Proteção: {signal.protection}</div>
-                  {signal.rounds > 0 && (
-                    <div className="text-[10px] text-muted-foreground/60 mt-1">
-                      {signal.result === 'green' ? `Acertou em ${signal.rounds} rodada${signal.rounds > 1 ? 's' : ''}` : `${signal.rounds} tentativa${signal.rounds > 1 ? 's' : ''}`}
-                    </div>
-                  )}
+                  <div>
+                    <div className="text-xs font-semibold text-foreground">{signal.entry}</div>
+                    <div className="text-[10px] text-muted-foreground">{signal.protection} • {signal.rounds > 0 ? `${signal.rounds}ª rodada` : ''}</div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <Icon size={16} className={`${cfg.color} ${signal.result === 'pending' ? 'animate-spin' : ''}`} />
-                  <span className={`text-xs font-display font-bold ${cfg.color}`}>{cfg.label}</span>
+                <div className="text-right">
+                  <span className={`text-[10px] font-bold ${isGreen ? 'text-emerald-400' : 'text-secondary'}`}>
+                    {isGreen ? 'WIN ✅' : 'LOSS ❌'}
+                  </span>
+                  <div className="text-[9px] text-muted-foreground/50 font-mono">{time}</div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
