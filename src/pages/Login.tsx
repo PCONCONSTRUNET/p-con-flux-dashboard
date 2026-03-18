@@ -133,7 +133,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/forgot-password')}
-                  className="text-sm text-primary hover:underline"
+                  className="text-xs text-primary hover:underline"
                 >
                   Esqueci a senha
                 </button>
