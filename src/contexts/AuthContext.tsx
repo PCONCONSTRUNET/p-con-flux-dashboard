@@ -23,8 +23,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 async function fetchUserRole(userId: string): Promise<UserRole> {
-  const { data } = await supabase.rpc('has_role', { _user_id: userId, _role: 'admin' });
-  return data ? 'admin' : 'client';
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching role:', error);
+      return 'client';
+    }
+    return data ? 'admin' : 'client';
+  } catch (e) {
+    console.error('Role fetch failed:', e);
+    return 'client';
+  }
 }
 
 async function buildUser(supabaseUser: SupabaseUser): Promise<User> {
