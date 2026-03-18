@@ -254,32 +254,8 @@ const Patterns = () => {
                 </div>
               </div>
 
-              {/* Mode Toggle */}
-              <div>
-                <label className="block text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mb-2">Condição</label>
-                <div className="flex p-1 rounded-2xl bg-muted/20 border border-border/30">
-                  <button
-                    onClick={() => setConfig(c => ({ ...c, mode: 'when_exit' }))}
-                    className={`flex-1 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 flex items-center justify-center gap-1.5 ${
-                      config.mode === 'when_exit'
-                        ? 'bg-primary/20 text-primary border border-primary/25 shadow-lg shadow-primary/10'
-                        : 'text-muted-foreground/50'
-                    }`}
-                  >
-                    ✅ QUANDO SAIR
-                  </button>
-                  <button
-                    onClick={() => setConfig(c => ({ ...c, mode: 'when_not_exit' }))}
-                    className={`flex-1 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 ${
-                      config.mode === 'when_not_exit'
-                        ? 'bg-primary/20 text-primary border border-primary/25 shadow-lg shadow-primary/10'
-                        : 'text-muted-foreground/50'
-                    }`}
-                  >
-                    QUANDO NÃO SAIR
-                  </button>
-                </div>
-              </div>
+
+
 
               {/* Color tokens */}
               <div>
