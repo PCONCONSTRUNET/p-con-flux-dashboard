@@ -385,19 +385,23 @@ export default function Checkout() {
 
         {/* Glassmorphism Card */}
         <div
-          className="rounded-2xl border border-white/[0.08] overflow-hidden backdrop-blur-xl"
+          className="rounded-2xl border border-white/[0.12] overflow-hidden backdrop-blur-xl relative"
           style={{
-            background: 'linear-gradient(160deg, hsla(240, 5%, 15%, 0.6) 0%, hsla(240, 5%, 8%, 0.7) 100%)',
-            boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), inset 0 1px 0 hsla(0,0%,100%,0.05), 0 0 80px hsla(187, 100%, 50%, 0.03)',
+            background: 'linear-gradient(160deg, hsla(187, 80%, 20%, 0.25) 0%, hsla(240, 10%, 12%, 0.7) 40%, hsla(345, 60%, 15%, 0.15) 100%)',
+            boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), inset 0 1px 0 hsla(187,100%,70%,0.1), 0 0 100px hsla(187, 100%, 50%, 0.05)',
           }}
         >
-          <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
+          {/* Top gradient line */}
+          <div className="h-[2px] w-full" style={{ background: 'linear-gradient(90deg, hsl(345, 100%, 50%), hsl(187, 100%, 50%), hsl(260, 100%, 60%))' }} />
+
+          {/* Subtle inner gradient overlay */}
+          <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{ background: 'radial-gradient(ellipse at top center, hsla(187,100%,50%,0.04) 0%, transparent 60%)' }} />
 
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 text-center border-b border-white/[0.05]">
-            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3 drop-shadow-[0_0_12px_hsla(187,100%,50%,0.3)]" />
-            <h1 className="text-lg font-display font-bold text-foreground">Checkout Seguro</h1>
-            <p className="text-sm text-muted-foreground/50 mt-1">Finalize sua assinatura</p>
+          <div className="px-6 pt-6 pb-4 text-center border-b border-white/[0.08] relative">
+            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3 drop-shadow-[0_0_16px_hsla(187,100%,50%,0.4)]" />
+            <h1 className="text-xl font-display font-bold text-white">Checkout Seguro</h1>
+            <p className="text-sm text-white/60 mt-1">Finalize sua assinatura</p>
           </div>
 
           {/* Plan Summary */}
