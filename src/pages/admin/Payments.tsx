@@ -136,6 +136,7 @@ const PaymentsPage = () => {
   const [periodFilter, setPeriodFilter] = useState<FilterType>('weekly');
   const [customStart, setCustomStart] = useState<Date | undefined>();
   const [customEnd, setCustomEnd] = useState<Date | undefined>();
+  const [selectedPayment, setSelectedPayment] = useState<PaymentRecord | null>(null);
 
   const activeFilter = periodFilter === 'custom' ? 'weekly' : periodFilter;
   const revenueData = revenueDataSets[activeFilter];
