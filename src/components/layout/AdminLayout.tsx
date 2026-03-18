@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, Layers, LogOut, Menu, X, Shield, UserCheck, CreditCard, Activity, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Layers, LogOut, Menu, X, Shield, UserCheck, CreditCard, Activity, ChevronRight, Plug } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const navItems = [
