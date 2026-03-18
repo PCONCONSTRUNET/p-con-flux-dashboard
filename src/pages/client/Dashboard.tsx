@@ -108,8 +108,8 @@ const ClientDashboard = () => {
         {/* Giros Anteriores */}
         <div className="mb-4">
           <h3 className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-2">Giros anteriores</h3>
-          <div className="flex flex-wrap gap-1.5">
-            {mockBlazeRounds.slice(0, 20).map((r) => {
+          <div className="flex gap-1.5 overflow-hidden">
+            {mockBlazeRounds.slice(0, 15).map((r) => {
               const bg = r.color === 'red' ? 'bg-secondary' : r.color === 'white' ? 'bg-[hsl(0_0%_88%)]' : 'bg-[hsl(240_6%_15%)]';
               const border = r.color === 'red' ? 'border-secondary/40' : r.color === 'white' ? 'border-[hsl(0_0%_75%)]/40' : 'border-[hsl(240_6%_25%)]/40';
               const text = r.color === 'red' ? 'text-white' : r.color === 'white' ? 'text-[hsl(240_6%_10%)]' : 'text-muted-foreground';
