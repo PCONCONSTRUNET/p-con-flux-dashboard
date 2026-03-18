@@ -470,7 +470,7 @@ export default function Checkout() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/15 border border-primary/30' : 'bg-emerald-400/15 border border-emerald-400/30'}`}>
-                  <PlanIcon size={18} className={planColor} />
+                  <img src={fluxFlame} alt="" className="w-6 h-6 object-contain" />
                 </div>
                 <div>
                   <p className="text-sm font-display font-bold text-white">{planLabel}</p>
