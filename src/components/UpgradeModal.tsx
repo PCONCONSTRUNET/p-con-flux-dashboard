@@ -109,8 +109,7 @@ export default function UpgradeModal() {
             {/* Annual */}
             <button
               onClick={() => handleSubscribe('annual')}
-              disabled={loadingPlan !== null}
-              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-emerald-400/20 transition-all hover:border-emerald-400/40 group text-left relative overflow-hidden disabled:opacity-50"
+              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-emerald-400/20 transition-all hover:border-emerald-400/40 group text-left relative overflow-hidden"
               style={{ background: 'linear-gradient(135deg, hsla(155,80%,50%,0.05) 0%, hsla(155,80%,50%,0.01) 100%)' }}
             >
               {/* Best option badge */}
@@ -123,7 +122,7 @@ export default function UpgradeModal() {
                 className="w-11 h-11 shrink-0 rounded-xl border border-emerald-400/25 flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, hsla(155,80%,50%,0.15) 0%, hsla(155,80%,50%,0.05) 100%)' }}
               >
-                {loadingPlan === 'annual' ? <Loader2 size={20} className="text-emerald-400 animate-spin" /> : <Crown size={20} className="text-emerald-400" />}
+                <Crown size={20} className="text-emerald-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX ANUAL</p>
@@ -132,7 +131,7 @@ export default function UpgradeModal() {
               <div className="text-right shrink-0 mt-2">
                 <p className="text-lg font-bold text-emerald-400">R$ {annualPrice}</p>
                 <span className="text-[10px] font-bold text-emerald-400/60 tracking-widest group-hover:translate-x-0.5 transition-transform inline-block">
-                  {loadingPlan === 'annual' ? 'AGUARDE...' : 'ASSINAR →'}
+                  ASSINAR →
                 </span>
               </div>
             </button>
