@@ -7,8 +7,6 @@ import logo from '@/assets/logo.png';
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
   { label: 'Padrões', icon: Layers, path: '/admin/patterns' },
-  { label: 'Catálogo Ao Vivo', icon: BarChart3, path: '/admin/catalog' },
-  { label: 'Histórico', icon: Clock, path: '/admin/history' },
   { label: 'Usuários', icon: Users, path: '/admin/users' },
   { label: 'Clientes', icon: UserCheck, path: '/admin/clients' },
 ];
