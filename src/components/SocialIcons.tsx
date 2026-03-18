@@ -2,7 +2,7 @@ const socials = [
   {
     name: 'WhatsApp',
     key: 'whatsapp',
-    link: '#',
+    link: 'https://wa.me/5548996915303',
     color: 'rgba(37, 211, 102, 0.6)',
     gradient: 'linear-gradient(135deg, #0a3d1a, #128c3e, #25d366, #0d2916)',
     icon: (
