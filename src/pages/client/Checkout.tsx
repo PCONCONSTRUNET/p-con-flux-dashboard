@@ -332,7 +332,7 @@ export default function Checkout() {
                     : 'text-muted-foreground/50 hover:text-muted-foreground/70'
                 }`}
               >
-                <CreditCard size={16} />
+                <img src={iconCard} alt="Cartão" className="w-5 h-5" />
                 Cartão
               </button>
             </div>
