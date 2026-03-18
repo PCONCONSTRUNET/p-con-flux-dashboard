@@ -13,6 +13,16 @@ export default function Integrations() {
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [copied, setCopied] = useState(false);
+
+  const webhookUrl = `https://xrphlhlqksxnkldsypap.supabase.co/functions/v1/mp-webhook`;
+
+  const handleCopyWebhook = () => {
+    navigator.clipboard.writeText(webhookUrl);
+    setCopied(true);
+    toast.success('URL copiada!');
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const [config, setConfig] = useState({
     accessToken: '',
