@@ -1,8 +1,23 @@
-import { useState } from 'react';
-import { mockPatterns, Pattern } from '@/data/mockData';
-import { Plus, Search, Edit, Power, X, Minus, Layers, Trash2, Copy, Eye, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Plus, Search, Edit, Power, X, Minus, Layers, Trash2, ChevronDown, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 type ColorToken = 'black' | 'red' | 'white';
+
+interface PatternRow {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  mode: string;
+  colors: string[];
+  numbers: number[];
+  gales: number;
+  victory_target: string;
+  created_at: string;
+  updated_at: string;
+}
 
 interface PatternConfig {
   name: string;
@@ -51,11 +66,42 @@ const defaultConfig: PatternConfig = {
 };
 
 const Patterns = () => {
-  const [patterns, setPatterns] = useState<Pattern[]>(mockPatterns);
+  const [patterns, setPatterns] = useState<PatternRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [config, setConfig] = useState<PatternConfig>({ ...defaultConfig });
+  const [saving, setSaving] = useState(false);
+
+  const fetchPatterns = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('patterns')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching patterns:', error);
+      toast.error('Erro ao carregar padrões');
+    } else {
+      setPatterns((data as PatternRow[]) || []);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchPatterns();
+
+    // Realtime subscription
+    const channel = supabase
+      .channel('patterns-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'patterns' }, () => {
+        fetchPatterns();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchPatterns]);
 
   const filtered = patterns.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -68,33 +114,48 @@ const Patterns = () => {
     setShowForm(true);
   };
 
-  const openEdit = (p: Pattern) => {
+  const openEdit = (p: PatternRow) => {
     setConfig({
       name: p.name,
       description: p.description,
-      status: p.status,
-      mode: 'when_exit',
-      colors: [],
-      numbers: [],
-      gales: 2,
-      victoryTarget: 'reds',
+      status: p.status as 'active' | 'inactive',
+      mode: (p.mode || 'when_exit') as PatternConfig['mode'],
+      colors: (p.colors || []) as ColorToken[],
+      numbers: p.numbers || [],
+      gales: p.gales ?? 2,
+      victoryTarget: (p.victory_target || 'reds') as PatternConfig['victoryTarget'],
     });
     setEditingId(p.id);
     setShowForm(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!config.name.trim()) return;
-    const colorsStr = config.colors.join(', ');
-    const numbersStr = config.numbers.join(', ');
-    const params = `Cores: [${colorsStr}] | Números: [${numbersStr}] | Gales: ${config.gales} | Vitória: ${config.victoryTarget}`;
-    const rules = `Modo: ${config.mode === 'when_exit' ? 'Quando sair' : 'Quando não sair'}`;
+    setSaving(true);
+
+    const payload = {
+      name: config.name.trim(),
+      description: config.description.trim(),
+      status: config.status,
+      mode: config.mode,
+      colors: config.colors,
+      numbers: config.numbers,
+      gales: config.gales,
+      victory_target: config.victoryTarget,
+      updated_at: new Date().toISOString(),
+    };
 
     if (editingId) {
-      setPatterns(prev => prev.map(p => p.id === editingId ? { ...p, name: config.name, description: config.description, status: config.status, parameters: params, rules } : p));
+      const { error } = await supabase.from('patterns').update(payload).eq('id', editingId);
+      if (error) { toast.error('Erro ao atualizar padrão'); console.error(error); }
+      else toast.success('Padrão atualizado!');
     } else {
-      setPatterns(prev => [...prev, { id: Date.now().toString(), name: config.name, description: config.description, status: config.status, parameters: params, rules, createdAt: new Date().toISOString().split('T')[0] }]);
+      const { error } = await supabase.from('patterns').insert(payload);
+      if (error) { toast.error('Erro ao criar padrão'); console.error(error); }
+      else toast.success('Padrão criado!');
     }
+
+    setSaving(false);
     setShowForm(false);
   };
 
@@ -114,13 +175,26 @@ const Patterns = () => {
     setConfig(prev => ({ ...prev, numbers: prev.numbers.filter((_, i) => i !== index) }));
   };
 
-  const toggleStatus = (id: string) => {
-    setPatterns(prev => prev.map(p => p.id === id ? { ...p, status: p.status === 'active' ? 'inactive' : 'active' } : p));
+  const toggleStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const { error } = await supabase.from('patterns').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', id);
+    if (error) toast.error('Erro ao alterar status');
+    else toast.success(newStatus === 'active' ? 'Padrão ativado!' : 'Padrão desativado!');
   };
 
-  const deletePattern = (id: string) => {
-    setPatterns(prev => prev.filter(p => p.id !== id));
+  const deletePattern = async (id: string) => {
+    const { error } = await supabase.from('patterns').delete().eq('id', id);
+    if (error) toast.error('Erro ao excluir padrão');
+    else toast.success('Padrão excluído!');
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
 
   // Empty state
   if (patterns.length === 0 && !showForm) {
@@ -191,12 +265,33 @@ const Patterns = () => {
               </div>
             </div>
 
+            {/* Info tags */}
+            {(p.colors.length > 0 || p.numbers.length > 0) && (
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                {p.colors.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    {p.colors.map((c, i) => {
+                      const ct = colorTokens.find(t => t.id === c);
+                      return ct ? <div key={i} className={`w-4 h-4 rounded-full ${ct.bg} border ${ct.border}`} /> : null;
+                    })}
+                  </div>
+                )}
+                {p.numbers.length > 0 && (
+                  <span className="text-[10px] text-muted-foreground/40">Nº: {p.numbers.join(', ')}</span>
+                )}
+                <span className="text-[10px] text-muted-foreground/30">|</span>
+                <span className="text-[10px] text-muted-foreground/40">Gales: {p.gales}</span>
+                <span className="text-[10px] text-muted-foreground/30">|</span>
+                <span className="text-[10px] text-muted-foreground/40">Vitória: {p.victory_target}</span>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/10">
               <button onClick={() => openEdit(p)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-card/40 border border-border/20 text-xs text-muted-foreground hover:text-foreground hover:border-border/40 transition-all">
                 <Edit size={12} /> Editar
               </button>
-              <button onClick={() => toggleStatus(p.id)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs transition-all ${p.status === 'active' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-card/40 border-border/20 text-muted-foreground hover:text-foreground'}`}>
+              <button onClick={() => toggleStatus(p.id, p.status)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs transition-all ${p.status === 'active' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-card/40 border-border/20 text-muted-foreground hover:text-foreground'}`}>
                 <Power size={12} /> {p.status === 'active' ? 'Desativar' : 'Ativar'}
               </button>
               <button onClick={() => deletePattern(p.id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary/5 border border-secondary/15 text-xs text-secondary/70 hover:text-secondary hover:border-secondary/30 transition-all">
@@ -227,51 +322,26 @@ const Patterns = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mb-1.5">Nome do padrão</label>
-                  <input
-                    type="text"
-                    value={config.name}
-                    onChange={e => setConfig(c => ({ ...c, name: e.target.value }))}
-                    placeholder="Ex: Sequência Alpha-7"
-                    maxLength={50}
-                    className="w-full bg-muted/20 border border-border/30 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/25 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-                  />
+                  <input type="text" value={config.name} onChange={e => setConfig(c => ({ ...c, name: e.target.value }))} placeholder="Ex: Sequência Alpha-7" maxLength={50}
+                    className="w-full bg-muted/20 border border-border/30 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/25 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
                 </div>
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mb-1.5">Descrição</label>
-                  <input
-                    type="text"
-                    value={config.description}
-                    onChange={e => setConfig(c => ({ ...c, description: e.target.value }))}
-                    placeholder="Descreva o padrão"
-                    maxLength={100}
-                    className="w-full bg-muted/20 border border-border/30 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/25 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-                  />
+                  <input type="text" value={config.description} onChange={e => setConfig(c => ({ ...c, description: e.target.value }))} placeholder="Descreva o padrão" maxLength={100}
+                    className="w-full bg-muted/20 border border-border/30 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/25 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
                 </div>
               </div>
-
-
-
 
               {/* Color tokens */}
               <div>
                 <label className="block text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mb-2">Montar usando cores:</label>
                 <div className="flex flex-wrap gap-2">
-                  {colorTokens.map(ct => {
-                    const isSelected = config.colors.includes(ct.id);
-                    return (
-                      <button
-                        key={ct.id}
-                        onClick={() => addColor(ct.id)}
-                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                          isSelected
-                            ? `${ct.border} ring-2 ring-primary/40 scale-110`
-                            : 'border-border/30 hover:border-border/60'
-                        }`}
-                      >
-                        <div className={`w-7 h-7 rounded-full ${ct.bg}`} />
-                      </button>
-                    );
-                  })}
+                  {colorTokens.map(ct => (
+                    <button key={ct.id} onClick={() => addColor(ct.id)}
+                      className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-200 border-border/30 hover:border-border/60`}>
+                      <div className={`w-7 h-7 rounded-full ${ct.bg}`} />
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -280,18 +350,10 @@ const Patterns = () => {
                 <label className="block text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mb-2">Montar usando números:</label>
                 <div className="flex flex-wrap gap-2">
                   {Array.from({ length: 15 }, (_, i) => i).map(n => {
-                    const isSelected = config.numbers.includes(n);
                     const nc = numberColors[n];
                     return (
-                      <button
-                        key={n}
-                        onClick={() => addNumber(n)}
-                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all duration-200 ${nc.bg} ${nc.text} ${
-                          isSelected
-                            ? 'border-primary ring-2 ring-primary/40 scale-110'
-                            : n === 0 ? 'border-border/50' : n <= 7 ? 'border-secondary/40' : 'border-zinc-600'
-                        }`}
-                      >
+                      <button key={n} onClick={() => addNumber(n)}
+                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all duration-200 ${nc.bg} ${nc.text} ${n === 0 ? 'border-border/50' : n <= 7 ? 'border-secondary/40' : 'border-zinc-600'}`}>
                         {n}
                       </button>
                     );
@@ -304,30 +366,22 @@ const Patterns = () => {
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mb-2">Gales:</label>
                   <div className="flex items-center gap-3 bg-muted/20 border border-border/30 rounded-xl p-1">
-                    <button
-                      onClick={() => setConfig(c => ({ ...c, gales: Math.max(0, c.gales - 1) }))}
-                      className="w-10 h-10 rounded-lg bg-card/60 border border-border/30 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all"
-                    >
+                    <button onClick={() => setConfig(c => ({ ...c, gales: Math.max(0, c.gales - 1) }))}
+                      className="w-10 h-10 rounded-lg bg-card/60 border border-border/30 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all">
                       <Minus size={16} />
                     </button>
                     <span className="flex-1 text-center text-xl font-bold text-foreground">{config.gales}</span>
-                    <button
-                      onClick={() => setConfig(c => ({ ...c, gales: Math.min(10, c.gales + 1) }))}
-                      className="w-10 h-10 rounded-lg bg-card/60 border border-border/30 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all"
-                    >
+                    <button onClick={() => setConfig(c => ({ ...c, gales: Math.min(10, c.gales + 1) }))}
+                      className="w-10 h-10 rounded-lg bg-card/60 border border-border/30 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all">
                       <Plus size={16} />
                     </button>
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mb-2">Vitória em:</label>
                   <div className="relative">
-                    <select
-                      value={config.victoryTarget}
-                      onChange={e => setConfig(c => ({ ...c, victoryTarget: e.target.value as PatternConfig['victoryTarget'] }))}
-                      className="w-full appearance-none bg-muted/20 border border-border/30 rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all cursor-pointer"
-                    >
+                    <select value={config.victoryTarget} onChange={e => setConfig(c => ({ ...c, victoryTarget: e.target.value as PatternConfig['victoryTarget'] }))}
+                      className="w-full appearance-none bg-muted/20 border border-border/30 rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all cursor-pointer">
                       <option value="reds">🔴 Vermelhos</option>
                       <option value="blacks">⚫ Pretos</option>
                       <option value="whites">⚪ Brancos</option>
@@ -345,14 +399,8 @@ const Patterns = () => {
                 <div className="rounded-2xl p-4 border border-primary/15 bg-primary/[0.03]">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-[10px] uppercase tracking-widest text-primary/60 font-semibold">Sequência montada</p>
-                    <button
-                      onClick={() => setConfig(c => ({ ...c, colors: [], numbers: [] }))}
-                      className="text-[10px] text-secondary/60 hover:text-secondary transition-all"
-                    >
-                      Limpar tudo
-                    </button>
+                    <button onClick={() => setConfig(c => ({ ...c, colors: [], numbers: [] }))} className="text-[10px] text-secondary/60 hover:text-secondary transition-all">Limpar tudo</button>
                   </div>
-
                   {config.colors.length > 0 && (
                     <div className="mb-3">
                       <p className="text-[10px] text-muted-foreground/40 mb-1.5">Cores:</p>
@@ -365,10 +413,7 @@ const Patterns = () => {
                               <div className={`w-8 h-8 rounded-full border ${ct.border} flex items-center justify-center overflow-hidden`}>
                                 <div className={`w-6 h-6 rounded-full ${ct.bg}`} />
                               </div>
-                              <button
-                                onClick={() => removeColorAt(i)}
-                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
+                              <button onClick={() => removeColorAt(i)} className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <X size={10} />
                               </button>
                             </div>
@@ -377,7 +422,6 @@ const Patterns = () => {
                       </div>
                     </div>
                   )}
-
                   {config.numbers.length > 0 && (
                     <div className="mb-3">
                       <p className="text-[10px] text-muted-foreground/40 mb-1.5">Números:</p>
@@ -386,13 +430,8 @@ const Patterns = () => {
                           const nc = numberColors[n];
                           return (
                             <div key={i} className="relative group">
-                              <div className={`w-8 h-8 rounded-full ${nc.bg} ${nc.text} flex items-center justify-center text-[11px] font-bold border border-border/20`}>
-                                {n}
-                              </div>
-                              <button
-                                onClick={() => removeNumberAt(i)}
-                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
+                              <div className={`w-8 h-8 rounded-full ${nc.bg} ${nc.text} flex items-center justify-center text-[11px] font-bold border border-border/20`}>{n}</div>
+                              <button onClick={() => removeNumberAt(i)} className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <X size={10} />
                               </button>
                             </div>
@@ -401,24 +440,16 @@ const Patterns = () => {
                       </div>
                     </div>
                   )}
-
                   <p className="text-xs text-muted-foreground/50">Gales: <span className="text-foreground font-semibold">{config.gales}</span> | Vitória: <span className="text-foreground font-semibold">{config.victoryTarget}</span></p>
                 </div>
               )}
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="flex-1 py-3 rounded-2xl border border-border/30 text-muted-foreground text-sm font-semibold hover:bg-muted/20 transition-all"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={!config.name.trim()}
-                  className="flex-1 py-3 rounded-2xl bg-primary/20 border border-primary/30 text-primary text-sm font-bold hover:bg-primary/30 transition-all shadow-lg shadow-primary/10 disabled:opacity-30 disabled:cursor-not-allowed"
-                >
+                <button onClick={() => setShowForm(false)} className="flex-1 py-3 rounded-2xl border border-border/30 text-muted-foreground text-sm font-semibold hover:bg-muted/20 transition-all">Cancelar</button>
+                <button onClick={handleSave} disabled={!config.name.trim() || saving}
+                  className="flex-1 py-3 rounded-2xl bg-primary/20 border border-primary/30 text-primary text-sm font-bold hover:bg-primary/30 transition-all shadow-lg shadow-primary/10 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                  {saving && <Loader2 size={14} className="animate-spin" />}
                   SALVAR PADRÃO
                 </button>
               </div>
