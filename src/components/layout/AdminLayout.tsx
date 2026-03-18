@@ -7,6 +7,7 @@ import logo from '@/assets/logo.png';
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
   { label: 'Padrões', icon: Layers, path: '/admin/patterns' },
+  { label: 'Fluxo', icon: Activity, path: '/admin/pattern-flow' },
   { label: 'Clientes', icon: UserCheck, path: '/admin/clients' },
   { label: 'Pagamentos', icon: CreditCard, path: '/admin/payments' },
 ];
