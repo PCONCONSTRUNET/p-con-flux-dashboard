@@ -452,7 +452,6 @@ const Patterns = () => {
                   )}
 
                   <p className="text-xs text-muted-foreground/50">Gales: <span className="text-foreground font-semibold">{config.gales}</span> | Vitória: <span className="text-foreground font-semibold">{config.victoryTarget}</span></p>
-                  </div>
                 </div>
               )}
 
