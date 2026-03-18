@@ -1,23 +1,66 @@
 import { useState, useEffect } from 'react';
-import { Crown, Zap, X, Sparkles } from 'lucide-react';
+import { Crown, Zap, X, Sparkles, Loader2 } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import pconLogo from '@/assets/pcon-flux-logo.png';
 
 export default function UpgradeModal() {
   const { showUpgradeModal, setShowUpgradeModal, subscription } = useSubscription();
   const [monthlyPrice, setMonthlyPrice] = useState('--');
   const [annualPrice, setAnnualPrice] = useState('--');
+  const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'annual' | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('mp_config');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.monthlyPrice) setMonthlyPrice(parsed.monthlyPrice);
-        if (parsed.annualPrice) setAnnualPrice(parsed.annualPrice);
-      } catch { /* ignore */ }
-    }
+    if (!showUpgradeModal) return;
+    const loadPrices = async () => {
+      const { data } = await supabase
+        .from('platform_settings')
+        .select('key, value')
+        .in('key', ['mp_monthly_price', 'mp_annual_price']);
+      if (data) {
+        data.forEach(row => {
+          if (row.key === 'mp_monthly_price') setMonthlyPrice(row.value);
+          if (row.key === 'mp_annual_price') setAnnualPrice(row.value);
+        });
+      }
+    };
+    loadPrices();
   }, [showUpgradeModal]);
+
+  const handleSubscribe = async (plan: 'monthly' | 'annual') => {
+    setLoadingPlan(plan);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Você precisa estar logado para assinar.');
+        setLoadingPlan(null);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-subscription', {
+        body: { plan },
+      });
+
+      if (error) {
+        console.error('Subscription error:', error);
+        toast.error('Erro ao criar assinatura. Tente novamente.');
+        setLoadingPlan(null);
+        return;
+      }
+
+      if (data?.checkout_url) {
+        window.open(data.checkout_url, '_blank');
+        toast.success('Redirecionando para o checkout do Mercado Pago...');
+      } else {
+        toast.error(data?.error || 'Erro ao gerar link de pagamento.');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      toast.error('Erro inesperado. Tente novamente.');
+    }
+    setLoadingPlan(null);
+  };
 
   if (!showUpgradeModal) return null;
 
