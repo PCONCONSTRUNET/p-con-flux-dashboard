@@ -42,6 +42,10 @@ export default function Integrations() {
           monthlyPrice: parsed.monthlyPrice || '',
           annualPrice: parsed.annualPrice || '',
         });
+        // Restore connection status if credentials were saved
+        if (parsed.accessToken && parsed.publicKey) {
+          setConnectionStatus('success');
+        }
       } catch { /* ignore */ }
     }
   }, []);
