@@ -469,7 +469,7 @@ export default function Checkout() {
           <div className="px-6 py-4 border-b border-white/[0.08] relative" style={{ background: 'linear-gradient(90deg, hsla(187, 100%, 50%, 0.04), transparent)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/15 border border-primary/30' : 'bg-emerald-400/15 border border-emerald-400/30'}`}>
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/15 border border-primary/30' : 'bg-emerald-400/15 border border-emerald-400/30'}`}>
                   <img src={fluxFlame} alt="" className="w-6 h-6 object-contain" />
                 </div>
                 <div>
