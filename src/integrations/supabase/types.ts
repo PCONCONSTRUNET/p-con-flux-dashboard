@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_signal_stats: {
+        Row: {
+          created_at: string
+          date: string
+          greens: number
+          id: string
+          losses: number
+          total_signals: number
+          win_rate: number
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          greens?: number
+          id?: string
+          losses?: number
+          total_signals?: number
+          win_rate?: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          greens?: number
+          id?: string
+          losses?: number
+          total_signals?: number
+          win_rate?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -44,6 +74,42 @@ export type Database = {
           telegram?: string | null
           updated_at?: string
           whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      signals: {
+        Row: {
+          archived: boolean
+          created_at: string
+          entry: string
+          id: string
+          protection: string
+          result: string
+          rounds: number
+          signal_type: string
+          target: string
+        }
+        Insert: {
+          archived?: boolean
+          created_at?: string
+          entry: string
+          id?: string
+          protection?: string
+          result: string
+          rounds?: number
+          signal_type?: string
+          target?: string
+        }
+        Update: {
+          archived?: boolean
+          created_at?: string
+          entry?: string
+          id?: string
+          protection?: string
+          result?: string
+          rounds?: number
+          signal_type?: string
+          target?: string
         }
         Relationships: []
       }

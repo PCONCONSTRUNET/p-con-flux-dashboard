@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radio, Lock, Shield } from 'lucide-react';
-import { mockSignals, mockBlazeRounds, type Signal, type BlazeColor } from '@/data/mockData';
+import { mockBlazeRounds, type Signal, type BlazeColor } from '@/data/mockData';
 import flameIcon from '@/assets/flame-icon.png';
 import BlazeRouletteStrip from '@/components/BlazeRouletteStrip';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import LockedFeature from '@/components/LockedFeature';
+import { supabase } from '@/integrations/supabase/client';
 
 type AnalysisState = 'scanning' | 'pattern_found' | 'confirmed' | 'idle';
 
@@ -19,11 +20,49 @@ const ClientDashboard = () => {
   const { hasActiveSubscription, setShowUpgradeModal } = useSubscription();
   const [maxGale, setMaxGale] = useState(1);
   const [minAssert, setMinAssert] = useState(95);
-  const [signals, setSignals] = useState<Signal[]>(mockSignals.filter((s) => s.result !== 'pending'));
+  const [signals, setSignals] = useState<Signal[]>([]);
   const [analysisState, setAnalysisState] = useState<AnalysisState>('scanning');
   const [currentEntry, setCurrentEntry] = useState<string | null>(null);
   const [showGaleDropdown, setShowGaleDropdown] = useState(false);
   const [showAssertDropdown, setShowAssertDropdown] = useState(false);
+
+  // Load today's signals from DB
+  useEffect(() => {
+    const loadSignals = async () => {
+      const { data, error } = await supabase
+        .from('signals')
+        .select('*')
+        .eq('archived', false)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        const mapped: Signal[] = data.map((s: any) => ({
+          id: s.id,
+          type: s.signal_type,
+          entry: s.entry,
+          protection: s.protection,
+          result: s.result,
+          timestamp: s.created_at,
+          rounds: s.rounds,
+          target: s.target,
+        }));
+        setSignals(mapped);
+      }
+    };
+    loadSignals();
+  }, []);
+
+  // Save signal to DB
+  const saveSignalToDB = useCallback(async (signal: Signal) => {
+    await supabase.from('signals').insert({
+      signal_type: signal.type,
+      entry: signal.entry,
+      protection: signal.protection,
+      result: signal.result,
+      rounds: signal.rounds,
+      target: signal.target,
+    });
+  }, []);
 
   const greens = signals.filter((s) => s.result === 'green').length;
   const losses = signals.filter((s) => s.result === 'loss').length;
@@ -47,25 +86,26 @@ const ClientDashboard = () => {
         setCurrentEntry(entry);
         setAnalysisState('pattern_found');
 
-        timeout = setTimeout(() => {
-          // Phase 3: Confirmed
-          setAnalysisState('confirmed');
-
           timeout = setTimeout(() => {
-            // Phase 4: Resolve and add to history
-            const isGreen = Math.random() > 0.25;
-            const newSignal: Signal = {
-              id: `s-${Date.now()}`,
-              type: 'Auto',
-              entry,
-              protection: `${maxGale} Gale${maxGale > 1 ? 's' : ''}`,
-              result: isGreen ? 'green' : 'loss',
-              timestamp: new Date().toISOString(),
-              rounds: Math.ceil(Math.random() * (maxGale + 1)),
-              target: 'Double'
-            };
-            setSignals((prev) => [newSignal, ...prev]);
-            setAnalysisState('idle');
+            // Phase 3: Confirmed
+            setAnalysisState('confirmed');
+
+            timeout = setTimeout(() => {
+              // Phase 4: Resolve and add to history + save to DB
+              const isGreen = Math.random() > 0.25;
+              const newSignal: Signal = {
+                id: `s-${Date.now()}`,
+                type: 'Auto',
+                entry,
+                protection: `${maxGale} Gale${maxGale > 1 ? 's' : ''}`,
+                result: isGreen ? 'green' : 'loss',
+                timestamp: new Date().toISOString(),
+                rounds: Math.ceil(Math.random() * (maxGale + 1)),
+                target: 'Double'
+              };
+              setSignals((prev) => [newSignal, ...prev]);
+              saveSignalToDB(newSignal);
+              setAnalysisState('idle');
 
             // Restart cycle
             timeout = setTimeout(cycle, 2000);
@@ -76,7 +116,7 @@ const ClientDashboard = () => {
 
     cycle();
     return () => clearTimeout(timeout);
-  }, [maxGale]);
+  }, [maxGale, saveSignalToDB]);
 
   const isLocked = !hasActiveSubscription;
 
