@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Search, Users, Crown, Clock, Shield, ChevronRight, Calendar, Zap, Phone, Send, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import ExportImportBar from '@/components/ExportImportBar';
+import { exportToPDF, exportToExcel, importFromExcel } from '@/utils/exportImport';
+import { toast } from 'sonner';
 
 interface ClientData {
   id: string;

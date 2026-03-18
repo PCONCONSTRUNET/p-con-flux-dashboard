@@ -146,6 +146,48 @@ const AdminDashboard = () => {
           <p className="text-sm text-muted-foreground/70 mt-1">Visão geral do sistema P-CON FLUX</p>
         </div>
 
+        <div className="flex items-center gap-3 flex-wrap">
+          <ExportImportBar
+            onExportPDF={() => {
+              const cols = [
+                { header: 'Métrica', key: 'metric' },
+                { header: 'Valor', key: 'value' },
+              ];
+              const data = [
+                { metric: 'Receita Total', value: `R$ ${totalRevenue.toLocaleString('pt-BR')}` },
+                { metric: 'Clientes Total', value: clientStats.total || 10 },
+                { metric: 'Win Rate', value: `${filteredWinRate}%` },
+                { metric: 'Padrões Ativos', value: activePatterns },
+                { metric: 'Greens', value: totalGreens },
+                { metric: 'Losses', value: totalLosses },
+              ];
+              exportToPDF('Dashboard - P-CON FLUX', cols, data, 'dashboard-pcon-flux');
+              toast.success('PDF exportado com sucesso!');
+            }}
+            onExportExcel={() => {
+              const cols = [
+                { header: 'Métrica', key: 'metric' },
+                { header: 'Valor', key: 'value' },
+              ];
+              const data = [
+                { metric: 'Receita Total', value: totalRevenue },
+                { metric: 'Clientes Total', value: clientStats.total || 10 },
+                { metric: 'Win Rate %', value: filteredWinRate },
+                { metric: 'Padrões Ativos', value: activePatterns },
+                { metric: 'Greens', value: totalGreens },
+                { metric: 'Losses', value: totalLosses },
+              ];
+              exportToExcel(cols, data, 'dashboard-pcon-flux', 'Dashboard');
+              toast.success('Excel exportado com sucesso!');
+            }}
+            onImportFile={(file) => {
+              importFromExcel(file, (rows) => {
+                toast.success(`${rows.length} registros importados do arquivo!`);
+                console.log('Imported data:', rows);
+              });
+            }}
+          />
+
         <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.8)' }}>
           {(['today', 'weekly', 'monthly', 'custom'] as FilterType[]).map((f) => (
             <button
