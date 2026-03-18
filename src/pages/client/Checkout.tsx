@@ -4,6 +4,8 @@ import { CreditCard, Lock, ArrowLeft, Loader2, CheckCircle2, Shield, Zap, Crown,
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import pconLogo from '@/assets/pcon-flux-logo.png';
+import iconPix from '@/assets/icon-pix.png';
+import iconCard from '@/assets/icon-card.png';
 
 declare global {
   interface Window {
