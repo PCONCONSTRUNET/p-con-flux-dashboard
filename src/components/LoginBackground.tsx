@@ -13,7 +13,7 @@ const LoginBackground = () => {
 
     // Load dice image
     const img = new Image();
-    img.src = blazeDice;
+    img.src = flameIcon;
     imageRef.current = img;
 
     let animationId: number;
