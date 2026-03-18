@@ -10,6 +10,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 
 import Login from "@/pages/Login";
 import ForgotPassword from "@/pages/ForgotPassword";
+import AdminLogin from "@/pages/admin/AdminLogin";
 import ClientDashboard from "@/pages/client/Dashboard";
 import LiveCatalog from "@/pages/client/LiveCatalog";
 import History from "@/pages/client/History";
