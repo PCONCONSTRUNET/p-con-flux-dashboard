@@ -36,7 +36,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    if (!user || user.role === 'admin') {
+    if (!user) {
       setLoading(false);
       return;
     }

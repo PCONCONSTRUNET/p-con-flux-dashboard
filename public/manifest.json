@@ -1,0 +1,19 @@
+{
+  "name": "P-CON FLUX",
+  "short_name": "FLUX",
+  "description": "Plataforma de monitoramento e análise em tempo real",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0a0a0f",
+  "background_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "/pwa-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
