@@ -283,45 +283,53 @@ const LiveCatalog = () => {
 
       {/* Rounds display */}
       {columnView ? (
-        /* Column view — each number (0-14) has its own vertical column, empty columns stay empty */
+        /* Column view — fixed grid with empty slots like Blaze reference */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto overflow-y-auto max-h-[500px]">
-          <div className="flex gap-1 min-w-fit">
-            {Array.from({ length: 15 }, (_, col) => {
-              const colRounds = columnData[col];
-              return (
-                <div key={col} className="flex flex-col items-center" style={{ minWidth: '42px' }}>
-                  {/* Header */}
-                  <div className="text-[10px] font-bold text-muted-foreground/60 pb-1.5 border-b border-border/30 font-mono w-full text-center sticky top-0 bg-card/90 backdrop-blur-sm z-10">
+          {(() => {
+            const maxRows = Math.max(...Object.values(columnData).map(c => c.length), 1);
+            return (
+              <div className="grid gap-x-1 gap-y-1" style={{ gridTemplateColumns: 'repeat(15, minmax(42px, 1fr))' }}>
+                {/* Headers */}
+                {Array.from({ length: 15 }, (_, col) => (
+                  <div key={`h-${col}`} className="text-center text-[10px] font-bold text-muted-foreground/60 pb-1 font-mono">
                     {String(col).padStart(2, '0')}
                   </div>
-                  {/* Rounds stacking down */}
-                  <div className="flex flex-col items-center gap-1 pt-1.5">
-                    {colRounds.map((r) => {
+                ))}
+                {/* Grid cells row by row */}
+                {Array.from({ length: maxRows }, (_, row) =>
+                  Array.from({ length: 15 }, (_, col) => {
+                    const r = columnData[col][row];
+                    if (r) {
                       const style = colorStyles[r.color];
                       const dimmed = highlighted && !isHighlighted(r);
                       return (
-                        <div key={r.id} className="flex flex-col items-center">
+                        <div key={`${col}-${row}`} className="flex flex-col items-center">
                           <div
                             onClick={() => handleClickRound(r)}
-                            className={`w-8 h-8 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                            className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
                               dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                             } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                           >
                             <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>
                           </div>
                           {showTimestamps && (
-                            <span className={`text-[7px] mt-0.5 font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                            <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
                               {formatTime(r.timestamp)}
                             </span>
                           )}
                         </div>
                       );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                    }
+                    return (
+                      <div key={`${col}-${row}`} className="flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-lg border border-border/20 bg-[hsl(240_6%_10%)]" />
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            );
+          })()}
         </div>
       ) : (
         /* Grid view — 22 per row */
