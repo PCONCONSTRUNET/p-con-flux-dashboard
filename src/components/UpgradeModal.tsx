@@ -1,9 +1,23 @@
-import { Crown, Zap, Shield, X, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Crown, Zap, X, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import pconLogo from '@/assets/pcon-flux-logo.png';
 
 export default function UpgradeModal() {
   const { showUpgradeModal, setShowUpgradeModal, subscription } = useSubscription();
+  const [monthlyPrice, setMonthlyPrice] = useState('--');
+  const [annualPrice, setAnnualPrice] = useState('--');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('mp_config');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.monthlyPrice) setMonthlyPrice(parsed.monthlyPrice);
+        if (parsed.annualPrice) setAnnualPrice(parsed.annualPrice);
+      } catch { /* ignore */ }
+    }
+  }, [showUpgradeModal]);
 
   if (!showUpgradeModal) return null;
 
@@ -46,7 +60,7 @@ export default function UpgradeModal() {
           <h2 className="text-xl font-bold text-foreground text-center mb-1.5">
             {subscription?.isExpired ? 'Seu período de teste expirou' : 'Faça upgrade do seu plano'}
           </h2>
-          <p className="text-[12px] text-muted-foreground/50 text-center mb-7">
+          <p className="text-sm text-muted-foreground/50 text-center mb-7">
             {subscription?.isExpired
               ? 'Para continuar acessando, escolha um plano abaixo.'
               : 'Desbloqueie todos os recursos da plataforma.'}
@@ -66,12 +80,15 @@ export default function UpgradeModal() {
                 <Zap size={20} className="text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-foreground tracking-wide">P-CON FLUX MENSAL</p>
-                <p className="text-[10px] text-muted-foreground/40 mt-0.5">Acesso completo por 30 dias</p>
+                <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX MENSAL</p>
+                <p className="text-xs text-muted-foreground/40 mt-0.5">Acesso completo por 30 dias</p>
               </div>
-              <span className="text-[11px] font-bold text-primary tracking-widest shrink-0 group-hover:translate-x-0.5 transition-transform">
-                ASSINAR →
-              </span>
+              <div className="text-right shrink-0">
+                <p className="text-lg font-bold text-primary">R$ {monthlyPrice}</p>
+                <span className="text-[10px] font-bold text-primary/60 tracking-widest group-hover:translate-x-0.5 transition-transform inline-block">
+                  ASSINAR →
+                </span>
+              </div>
             </button>
 
             {/* Annual */}
@@ -92,18 +109,21 @@ export default function UpgradeModal() {
                 <Crown size={20} className="text-emerald-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-foreground tracking-wide">P-CON FLUX ANUAL</p>
-                <p className="text-[10px] text-muted-foreground/40 mt-0.5">Acesso completo por 365 dias</p>
+                <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX ANUAL</p>
+                <p className="text-xs text-muted-foreground/40 mt-0.5">Acesso completo por 365 dias</p>
               </div>
-              <span className="text-[11px] font-bold text-emerald-400 tracking-widest shrink-0 group-hover:translate-x-0.5 transition-transform">
-                ASSINAR →
-              </span>
+              <div className="text-right shrink-0 mt-2">
+                <p className="text-lg font-bold text-emerald-400">R$ {annualPrice}</p>
+                <span className="text-[10px] font-bold text-emerald-400/60 tracking-widest group-hover:translate-x-0.5 transition-transform inline-block">
+                  ASSINAR →
+                </span>
+              </div>
             </button>
           </div>
 
           {/* Footer */}
           {!subscription?.isExpired && subscription?.timeRemaining && (
-            <p className="text-[10px] text-center text-muted-foreground/30 mt-5">
+            <p className="text-xs text-center text-muted-foreground/30 mt-5">
               Você ainda tem <span className="text-muted-foreground/50 font-semibold">{subscription.timeRemaining}</span> de teste grátis
             </p>
           )}
