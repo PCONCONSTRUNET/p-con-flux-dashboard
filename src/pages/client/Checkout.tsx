@@ -4,6 +4,8 @@ import { CreditCard, Lock, ArrowLeft, Loader2, CheckCircle2, Shield, Zap, Crown,
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import pconLogo from '@/assets/pcon-flux-logo.png';
+import iconPix from '@/assets/icon-pix.png';
+import iconCard from '@/assets/icon-card.png';
 
 declare global {
   interface Window {
@@ -319,7 +321,7 @@ export default function Checkout() {
                     : 'text-muted-foreground/50 hover:text-muted-foreground/70'
                 }`}
               >
-                <QrCode size={16} />
+                <img src={iconPix} alt="PIX" className="w-5 h-5" />
                 PIX
               </button>
               <button
@@ -330,7 +332,7 @@ export default function Checkout() {
                     : 'text-muted-foreground/50 hover:text-muted-foreground/70'
                 }`}
               >
-                <CreditCard size={16} />
+                <img src={iconCard} alt="Cartão" className="w-5 h-5" />
                 Cartão
               </button>
             </div>
