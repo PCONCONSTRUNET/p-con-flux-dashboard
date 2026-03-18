@@ -243,7 +243,7 @@ const AdminDashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="hsla(240,6%,30%,0.2)" />
               <XAxis dataKey="hour" tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsla(240,6%,50%,0.1)' }} />
               <Bar dataKey="greens" name="Greens" fill="url(#greenGrad)" radius={[4, 4, 0, 0]} />
               <Bar dataKey="losses" name="Losses" fill="url(#lossGrad)" radius={[4, 4, 0, 0]} />
             </BarChart>
