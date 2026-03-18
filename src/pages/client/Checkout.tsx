@@ -148,10 +148,9 @@ export default function Checkout() {
     setProcessing(false);
   };
 
-  const startPolling = (paymentId: string) => {
+  const startPolling = (source: string) => {
     if (pollingRef.current) clearInterval(pollingRef.current);
     
-    // Poll subscription status every 5 seconds
     pollingRef.current = setInterval(async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -164,15 +163,22 @@ export default function Checkout() {
 
       if (sub && sub.is_active && sub.plan !== 'trial') {
         if (pollingRef.current) clearInterval(pollingRef.current);
+        setAwaitingConfirmation(false);
         setSuccess(true);
-        toast.success('Pagamento PIX confirmado!');
+        toast.success('Pagamento confirmado!');
         setTimeout(() => navigate('/client'), 3000);
       }
-    }, 5000);
+    }, 4000);
 
     // Stop polling after 10 minutes
     setTimeout(() => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        if (!success) {
+          toast.info('Tempo de espera expirou. Verifique seu painel para o status.');
+          setAwaitingConfirmation(false);
+        }
+      }
     }, 600000);
   };
 
