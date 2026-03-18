@@ -356,7 +356,7 @@ const LiveCatalog = () => {
                           {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                         </div>
                         {showTimestamps && (
-                          <span className="text-[9px] font-sans font-semibold text-muted-foreground tracking-tight leading-[14px]">
+                          <span className="text-[9px] font-sans font-semibold text-muted-foreground tracking-tight leading-[14px] bg-muted/30 px-1 py-0.5 rounded mt-0.5">
                             {formatTime(r.timestamp)}
                           </span>
                         )}
@@ -403,7 +403,7 @@ const LiveCatalog = () => {
                     {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                   </div>
                   {showTimestamps && (
-                    <span className={`text-[9px] mt-0.5 font-sans font-semibold tracking-tight transition-opacity ${dimmed ? 'opacity-10' : 'text-muted-foreground'}`}>
+                    <span className={`text-[9px] mt-0.5 font-sans font-semibold tracking-tight transition-opacity bg-muted/30 px-1 py-0.5 rounded ${dimmed ? 'opacity-10' : 'text-muted-foreground'}`}>
                       {time}
                     </span>
                   )}
