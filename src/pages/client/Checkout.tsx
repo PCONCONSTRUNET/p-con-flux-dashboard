@@ -560,45 +560,45 @@ export default function Checkout() {
           {paymentMethod === 'card' && (
             <form onSubmit={handleCardSubmit} className="px-6 py-5 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-display font-semibold text-muted-foreground/60">Número do Cartão</label>
+                <label className="text-xs font-display font-semibold text-white/70">Número do Cartão</label>
                 <div className="relative">
-                  <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/30" />
+                  <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
                   <input
                     type="text"
                     inputMode="numeric"
                     placeholder="0000 0000 0000 0000"
                     value={cardNumber}
                     onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-display font-semibold text-muted-foreground/60">Nome no Cartão</label>
+                <label className="text-xs font-display font-semibold text-white/70">Nome no Cartão</label>
                 <input
                   type="text"
                   placeholder="NOME COMO ESTÁ NO CARTÃO"
                   value={cardName}
                   onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                  className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                  className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-display font-semibold text-muted-foreground/60">Validade</label>
+                  <label className="text-xs font-display font-semibold text-white/70">Validade</label>
                   <input
                     type="text"
                     inputMode="numeric"
                     placeholder="MM/AA"
                     value={expiry}
                     onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                    className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                    className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-display font-semibold text-muted-foreground/60">CVV</label>
+                  <label className="text-xs font-display font-semibold text-white/70">CVV</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -607,35 +607,38 @@ export default function Checkout() {
                       maxLength={4}
                       value={cvv}
                       onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                      className="w-full h-11 px-4 pr-10 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                      className="w-full h-11 px-4 pr-10 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                     />
-                    <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/20" />
+                    <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25" />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-display font-semibold text-muted-foreground/60">CPF do Titular</label>
+                <label className="text-xs font-display font-semibold text-white/70">CPF do Titular</label>
                 <input
                   type="text"
                   inputMode="numeric"
                   placeholder="000.000.000-00"
                   value={docNumber}
                   onChange={(e) => setDocNumber(formatCPF(e.target.value))}
-                  className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                  className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                 />
               </div>
 
               <div className="flex items-center gap-2 py-2">
-                <Shield size={14} className="text-emerald-400/60" />
-                <p className="text-[11px] text-muted-foreground/40">Pagamento seguro processado pelo Mercado Pago</p>
+                <Shield size={14} className="text-emerald-400/80" />
+                <p className="text-[11px] text-white/50">Pagamento seguro processado pelo Mercado Pago</p>
               </div>
 
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-display font-bold tracking-wide text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                style={{ boxShadow: '0 4px 20px hsla(187, 100%, 50%, 0.25)' }}
+                className="w-full h-12 rounded-xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(187, 100%, 45%), hsl(187, 100%, 35%))',
+                  boxShadow: '0 4px 25px hsla(187, 100%, 50%, 0.35), inset 0 1px 0 hsla(0,0%,100%,0.15)',
+                }}
               >
                 {processing ? (
                   <>
