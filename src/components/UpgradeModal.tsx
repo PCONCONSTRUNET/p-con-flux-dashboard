@@ -7,7 +7,7 @@ export default function UpgradeModal() {
 
   if (!showUpgradeModal) return null;
 
-  const canDismiss = subscription && !subscription.isExpired;
+  const canDismiss = true;
 
   return (
     <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center p-4">
