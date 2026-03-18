@@ -488,7 +488,7 @@ export default function Checkout() {
             <div className="flex gap-2 p-1.5 rounded-2xl border border-white/[0.08] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.4)' }}>
               <button
                 onClick={() => { setPaymentMethod('pix'); setPixGenerated(false); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-display font-bold transition-all ${
                   paymentMethod === 'pix'
                     ? 'text-white border border-primary/30'
                     : 'text-white/40 hover:text-white/60'
