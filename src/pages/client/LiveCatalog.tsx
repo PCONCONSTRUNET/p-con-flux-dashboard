@@ -340,6 +340,8 @@ const LiveCatalog = () => {
         </div>
       </div>
 
+      <div className="flex gap-4">
+        <div className="flex-1 min-w-0">
       {fixedColumns ? (
         /* Fixed columns — horizontal grid: rows = 10-min blocks, cols = 00-09, 2 stones per cell */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
@@ -443,6 +445,35 @@ const LiveCatalog = () => {
           </div>
         </div>
       )}
+        </div>
+
+        {/* Ad banner - outdoor de anúncios */}
+        <div className="hidden lg:flex flex-col gap-3 w-[280px] shrink-0">
+          <div className="rounded-2xl border border-border/50 bg-card/50 overflow-hidden flex flex-col items-center justify-center h-[300px] relative group cursor-pointer transition-all hover:border-primary/30">
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, hsl(240 6% 8%) 0%, hsl(210 40% 12%) 100%)' }} />
+            <div className="relative z-10 flex flex-col items-center gap-3 p-4 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <span className="text-2xl">📢</span>
+              </div>
+              <p className="text-sm font-bold text-foreground">Espaço Publicitário</p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">Anuncie aqui para milhares de usuários ativos</p>
+              <span className="text-[10px] uppercase tracking-widest font-semibold text-primary border border-primary/30 rounded-lg px-3 py-1.5 bg-primary/5">Anuncie Aqui</span>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border/50 bg-card/50 overflow-hidden flex flex-col items-center justify-center h-[280px] relative group cursor-pointer transition-all hover:border-secondary/30">
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, hsl(240 6% 8%) 0%, hsl(345 40% 12%) 100%)' }} />
+            <div className="relative z-10 flex flex-col items-center gap-3 p-4 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-center justify-center">
+                <span className="text-2xl">🎯</span>
+              </div>
+              <p className="text-sm font-bold text-foreground">Patrocinador</p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">Destaque sua marca neste espaço premium</p>
+              <span className="text-[10px] uppercase tracking-widest font-semibold text-secondary border border-secondary/30 rounded-lg px-3 py-1.5 bg-secondary/5">Saiba Mais</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
