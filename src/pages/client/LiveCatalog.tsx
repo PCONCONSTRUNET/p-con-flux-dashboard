@@ -283,53 +283,44 @@ const LiveCatalog = () => {
 
       {/* Rounds display */}
       {columnView ? (
-        /* Column view — fixed columns per number (0-14) */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto">
-          <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(15, minmax(40px, 1fr))' }}>
-            {/* Column headers */}
-            {Array.from({ length: 15 }, (_, i) => (
-              <div key={`header-${i}`} className="text-center text-[10px] font-bold text-muted-foreground/60 pb-1.5 border-b border-border/30 font-mono">
-                {String(i).padStart(2, '0')}
-              </div>
-            ))}
-            {/* Column cells — find max column height */}
-            {(() => {
-              const maxRows = Math.max(...Object.values(columnData).map(c => c.length), 1);
-              const cells = [];
-              for (let row = 0; row < maxRows; row++) {
-                for (let col = 0; col <= 14; col++) {
-                  const r = columnData[col][row];
-                  if (r) {
-                    const style = colorStyles[r.color];
-                    const dimmed = highlighted && !isHighlighted(r);
-                    cells.push(
-                      <div key={`${col}-${row}`} className="flex flex-col items-center pt-1">
-                        <div
-                          onClick={() => handleClickRound(r)}
-                          className={`w-8 h-8 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                            dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                          } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                        >
-                          <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>
+        /* Column view — each number (0-14) has its own vertical column, empty columns stay empty */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto overflow-y-auto max-h-[500px]">
+          <div className="flex gap-1 min-w-fit">
+            {Array.from({ length: 15 }, (_, col) => {
+              const colRounds = columnData[col];
+              return (
+                <div key={col} className="flex flex-col items-center" style={{ minWidth: '42px' }}>
+                  {/* Header */}
+                  <div className="text-[10px] font-bold text-muted-foreground/60 pb-1.5 border-b border-border/30 font-mono w-full text-center sticky top-0 bg-card/90 backdrop-blur-sm z-10">
+                    {String(col).padStart(2, '0')}
+                  </div>
+                  {/* Rounds stacking down */}
+                  <div className="flex flex-col items-center gap-1 pt-1.5">
+                    {colRounds.map((r) => {
+                      const style = colorStyles[r.color];
+                      const dimmed = highlighted && !isHighlighted(r);
+                      return (
+                        <div key={r.id} className="flex flex-col items-center">
+                          <div
+                            onClick={() => handleClickRound(r)}
+                            className={`w-8 h-8 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                              dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                            } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                          >
+                            <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>
+                          </div>
+                          {showTimestamps && (
+                            <span className={`text-[7px] mt-0.5 font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                              {formatTime(r.timestamp)}
+                            </span>
+                          )}
                         </div>
-                        {showTimestamps && (
-                          <span className={`text-[7px] mt-0.5 font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                            {formatTime(r.timestamp)}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  } else {
-                    cells.push(
-                      <div key={`${col}-${row}`} className="flex items-center justify-center pt-1">
-                        <div className="w-8 h-8 rounded-lg border border-border/20 bg-muted/5" />
-                      </div>
-                    );
-                  }
-                }
-              }
-              return cells;
-            })()}
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (
