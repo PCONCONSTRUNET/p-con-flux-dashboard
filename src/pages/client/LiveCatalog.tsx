@@ -123,8 +123,15 @@ const LiveCatalog = () => {
             <Filter size={12} />
             Filtros
           </button>
-        </div>
-      </div>
+          <button
+            onClick={() => setColumnView(!columnView)}
+            className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-3 py-2 rounded-xl border transition-all ${
+              columnView ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
+            }`}
+          >
+            {columnView ? <Columns3 size={12} /> : <LayoutGrid size={12} />}
+            {columnView ? 'Colunas' : 'Grade'}
+          </button>
 
       {/* Filters */}
       {showFilters && (
