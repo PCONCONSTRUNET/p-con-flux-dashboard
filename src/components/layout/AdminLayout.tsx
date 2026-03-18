@@ -89,10 +89,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <div className="flex flex-1 relative z-10">
+      <div className="flex flex-1 relative z-10 overflow-hidden">
         {/* Desktop sidebar */}
         <aside
-          className="hidden lg:flex flex-col w-60 border-r border-border/50 p-4"
+          className="hidden lg:flex flex-col w-60 border-r border-border/50 p-4 h-[calc(100vh-0px)] sticky top-0"
           style={{ background: 'linear-gradient(180deg, hsla(240, 6%, 8%, 0.95) 0%, hsla(240, 6%, 5%, 0.95) 100%)', backdropFilter: 'blur(20px)' }}
         >
           <div className="flex items-center gap-2 mb-8">
@@ -118,7 +118,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               </button>
             ))}
           </nav>
-          <div className="border-t border-border/50 pt-4">
+          <div className="border-t border-border/50 pt-4 mt-auto">
             <div className="flex items-center gap-2 mb-3 px-1">
               <Shield size={14} className="text-secondary" />
               <span className="text-xs text-muted-foreground">{user?.name}</span>
