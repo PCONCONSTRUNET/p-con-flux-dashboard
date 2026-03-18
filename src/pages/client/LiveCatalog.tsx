@@ -395,7 +395,7 @@ const LiveCatalog = () => {
                   className="flex flex-col items-center cursor-pointer group"
                 >
                   <div
-                    className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
+                    className={`w-9 h-9 rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
                       dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                     } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                   >
