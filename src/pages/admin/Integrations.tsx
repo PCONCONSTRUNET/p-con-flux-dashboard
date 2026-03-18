@@ -97,11 +97,9 @@ export default function Integrations() {
             {/* Header */}
             <div className="px-6 py-5 flex items-center justify-between border-b border-border/10">
               <div className="flex items-center gap-4">
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
-                  style={{ background: 'linear-gradient(135deg, #00b1ea, #009ee3)', boxShadow: '0 4px 20px hsla(195, 100%, 46%, 0.25)' }}
-                >
-                  <CreditCard size={20} className="text-white" />
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-white/10">
+                  <img src={mercadoPagoIcon} alt="Mercado Pago" className="w-8 h-8" />
+                </div>
                 </div>
                 <div>
                   <h3 className="text-base font-display font-bold text-foreground">Mercado Pago</h3>
