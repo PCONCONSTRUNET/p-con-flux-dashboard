@@ -355,13 +355,14 @@ const LiveCatalog = () => {
                       <div key={r.id} className="flex flex-col items-center" style={{ width: '52px', height: '78px' }}>
                         <div
                           onClick={() => handleClickRound(r)}
-                          className={`w-full rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                          className={`w-full rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
                             dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                           } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                           style={{ height: '50px' }}
                         >
-                          {showNumbers && <span className={`text-sm font-bold ${style.text}`}>{r.roll}</span>}
-                          {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+                          <div className={`w-[30px] h-[30px] rounded-full border-2 ${r.color === 'red' ? 'border-white/30' : r.color === 'white' ? 'border-[hsl(240_6%_30%)]/40' : 'border-white/15'} flex items-center justify-center`}>
+                            {showNumbers && <span className={`text-xs font-bold ${style.text}`}>{r.roll}</span>}
+                          </div>
                         </div>
                         {showTimestamps && (
                           <span className="text-[10px] font-sans font-bold text-muted-foreground tracking-tight leading-[16px] bg-muted/30 px-1.5 py-0.5 rounded mt-0.5">
