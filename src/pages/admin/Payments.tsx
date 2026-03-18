@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, CreditCard, CheckCircle2, XCircle, Clock, Crown, Zap, ChevronDown } from 'lucide-react';
+import { Search, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, CreditCard, CheckCircle2, XCircle, Clock, Crown, Zap, ChevronDown, Copy, Building2, Hash, Receipt, User, Mail, FileText, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
 import ExportImportBar from '@/components/ExportImportBar';
@@ -10,6 +10,8 @@ import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
 
 type FilterType = 'today' | 'weekly' | 'monthly' | 'custom';
 
@@ -22,24 +24,36 @@ interface PaymentRecord {
   amount: number;
   date: string;
   method: string;
+  transaction_id: string;
+  bank: string;
+  card_last4?: string;
+  ip_address: string;
+  currency: string;
+  fee: number;
+  net_amount: number;
+  description: string;
 }
 
 // Mock payment data
+const banks = ['Nubank', 'Itaú', 'Bradesco', 'Banco do Brasil', 'Santander', 'Inter', 'C6 Bank'];
+const generateTxId = () => `TXN-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+const generateIP = () => `${Math.floor(Math.random()*200)+10}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
+
 const mockPayments: PaymentRecord[] = [
-  { id: 'pay-1', user_name: 'Carlos Silva', user_email: 'carlos@empresa.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 30).toISOString(), method: 'PIX' },
-  { id: 'pay-2', user_name: 'Ana Rodrigues', user_email: 'ana@empresa.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), method: 'Cartão' },
-  { id: 'pay-3', user_name: 'Bruno Costa', user_email: 'bruno@startup.io', plan: 'monthly', status: 'failed', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), method: 'Cartão' },
-  { id: 'pay-4', user_name: 'Mariana Santos', user_email: 'mariana@corp.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), method: 'PIX' },
-  { id: 'pay-5', user_name: 'Lucas Pereira', user_email: 'lucas@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), method: 'Boleto' },
-  { id: 'pay-6', user_name: 'Fernanda Lima', user_email: 'fernanda@email.com', plan: 'monthly', status: 'pending', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), method: 'Boleto' },
-  { id: 'pay-7', user_name: 'Rafael Mendes', user_email: 'rafael@email.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), method: 'PIX' },
-  { id: 'pay-8', user_name: 'Julia Almeida', user_email: 'julia@email.com', plan: 'monthly', status: 'refunded', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(), method: 'Cartão' },
-  { id: 'pay-9', user_name: 'Pedro Oliveira', user_email: 'pedro@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), method: 'PIX' },
-  { id: 'pay-10', user_name: 'Camila Souza', user_email: 'camila@email.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(), method: 'Cartão' },
-  { id: 'pay-11', user_name: 'Diego Ramos', user_email: 'diego@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(), method: 'PIX' },
-  { id: 'pay-12', user_name: 'Tatiana Gomes', user_email: 'tatiana@email.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(), method: 'Cartão' },
-  { id: 'pay-13', user_name: 'Marcos Dias', user_email: 'marcos@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 20).toISOString(), method: 'Boleto' },
-  { id: 'pay-14', user_name: 'Patricia Nunes', user_email: 'patricia@email.com', plan: 'monthly', status: 'failed', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 25).toISOString(), method: 'Cartão' },
+  { id: 'pay-1', user_name: 'Carlos Silva', user_email: 'carlos@empresa.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 30).toISOString(), method: 'PIX', transaction_id: generateTxId(), bank: 'Nubank', ip_address: generateIP(), currency: 'BRL', fee: 4.97, net_amount: 492.03, description: 'Assinatura Anual - P-CON FLUX' },
+  { id: 'pay-2', user_name: 'Ana Rodrigues', user_email: 'ana@empresa.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), method: 'Cartão', transaction_id: generateTxId(), bank: 'Itaú', card_last4: '4521', ip_address: generateIP(), currency: 'BRL', fee: 1.50, net_amount: 48.40, description: 'Assinatura Mensal - P-CON FLUX' },
+  { id: 'pay-3', user_name: 'Bruno Costa', user_email: 'bruno@startup.io', plan: 'monthly', status: 'failed', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), method: 'Cartão', transaction_id: generateTxId(), bank: 'Bradesco', card_last4: '7890', ip_address: generateIP(), currency: 'BRL', fee: 0, net_amount: 0, description: 'Assinatura Mensal - P-CON FLUX (Falha)' },
+  { id: 'pay-4', user_name: 'Mariana Santos', user_email: 'mariana@corp.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), method: 'PIX', transaction_id: generateTxId(), bank: 'Banco do Brasil', ip_address: generateIP(), currency: 'BRL', fee: 4.97, net_amount: 492.03, description: 'Assinatura Anual - P-CON FLUX' },
+  { id: 'pay-5', user_name: 'Lucas Pereira', user_email: 'lucas@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), method: 'Boleto', transaction_id: generateTxId(), bank: 'Santander', ip_address: generateIP(), currency: 'BRL', fee: 2.50, net_amount: 47.40, description: 'Assinatura Mensal - P-CON FLUX' },
+  { id: 'pay-6', user_name: 'Fernanda Lima', user_email: 'fernanda@email.com', plan: 'monthly', status: 'pending', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), method: 'Boleto', transaction_id: generateTxId(), bank: 'Inter', ip_address: generateIP(), currency: 'BRL', fee: 0, net_amount: 0, description: 'Assinatura Mensal - P-CON FLUX (Pendente)' },
+  { id: 'pay-7', user_name: 'Rafael Mendes', user_email: 'rafael@email.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), method: 'PIX', transaction_id: generateTxId(), bank: 'C6 Bank', ip_address: generateIP(), currency: 'BRL', fee: 4.97, net_amount: 492.03, description: 'Assinatura Anual - P-CON FLUX' },
+  { id: 'pay-8', user_name: 'Julia Almeida', user_email: 'julia@email.com', plan: 'monthly', status: 'refunded', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(), method: 'Cartão', transaction_id: generateTxId(), bank: 'Nubank', card_last4: '3344', ip_address: generateIP(), currency: 'BRL', fee: 1.50, net_amount: -49.90, description: 'Assinatura Mensal - P-CON FLUX (Reembolso)' },
+  { id: 'pay-9', user_name: 'Pedro Oliveira', user_email: 'pedro@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), method: 'PIX', transaction_id: generateTxId(), bank: 'Itaú', ip_address: generateIP(), currency: 'BRL', fee: 0.50, net_amount: 49.40, description: 'Assinatura Mensal - P-CON FLUX' },
+  { id: 'pay-10', user_name: 'Camila Souza', user_email: 'camila@email.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(), method: 'Cartão', transaction_id: generateTxId(), bank: 'Bradesco', card_last4: '1122', ip_address: generateIP(), currency: 'BRL', fee: 14.91, net_amount: 482.09, description: 'Assinatura Anual - P-CON FLUX' },
+  { id: 'pay-11', user_name: 'Diego Ramos', user_email: 'diego@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(), method: 'PIX', transaction_id: generateTxId(), bank: 'Nubank', ip_address: generateIP(), currency: 'BRL', fee: 0.50, net_amount: 49.40, description: 'Assinatura Mensal - P-CON FLUX' },
+  { id: 'pay-12', user_name: 'Tatiana Gomes', user_email: 'tatiana@email.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(), method: 'Cartão', transaction_id: generateTxId(), bank: 'Santander', card_last4: '5566', ip_address: generateIP(), currency: 'BRL', fee: 14.91, net_amount: 482.09, description: 'Assinatura Anual - P-CON FLUX' },
+  { id: 'pay-13', user_name: 'Marcos Dias', user_email: 'marcos@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 20).toISOString(), method: 'Boleto', transaction_id: generateTxId(), bank: 'Banco do Brasil', ip_address: generateIP(), currency: 'BRL', fee: 2.50, net_amount: 47.40, description: 'Assinatura Mensal - P-CON FLUX' },
+  { id: 'pay-14', user_name: 'Patricia Nunes', user_email: 'patricia@email.com', plan: 'monthly', status: 'failed', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 25).toISOString(), method: 'Cartão', transaction_id: generateTxId(), bank: 'Inter', card_last4: '9988', ip_address: generateIP(), currency: 'BRL', fee: 0, net_amount: 0, description: 'Assinatura Mensal - P-CON FLUX (Falha)' },
 ];
 
 const revenueDataSets: Record<Exclude<FilterType, 'custom'>, { label: string; value: number }[]> = {
@@ -122,6 +136,7 @@ const PaymentsPage = () => {
   const [periodFilter, setPeriodFilter] = useState<FilterType>('weekly');
   const [customStart, setCustomStart] = useState<Date | undefined>();
   const [customEnd, setCustomEnd] = useState<Date | undefined>();
+  const [selectedPayment, setSelectedPayment] = useState<PaymentRecord | null>(null);
 
   const activeFilter = periodFilter === 'custom' ? 'weekly' : periodFilter;
   const revenueData = revenueDataSets[activeFilter];
@@ -429,7 +444,8 @@ const PaymentsPage = () => {
           return (
             <div
               key={payment.id}
-              className={`rounded-2xl p-4 border backdrop-blur-sm transition-all ${sc.border} ${sc.bg}`}
+              onClick={() => setSelectedPayment(payment)}
+              className={`rounded-2xl p-4 border backdrop-blur-sm transition-all cursor-pointer hover:scale-[1.01] hover:shadow-lg ${sc.border} ${sc.bg}`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3.5">
@@ -468,6 +484,95 @@ const PaymentsPage = () => {
           );
         })}
       </div>
+
+      {/* Payment Detail Modal */}
+      <Dialog open={!!selectedPayment} onOpenChange={(open) => !open && setSelectedPayment(null)}>
+        <DialogContent className="sm:max-w-md border-border/30 p-0 overflow-hidden" style={{ background: 'hsl(240, 6%, 10%)' }}>
+          {selectedPayment && (() => {
+            const sc = statusConfig[selectedPayment.status];
+            const pc = planConfig[selectedPayment.plan];
+            const StatusIcon = sc.icon;
+            const date = new Date(selectedPayment.date);
+
+            const copyToClipboard = (text: string) => {
+              navigator.clipboard.writeText(text);
+              toast.success('Copiado!');
+            };
+
+            const DetailRow = ({ icon: Icon, label, value, copyable }: { icon: any; label: string; value: string; copyable?: boolean }) => (
+              <div className="flex items-center justify-between py-2.5">
+                <div className="flex items-center gap-2.5 text-muted-foreground/60">
+                  <Icon size={13} />
+                  <span className="text-[11px] font-medium">{label}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[12px] font-semibold text-foreground">{value}</span>
+                  {copyable && (
+                    <button onClick={() => copyToClipboard(value)} className="p-1 rounded hover:bg-muted/30 transition-colors">
+                      <Copy size={10} className="text-muted-foreground/40" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+
+            return (
+              <>
+                {/* Header with status */}
+                <div className={`px-6 pt-6 pb-4 ${sc.bg} border-b ${sc.border}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Receipt size={16} className="text-primary" />
+                      <span className="text-[10px] font-bold tracking-widest text-muted-foreground/50 uppercase">Comprovante</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${sc.border} ${sc.bg}`}>
+                      <StatusIcon size={12} className={sc.color} />
+                      <span className={`text-[10px] font-bold tracking-wider ${sc.color}`}>{sc.label.toUpperCase()}</span>
+                    </div>
+                  </div>
+                  <p className={`text-3xl font-bold ${selectedPayment.status === 'paid' ? 'text-emerald-400' : selectedPayment.status === 'failed' ? 'text-secondary' : 'text-foreground'}`}>
+                    R$ {selectedPayment.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground/50 mt-1">{selectedPayment.description}</p>
+                </div>
+
+                {/* Details */}
+                <div className="px-6 py-4 space-y-0">
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase mb-2">Dados do Cliente</p>
+                  <DetailRow icon={User} label="Nome" value={selectedPayment.user_name} />
+                  <DetailRow icon={Mail} label="Email" value={selectedPayment.user_email} copyable />
+
+                  <Separator className="my-2 bg-border/20" />
+
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase mb-2 mt-3">Detalhes da Transação</p>
+                  <DetailRow icon={Hash} label="ID Transação" value={selectedPayment.transaction_id} copyable />
+                  <DetailRow icon={Building2} label="Banco" value={selectedPayment.bank} />
+                  <DetailRow icon={CreditCard} label="Método" value={selectedPayment.card_last4 ? `${selectedPayment.method} •••• ${selectedPayment.card_last4}` : selectedPayment.method} />
+                  <DetailRow icon={CalendarIcon} label="Data/Hora" value={`${date.toLocaleDateString('pt-BR')} ${date.toLocaleTimeString('pt-BR')}`} />
+                  <DetailRow icon={Crown} label="Plano" value={pc.label} />
+
+                  <Separator className="my-2 bg-border/20" />
+
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase mb-2 mt-3">Valores</p>
+                  <DetailRow icon={DollarSign} label="Valor Bruto" value={`R$ ${selectedPayment.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
+                  <DetailRow icon={ArrowDownRight} label="Taxa" value={`- R$ ${selectedPayment.fee.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
+                  <div className="flex items-center justify-between py-2.5 border-t border-border/20 mt-1">
+                    <span className="text-[11px] font-bold text-muted-foreground/60">Valor Líquido</span>
+                    <span className="text-[13px] font-bold text-emerald-400">R$ {selectedPayment.net_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  </div>
+
+                  <Separator className="my-2 bg-border/20" />
+
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase mb-2 mt-3">Segurança</p>
+                  <DetailRow icon={Shield} label="IP de Origem" value={selectedPayment.ip_address} copyable />
+                  <DetailRow icon={FileText} label="Moeda" value={selectedPayment.currency} />
+                  <DetailRow icon={Hash} label="ID Pagamento" value={selectedPayment.id} copyable />
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
