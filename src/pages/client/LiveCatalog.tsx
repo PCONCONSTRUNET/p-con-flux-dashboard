@@ -64,18 +64,17 @@ const LiveCatalog = () => {
     };
   }, [rounds, limit]);
 
-  const MAX_PER_MINUTE = 2;
+  const FIXED_ROWS = 15;
 
-  // Group rounds by last digit of minute (00-09) with max 2 stones per minute column
+  // Group rounds by last digit of minute (00-09), unlimited per column
   const minuteDigitColumns = useMemo(() => {
     const columns: BlazeRound[][] = Array.from({ length: 10 }, () => []);
 
-    // Newest first, keeping only the last 2 for each minute digit column
-    displayed.forEach(round => {
+    // Oldest first so they fill top-to-bottom in order
+    const sorted = [...displayed].reverse();
+    sorted.forEach(round => {
       const digit = new Date(round.timestamp).getMinutes() % 10;
-      if (columns[digit].length < MAX_PER_MINUTE) {
-        columns[digit].push(round);
-      }
+      columns[digit].push(round);
     });
 
     return columns;
