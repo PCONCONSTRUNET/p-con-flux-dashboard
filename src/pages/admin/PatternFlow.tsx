@@ -146,7 +146,7 @@ const PatternFlow = () => {
           <h3 className="font-display text-sm font-bold text-foreground mb-0.5">Comparativo por Padrão</h3>
           <p className="text-[10px] text-muted-foreground/50 mb-5">Greens vs Losses por padrão</p>
           <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={patternFlows.map(p => ({ name: p.name.split(' ')[0], greens: p.greens, losses: p.losses }))} barGap={3}>
+            <BarChart data={patternFlows.map(p => ({ name: p.name.split(' ')[0], greens: p.greens, losses: p.losses }))} barGap={3} style={{ background: 'transparent' }}>
               <defs>
                 <linearGradient id="flowGreenGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="hsl(152, 69%, 55%)" stopOpacity={0.95} />
