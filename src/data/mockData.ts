@@ -1,4 +1,5 @@
 // Mock data for the entire application
+
 export interface Pattern {
   id: string;
   name: string;
@@ -26,6 +27,70 @@ export interface ClientUser {
   role: 'client';
   createdAt: string;
 }
+
+// Blaze Double colors
+export type BlazeColor = 'red' | 'black' | 'white';
+
+export interface BlazeRound {
+  id: string;
+  number: number;
+  color: BlazeColor;
+  timestamp: string;
+  roll: number; // 0-14
+}
+
+// Sinais (Signals)
+export type SignalResult = 'green' | 'loss' | 'pending';
+
+export interface Signal {
+  id: string;
+  type: string;
+  entry: string;
+  protection: string;
+  result: SignalResult;
+  timestamp: string;
+  rounds: number;
+  target: string;
+}
+
+// Generate mock Blaze rounds
+function generateBlazeRounds(count: number): BlazeRound[] {
+  const rounds: BlazeRound[] = [];
+  const now = Date.now();
+  for (let i = 0; i < count; i++) {
+    const roll = Math.floor(Math.random() * 15);
+    let color: BlazeColor = 'black';
+    if (roll === 0) color = 'white';
+    else if ([1, 2, 3, 4, 5, 6, 7].includes(roll)) color = 'red';
+    else color = 'black';
+
+    rounds.push({
+      id: `br-${i}`,
+      number: count - i,
+      color,
+      timestamp: new Date(now - i * 25000).toISOString(),
+      roll,
+    });
+  }
+  return rounds;
+}
+
+export const mockBlazeRounds: BlazeRound[] = generateBlazeRounds(200);
+
+export const mockSignals: Signal[] = [
+  { id: 's1', type: 'Sequência', entry: '3x Vermelho → Preto', protection: '1 Gale', result: 'green', timestamp: new Date(Date.now() - 120000).toISOString(), rounds: 1, target: 'Double' },
+  { id: 's2', type: 'Padrão', entry: '2x Preto → Vermelho', protection: '2 Gales', result: 'green', timestamp: new Date(Date.now() - 300000).toISOString(), rounds: 2, target: 'Double' },
+  { id: 's3', type: 'Tendência', entry: '4x Vermelho → Branco', protection: 'Sem proteção', result: 'loss', timestamp: new Date(Date.now() - 480000).toISOString(), rounds: 1, target: 'Double' },
+  { id: 's4', type: 'Sequência', entry: '5x Preto → Vermelho', protection: '1 Gale', result: 'green', timestamp: new Date(Date.now() - 660000).toISOString(), rounds: 1, target: 'Double' },
+  { id: 's5', type: 'Convergência', entry: '3x Vermelho → Preto', protection: '2 Gales', result: 'green', timestamp: new Date(Date.now() - 900000).toISOString(), rounds: 3, target: 'Double' },
+  { id: 's6', type: 'Padrão', entry: '2x Preto → Vermelho', protection: '1 Gale', result: 'loss', timestamp: new Date(Date.now() - 1200000).toISOString(), rounds: 2, target: 'Double' },
+  { id: 's7', type: 'Sequência', entry: '4x Vermelho → Preto', protection: '1 Gale', result: 'green', timestamp: new Date(Date.now() - 1500000).toISOString(), rounds: 1, target: 'Double' },
+  { id: 's8', type: 'Tendência', entry: '3x Preto → Vermelho', protection: '2 Gales', result: 'green', timestamp: new Date(Date.now() - 1800000).toISOString(), rounds: 2, target: 'Double' },
+  { id: 's9', type: 'Padrão', entry: '5x Vermelho → Branco', protection: 'Sem proteção', result: 'pending', timestamp: new Date(Date.now() - 30000).toISOString(), rounds: 0, target: 'Double' },
+  { id: 's10', type: 'Sequência', entry: '2x Preto → Vermelho', protection: '1 Gale', result: 'green', timestamp: new Date(Date.now() - 2100000).toISOString(), rounds: 1, target: 'Double' },
+  { id: 's11', type: 'Convergência', entry: '3x Vermelho → Preto', protection: '1 Gale', result: 'green', timestamp: new Date(Date.now() - 2400000).toISOString(), rounds: 1, target: 'Double' },
+  { id: 's12', type: 'Tendência', entry: '4x Preto → Vermelho', protection: '2 Gales', result: 'loss', timestamp: new Date(Date.now() - 2700000).toISOString(), rounds: 3, target: 'Double' },
+];
 
 export const mockPatterns: Pattern[] = [
   { id: '1', name: 'Sequência Alpha-7', description: 'Detecta padrões repetitivos em intervalos regulares', status: 'active', parameters: 'Intervalo: 5min, Threshold: 85%', rules: 'Mínimo 3 ocorrências consecutivas', createdAt: '2026-03-01' },
