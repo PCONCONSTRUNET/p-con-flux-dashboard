@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Zap, Trophy, XCircle, Percent, ChevronDown, ExternalLink, Loader2, CheckCircle2, Radio } from 'lucide-react';
+import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radio } from 'lucide-react';
 import { mockSignals, type Signal } from '@/data/mockData';
 import flameIcon from '@/assets/flame-icon.png';
+import BlazeRoulette from '@/components/BlazeRoulette';
 
 type AnalysisState = 'scanning' | 'pattern_found' | 'confirmed' | 'idle';
 
@@ -170,27 +171,12 @@ const ClientDashboard = () => {
           'bg-gradient-to-r from-transparent via-secondary/60 to-transparent'
         }`} />
 
-        {/* Circle */}
+        {/* Roulette */}
         <div className="flex justify-center mb-4">
-          <div className={`w-28 h-28 rounded-full border-[3px] flex items-center justify-center transition-all duration-500 ${
-            analysisState === 'scanning'
-              ? 'border-muted-foreground/20 animate-pulse'
-              : analysisState === 'pattern_found'
-                ? 'border-primary/50 shadow-[0_0_30px_hsla(187,100%,50%,0.2)]'
-                : analysisState === 'confirmed'
-                  ? 'border-emerald-500/50 shadow-[0_0_40px_hsla(145,80%,50%,0.25)]'
-                  : 'border-border/30'
-          }`}>
-            {analysisState === 'scanning' ? (
-              <Radio size={36} className="text-muted-foreground animate-pulse" />
-            ) : analysisState === 'pattern_found' ? (
-              <Zap size={36} className="text-primary" />
-            ) : analysisState === 'confirmed' ? (
-              <CheckCircle2 size={36} className="text-emerald-400" />
-            ) : (
-              <Loader2 size={36} className="text-muted-foreground/40" />
-            )}
-          </div>
+          <BlazeRoulette
+            spinning={analysisState === 'scanning'}
+            size={140}
+          />
         </div>
 
         {/* Status */}
