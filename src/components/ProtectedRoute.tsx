@@ -8,7 +8,14 @@ interface Props {
 }
 
 const ProtectedRoute = ({ children, role }: Props) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-primary font-display text-sm animate-pulse">Carregando...</div>
+      </div>
+    );
+  }
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (role && user?.role !== role) {
     return <Navigate to={user?.role === 'admin' ? '/admin' : '/client'} replace />;
