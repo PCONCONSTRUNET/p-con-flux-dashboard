@@ -38,6 +38,7 @@ const socials = [
   {
     name: 'Discord',
     key: 'discord',
+    link: '#',
     color: 'rgba(88, 101, 242, 0.6)',
     gradient: 'linear-gradient(135deg, #1a1a3d, #3b40a0, #5865f2, #1e2044)',
     icon: (
