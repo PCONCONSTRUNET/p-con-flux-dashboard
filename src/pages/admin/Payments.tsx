@@ -444,7 +444,8 @@ const PaymentsPage = () => {
           return (
             <div
               key={payment.id}
-              className={`rounded-2xl p-4 border backdrop-blur-sm transition-all ${sc.border} ${sc.bg}`}
+              onClick={() => setSelectedPayment(payment)}
+              className={`rounded-2xl p-4 border backdrop-blur-sm transition-all cursor-pointer hover:scale-[1.01] hover:shadow-lg ${sc.border} ${sc.bg}`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3.5">
@@ -483,6 +484,95 @@ const PaymentsPage = () => {
           );
         })}
       </div>
+
+      {/* Payment Detail Modal */}
+      <Dialog open={!!selectedPayment} onOpenChange={(open) => !open && setSelectedPayment(null)}>
+        <DialogContent className="sm:max-w-md border-border/30 p-0 overflow-hidden" style={{ background: 'hsl(240, 6%, 10%)' }}>
+          {selectedPayment && (() => {
+            const sc = statusConfig[selectedPayment.status];
+            const pc = planConfig[selectedPayment.plan];
+            const StatusIcon = sc.icon;
+            const date = new Date(selectedPayment.date);
+
+            const copyToClipboard = (text: string) => {
+              navigator.clipboard.writeText(text);
+              toast.success('Copiado!');
+            };
+
+            const DetailRow = ({ icon: Icon, label, value, copyable }: { icon: any; label: string; value: string; copyable?: boolean }) => (
+              <div className="flex items-center justify-between py-2.5">
+                <div className="flex items-center gap-2.5 text-muted-foreground/60">
+                  <Icon size={13} />
+                  <span className="text-[11px] font-medium">{label}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[12px] font-semibold text-foreground">{value}</span>
+                  {copyable && (
+                    <button onClick={() => copyToClipboard(value)} className="p-1 rounded hover:bg-muted/30 transition-colors">
+                      <Copy size={10} className="text-muted-foreground/40" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+
+            return (
+              <>
+                {/* Header with status */}
+                <div className={`px-6 pt-6 pb-4 ${sc.bg} border-b ${sc.border}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Receipt size={16} className="text-primary" />
+                      <span className="text-[10px] font-bold tracking-widest text-muted-foreground/50 uppercase">Comprovante</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${sc.border} ${sc.bg}`}>
+                      <StatusIcon size={12} className={sc.color} />
+                      <span className={`text-[10px] font-bold tracking-wider ${sc.color}`}>{sc.label.toUpperCase()}</span>
+                    </div>
+                  </div>
+                  <p className={`text-3xl font-bold ${selectedPayment.status === 'paid' ? 'text-emerald-400' : selectedPayment.status === 'failed' ? 'text-secondary' : 'text-foreground'}`}>
+                    R$ {selectedPayment.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground/50 mt-1">{selectedPayment.description}</p>
+                </div>
+
+                {/* Details */}
+                <div className="px-6 py-4 space-y-0">
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase mb-2">Dados do Cliente</p>
+                  <DetailRow icon={User} label="Nome" value={selectedPayment.user_name} />
+                  <DetailRow icon={Mail} label="Email" value={selectedPayment.user_email} copyable />
+
+                  <Separator className="my-2 bg-border/20" />
+
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase mb-2 mt-3">Detalhes da Transação</p>
+                  <DetailRow icon={Hash} label="ID Transação" value={selectedPayment.transaction_id} copyable />
+                  <DetailRow icon={Building2} label="Banco" value={selectedPayment.bank} />
+                  <DetailRow icon={CreditCard} label="Método" value={selectedPayment.card_last4 ? `${selectedPayment.method} •••• ${selectedPayment.card_last4}` : selectedPayment.method} />
+                  <DetailRow icon={CalendarIcon} label="Data/Hora" value={`${date.toLocaleDateString('pt-BR')} ${date.toLocaleTimeString('pt-BR')}`} />
+                  <DetailRow icon={Crown} label="Plano" value={pc.label} />
+
+                  <Separator className="my-2 bg-border/20" />
+
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase mb-2 mt-3">Valores</p>
+                  <DetailRow icon={DollarSign} label="Valor Bruto" value={`R$ ${selectedPayment.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
+                  <DetailRow icon={ArrowDownRight} label="Taxa" value={`- R$ ${selectedPayment.fee.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
+                  <div className="flex items-center justify-between py-2.5 border-t border-border/20 mt-1">
+                    <span className="text-[11px] font-bold text-muted-foreground/60">Valor Líquido</span>
+                    <span className="text-[13px] font-bold text-emerald-400">R$ {selectedPayment.net_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  </div>
+
+                  <Separator className="my-2 bg-border/20" />
+
+                  <p className="text-[10px] font-bold tracking-widest text-muted-foreground/40 uppercase mb-2 mt-3">Segurança</p>
+                  <DetailRow icon={Shield} label="IP de Origem" value={selectedPayment.ip_address} copyable />
+                  <DetailRow icon={FileText} label="Moeda" value={selectedPayment.currency} />
+                  <DetailRow icon={Hash} label="ID Pagamento" value={selectedPayment.id} copyable />
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
