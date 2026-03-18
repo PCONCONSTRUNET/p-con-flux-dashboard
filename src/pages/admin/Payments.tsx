@@ -2,6 +2,9 @@ import { useState, useMemo } from 'react';
 import { Search, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, CreditCard, CheckCircle2, XCircle, Clock, Crown, Zap, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
+import ExportImportBar from '@/components/ExportImportBar';
+import { exportToPDF, exportToExcel, importFromExcel } from '@/utils/exportImport';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -173,20 +176,68 @@ const PaymentsPage = () => {
           <p className="text-sm text-muted-foreground/70 mt-1">Análise completa de receitas e assinaturas</p>
         </div>
 
-        <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.8)' }}>
-          {(['today', 'weekly', 'monthly', 'custom'] as FilterType[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => setPeriodFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-display font-semibold tracking-wider transition-all ${
-                periodFilter === f
-                  ? 'bg-primary/15 text-primary border border-primary/25'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent'
-              }`}
-            >
-              {filterLabels[f]}
-            </button>
-          ))}
+        <div className="flex items-center gap-3 flex-wrap">
+          <ExportImportBar
+            onExportPDF={() => {
+              const cols = [
+                { header: 'Cliente', key: 'user_name' },
+                { header: 'Email', key: 'user_email' },
+                { header: 'Plano', key: 'plan' },
+                { header: 'Valor', key: 'amount' },
+                { header: 'Status', key: 'status' },
+                { header: 'Método', key: 'method' },
+                { header: 'Data', key: 'date' },
+              ];
+              const data = filtered.map(p => ({
+                ...p,
+                amount: `R$ ${p.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                date: new Date(p.date).toLocaleDateString('pt-BR'),
+                status: statusConfig[p.status].label,
+              }));
+              exportToPDF('Pagamentos - P-CON FLUX', cols, data, 'pagamentos-pcon-flux');
+              toast.success('PDF exportado com sucesso!');
+            }}
+            onExportExcel={() => {
+              const cols = [
+                { header: 'Cliente', key: 'user_name' },
+                { header: 'Email', key: 'user_email' },
+                { header: 'Plano', key: 'plan' },
+                { header: 'Valor', key: 'amount' },
+                { header: 'Status', key: 'status' },
+                { header: 'Método', key: 'method' },
+                { header: 'Data', key: 'date' },
+              ];
+              const data = filtered.map(p => ({
+                ...p,
+                date: new Date(p.date).toLocaleDateString('pt-BR'),
+                status: statusConfig[p.status].label,
+              }));
+              exportToExcel(cols, data, 'pagamentos-pcon-flux', 'Pagamentos');
+              toast.success('Excel exportado com sucesso!');
+            }}
+            onImportFile={(file) => {
+              importFromExcel(file, (rows) => {
+                toast.success(`${rows.length} registros importados do arquivo!`);
+                console.log('Imported payments:', rows);
+              });
+            }}
+          />
+
+          <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.8)' }}>
+            {(['today', 'weekly', 'monthly', 'custom'] as FilterType[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setPeriodFilter(f)}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-display font-semibold tracking-wider transition-all ${
+                  periodFilter === f
+                    ? 'bg-primary/15 text-primary border border-primary/25'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent'
+                }`}
+              >
+                {filterLabels[f]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

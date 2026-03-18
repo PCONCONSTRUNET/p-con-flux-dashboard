@@ -4,6 +4,9 @@ import { Users, TrendingUp, Crown, Zap, Clock, DollarSign, Activity, ArrowRight,
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import ExportImportBar from '@/components/ExportImportBar';
+import { exportToPDF, exportToExcel, importFromExcel } from '@/utils/exportImport';
+import { toast } from 'sonner';
 
 type FilterType = 'today' | 'weekly' | 'monthly' | 'custom';
 
@@ -143,20 +146,63 @@ const AdminDashboard = () => {
           <p className="text-sm text-muted-foreground/70 mt-1">Visão geral do sistema P-CON FLUX</p>
         </div>
 
-        <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.8)' }}>
-          {(['today', 'weekly', 'monthly', 'custom'] as FilterType[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-display font-semibold tracking-wider transition-all ${
-                filter === f
-                  ? 'bg-primary/15 text-primary border border-primary/25'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent'
-              }`}
-            >
-              {filterLabels[f]}
-            </button>
-          ))}
+        <div className="flex items-center gap-3 flex-wrap">
+          <ExportImportBar
+            onExportPDF={() => {
+              const cols = [
+                { header: 'Métrica', key: 'metric' },
+                { header: 'Valor', key: 'value' },
+              ];
+              const data = [
+                { metric: 'Receita Total', value: `R$ ${totalRevenue.toLocaleString('pt-BR')}` },
+                { metric: 'Clientes Total', value: clientStats.total || 10 },
+                { metric: 'Win Rate', value: `${filteredWinRate}%` },
+                { metric: 'Padrões Ativos', value: activePatterns },
+                { metric: 'Greens', value: totalGreens },
+                { metric: 'Losses', value: totalLosses },
+              ];
+              exportToPDF('Dashboard - P-CON FLUX', cols, data, 'dashboard-pcon-flux');
+              toast.success('PDF exportado com sucesso!');
+            }}
+            onExportExcel={() => {
+              const cols = [
+                { header: 'Métrica', key: 'metric' },
+                { header: 'Valor', key: 'value' },
+              ];
+              const data = [
+                { metric: 'Receita Total', value: totalRevenue },
+                { metric: 'Clientes Total', value: clientStats.total || 10 },
+                { metric: 'Win Rate %', value: filteredWinRate },
+                { metric: 'Padrões Ativos', value: activePatterns },
+                { metric: 'Greens', value: totalGreens },
+                { metric: 'Losses', value: totalLosses },
+              ];
+              exportToExcel(cols, data, 'dashboard-pcon-flux', 'Dashboard');
+              toast.success('Excel exportado com sucesso!');
+            }}
+            onImportFile={(file) => {
+              importFromExcel(file, (rows) => {
+                toast.success(`${rows.length} registros importados do arquivo!`);
+                console.log('Imported data:', rows);
+              });
+            }}
+          />
+
+          <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.8)' }}>
+            {(['today', 'weekly', 'monthly', 'custom'] as FilterType[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-display font-semibold tracking-wider transition-all ${
+                  filter === f
+                    ? 'bg-primary/15 text-primary border border-primary/25'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent'
+                }`}
+              >
+                {filterLabels[f]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
