@@ -157,20 +157,37 @@ const LiveCatalog = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col items-end">
-            <span className="text-sm font-bold font-mono text-primary tracking-wider">{clock}</span>
-            <span className="text-[9px] text-muted-foreground uppercase tracking-widest">Brasília</span>
-          </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-3 py-2 rounded-xl border transition-all ${
-              showFilters ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
-            }`}
-          >
-            <Filter size={12} />
-            Filtros
-          </button>
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-3 py-2 rounded-xl border transition-all ${
+            showFilters ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
+          }`}
+        >
+          <Filter size={12} />
+          Filtros
+        </button>
+      </div>
+
+      {/* Clock card */}
+      <div className="flex justify-end">
+        <div
+          className="w-[280px] h-[130px] rounded-2xl flex flex-col justify-center relative cursor-pointer overflow-hidden transition-all duration-300 group"
+          style={{
+            background: 'linear-gradient(to right, hsl(240 6% 8%), hsl(210 40% 16%))',
+            boxShadow: '5px 10px 50px rgba(0,0,0,0.7), -5px 0px 250px rgba(0,0,0,0.7)',
+          }}
+        >
+          <p className="text-[46px] font-bold text-foreground leading-none ml-4 mt-0">
+            {clock.slice(0, 5)}
+            <span className="text-[15px] ml-1.5 text-foreground/70">{clock.slice(6)}</span>
+          </p>
+          <p className="text-base font-medium text-foreground/80 ml-4 mt-1">
+            {new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'long' })}
+          </p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" className="text-[20px] absolute right-4 top-4 text-foreground/60 transition-all duration-300 group-hover:text-[23px]">
+            <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z" />
+            <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z" />
+          </svg>
         </div>
       </div>
 
