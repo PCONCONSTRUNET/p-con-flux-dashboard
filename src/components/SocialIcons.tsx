@@ -63,10 +63,11 @@ const SocialIcons = () => {
           </span>
           {/* Icon button */}
           <a
-            href="#"
+            href={s.link}
+            target="_blank"
+            rel="noopener noreferrer"
             className="social-glass-icon"
             style={{ borderColor: s.color }}
-            onClick={(e) => e.preventDefault()}
           >
             <span className="social-filled" style={{ background: s.gradient, backgroundSize: '400% 400%' }} />
             <span className="social-shine" />
