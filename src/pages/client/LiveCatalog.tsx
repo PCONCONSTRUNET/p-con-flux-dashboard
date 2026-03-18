@@ -68,9 +68,10 @@ const LiveCatalog = () => {
   }, [rounds, limit]);
 
   const fixedColumnSource = useMemo(() => {
-    if (colorFilter === 'all') return rounds;
-    return rounds.filter((round) => round.color === colorFilter);
-  }, [rounds, colorFilter]);
+    const sliced = rounds.slice(0, limit);
+    if (colorFilter === 'all') return sliced;
+    return sliced.filter((round) => round.color === colorFilter);
+  }, [rounds, colorFilter, limit]);
 
   // Build grid: rows = 10-min blocks, cols = minute last digit (0-9), each cell = up to 2 rounds
   const fixedGrid = useMemo(() => {
