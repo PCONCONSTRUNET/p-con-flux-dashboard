@@ -44,6 +44,48 @@ export type Database = {
         }
         Relationships: []
       }
+      patterns: {
+        Row: {
+          colors: string[]
+          created_at: string
+          description: string
+          gales: number
+          id: string
+          mode: string
+          name: string
+          numbers: number[]
+          status: string
+          updated_at: string
+          victory_target: string
+        }
+        Insert: {
+          colors?: string[]
+          created_at?: string
+          description?: string
+          gales?: number
+          id?: string
+          mode?: string
+          name: string
+          numbers?: number[]
+          status?: string
+          updated_at?: string
+          victory_target?: string
+        }
+        Update: {
+          colors?: string[]
+          created_at?: string
+          description?: string
+          gales?: number
+          id?: string
+          mode?: string
+          name?: string
+          numbers?: number[]
+          status?: string
+          updated_at?: string
+          victory_target?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
