@@ -227,14 +227,22 @@ export default function Integrations() {
 
                 <div className="space-y-2">
                   <Label className="text-[11px] font-display font-semibold text-muted-foreground/60">URL de Notificação</Label>
-                  <Input
-                    placeholder="https://seudominio.com/api/webhook/mp"
-                    value={config.webhookUrl}
-                    onChange={(e) => setConfig(prev => ({ ...prev, webhookUrl: e.target.value }))}
-                    className="bg-background/40 border-border/15 text-xs font-mono placeholder:text-muted-foreground/15 focus:border-primary/30 focus:bg-background/60 h-11 rounded-xl transition-all"
-                  />
+                  <div className="relative group">
+                    <Input
+                      readOnly
+                      value={webhookUrl}
+                      className="bg-background/40 border-border/15 text-xs pr-12 font-mono text-primary/80 focus:border-primary/30 focus:bg-background/60 h-11 rounded-xl transition-all cursor-default"
+                    />
+                    <button
+                      onClick={handleCopyWebhook}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/30 hover:text-primary transition-colors"
+                      title="Copiar URL"
+                    >
+                      {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                    </button>
+                  </div>
                   <p className="text-[10px] text-muted-foreground/30 leading-relaxed">
-                    Cadastre esta URL nas configurações de webhook do seu aplicativo no painel do Mercado Pago.
+                    Copie esta URL e cadastre nas <strong className="text-foreground/50">configurações de webhook</strong> do seu aplicativo no painel do Mercado Pago.
                   </p>
                 </div>
               </section>
