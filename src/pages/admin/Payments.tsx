@@ -1,7 +1,14 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Search, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, Calendar, Filter, CreditCard, CheckCircle2, XCircle, Clock, Crown, Zap, ChevronDown } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, CreditCard, CheckCircle2, XCircle, Clock, Crown, Zap, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+
+type FilterType = 'today' | 'weekly' | 'monthly' | 'custom';
 
 interface PaymentRecord {
   id: string;
@@ -26,23 +33,56 @@ const mockPayments: PaymentRecord[] = [
   { id: 'pay-8', user_name: 'Julia Almeida', user_email: 'julia@email.com', plan: 'monthly', status: 'refunded', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(), method: 'Cartão' },
   { id: 'pay-9', user_name: 'Pedro Oliveira', user_email: 'pedro@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), method: 'PIX' },
   { id: 'pay-10', user_name: 'Camila Souza', user_email: 'camila@email.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(), method: 'Cartão' },
+  { id: 'pay-11', user_name: 'Diego Ramos', user_email: 'diego@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(), method: 'PIX' },
+  { id: 'pay-12', user_name: 'Tatiana Gomes', user_email: 'tatiana@email.com', plan: 'annual', status: 'paid', amount: 497.00, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(), method: 'Cartão' },
+  { id: 'pay-13', user_name: 'Marcos Dias', user_email: 'marcos@email.com', plan: 'monthly', status: 'paid', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 20).toISOString(), method: 'Boleto' },
+  { id: 'pay-14', user_name: 'Patricia Nunes', user_email: 'patricia@email.com', plan: 'monthly', status: 'failed', amount: 49.90, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 25).toISOString(), method: 'Cartão' },
 ];
 
-const revenueByDay = [
-  { day: 'Seg', value: 547 },
-  { day: 'Ter', value: 497 },
-  { day: 'Qua', value: 99 },
-  { day: 'Qui', value: 547 },
-  { day: 'Sex', value: 994 },
-  { day: 'Sáb', value: 497 },
-  { day: 'Dom', value: 149 },
-];
+const revenueDataSets: Record<Exclude<FilterType, 'custom'>, { label: string; value: number }[]> = {
+  today: [
+    { label: '06h', value: 150 },
+    { label: '09h', value: 497 },
+    { label: '12h', value: 99 },
+    { label: '15h', value: 49 },
+    { label: '18h', value: 0 },
+    { label: '21h', value: 49 },
+  ],
+  weekly: [
+    { label: 'Seg', value: 547 },
+    { label: 'Ter', value: 497 },
+    { label: 'Qua', value: 99 },
+    { label: 'Qui', value: 547 },
+    { label: 'Sex', value: 994 },
+    { label: 'Sáb', value: 497 },
+    { label: 'Dom', value: 149 },
+  ],
+  monthly: [
+    { label: 'Sem 1', value: 2100 },
+    { label: 'Sem 2', value: 1850 },
+    { label: 'Sem 3', value: 2400 },
+    { label: 'Sem 4', value: 3200 },
+  ],
+};
 
 const revenueByMethod = [
   { method: 'PIX', value: 1988, color: 'hsl(152, 69%, 55%)' },
   { method: 'Cartão', value: 1094, color: 'hsl(187, 100%, 50%)' },
   { method: 'Boleto', value: 249, color: 'hsl(45, 93%, 58%)' },
 ];
+
+const filterLabels: Record<FilterType, string> = {
+  today: 'Hoje',
+  weekly: 'Semanal',
+  monthly: 'Mensal',
+  custom: 'Personalizado',
+};
+
+const periodSubtitle: Record<Exclude<FilterType, 'custom'>, string> = {
+  today: 'Últimas 24 horas',
+  weekly: 'Últimos 7 dias',
+  monthly: 'Últimos 30 dias',
+};
 
 const statusConfig = {
   paid: { label: 'Pago', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', icon: CheckCircle2 },
@@ -76,31 +116,114 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const PaymentsPage = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'paid' | 'pending' | 'failed' | 'refunded'>('all');
-  const [planFilter, setPlanFilter] = useState<'all' | 'monthly' | 'annual'>('all');
+  const [periodFilter, setPeriodFilter] = useState<FilterType>('weekly');
+  const [customStart, setCustomStart] = useState<Date | undefined>();
+  const [customEnd, setCustomEnd] = useState<Date | undefined>();
+
+  const activeFilter = periodFilter === 'custom' ? 'weekly' : periodFilter;
+  const revenueData = revenueDataSets[activeFilter];
+
+  // Filter payments by period
+  const periodFilteredPayments = useMemo(() => {
+    const now = new Date();
+    return mockPayments.filter(p => {
+      const pDate = new Date(p.date);
+      if (periodFilter === 'today') {
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        return pDate >= startOfDay;
+      }
+      if (periodFilter === 'weekly') {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return pDate >= weekAgo;
+      }
+      if (periodFilter === 'monthly') {
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return pDate >= monthAgo;
+      }
+      if (periodFilter === 'custom' && customStart && customEnd) {
+        const endOfDay = new Date(customEnd);
+        endOfDay.setHours(23, 59, 59, 999);
+        return pDate >= customStart && pDate <= endOfDay;
+      }
+      return true;
+    });
+  }, [periodFilter, customStart, customEnd]);
 
   const filtered = useMemo(() => {
-    return mockPayments.filter(p => {
+    return periodFilteredPayments.filter(p => {
       if (statusFilter !== 'all' && p.status !== statusFilter) return false;
-      if (planFilter !== 'all' && p.plan !== planFilter) return false;
       if (search && !p.user_name.toLowerCase().includes(search.toLowerCase()) && !p.user_email.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [search, statusFilter, planFilter]);
+  }, [search, statusFilter, periodFilteredPayments]);
 
-  const totalRevenue = mockPayments.filter(p => p.status === 'paid').reduce((a, p) => a + p.amount, 0);
-  const monthlyRevenue = mockPayments.filter(p => p.status === 'paid' && p.plan === 'monthly').reduce((a, p) => a + p.amount, 0);
-  const annualRevenue = mockPayments.filter(p => p.status === 'paid' && p.plan === 'annual').reduce((a, p) => a + p.amount, 0);
-  const pendingAmount = mockPayments.filter(p => p.status === 'pending').reduce((a, p) => a + p.amount, 0);
-  const paidCount = mockPayments.filter(p => p.status === 'paid').length;
-  const failedCount = mockPayments.filter(p => p.status === 'failed').length;
+  const totalRevenue = periodFilteredPayments.filter(p => p.status === 'paid').reduce((a, p) => a + p.amount, 0);
+  const monthlyRevenue = periodFilteredPayments.filter(p => p.status === 'paid' && p.plan === 'monthly').reduce((a, p) => a + p.amount, 0);
+  const annualRevenue = periodFilteredPayments.filter(p => p.status === 'paid' && p.plan === 'annual').reduce((a, p) => a + p.amount, 0);
+  const pendingAmount = periodFilteredPayments.filter(p => p.status === 'pending').reduce((a, p) => a + p.amount, 0);
+  const paidCount = periodFilteredPayments.filter(p => p.status === 'paid').length;
+  const failedCount = periodFilteredPayments.filter(p => p.status === 'failed').length;
 
   return (
     <div className="space-y-6 animate-fade-in pb-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground tracking-tight">Pagamentos</h1>
-        <p className="text-sm text-muted-foreground/70 mt-1">Análise completa de receitas e assinaturas</p>
+      {/* Header + Period Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground tracking-tight">Pagamentos</h1>
+          <p className="text-sm text-muted-foreground/70 mt-1">Análise completa de receitas e assinaturas</p>
+        </div>
+
+        <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.8)' }}>
+          {(['today', 'weekly', 'monthly', 'custom'] as FilterType[]).map((f) => (
+            <button
+              key={f}
+              onClick={() => setPeriodFilter(f)}
+              className={`px-3 py-1.5 rounded-lg text-[11px] font-display font-semibold tracking-wider transition-all ${
+                periodFilter === f
+                  ? 'bg-primary/15 text-primary border border-primary/25'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent'
+              }`}
+            >
+              {filterLabels[f]}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* Custom date pickers */}
+      {periodFilter === 'custom' && (
+        <div className="flex items-center gap-3 p-3 rounded-xl border border-border/30" style={{ background: 'hsla(240,6%,10%,0.6)' }}>
+          <CalendarIcon size={14} className="text-primary" />
+          <div className="flex items-center gap-2">
+            <label className="text-[10px] text-muted-foreground font-display">DE:</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className={cn("h-8 px-3 text-xs rounded-lg border-border/30 bg-muted/20", !customStart && "text-muted-foreground")}>
+                  <CalendarIcon size={12} className="mr-1.5" />
+                  {customStart ? format(customStart, "dd/MM/yyyy") : "Selecionar"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={customStart} onSelect={setCustomStart} initialFocus className={cn("p-3 pointer-events-auto")} />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-[10px] text-muted-foreground font-display">ATÉ:</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className={cn("h-8 px-3 text-xs rounded-lg border-border/30 bg-muted/20", !customEnd && "text-muted-foreground")}>
+                  <CalendarIcon size={12} className="mr-1.5" />
+                  {customEnd ? format(customEnd, "dd/MM/yyyy") : "Selecionar"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={customEnd} onSelect={setCustomEnd} initialFocus className={cn("p-3 pointer-events-auto")} />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+      )}
 
       {/* Revenue Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -115,7 +238,7 @@ const PaymentsPage = () => {
             </div>
           </div>
           <p className="text-xl font-bold text-foreground">R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mt-1">Receita Total</p>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold mt-1">Receita {filterLabels[periodFilter]}</p>
         </div>
 
         <div className="rounded-2xl p-4 border border-primary/20 backdrop-blur-xl relative overflow-hidden"
@@ -156,8 +279,8 @@ const PaymentsPage = () => {
           style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.6) 0%, hsla(240,6%,8%,0.8) 100%)' }}>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-foreground">Receita por Dia</h3>
-              <p className="text-[10px] text-muted-foreground/50">Últimos 7 dias</p>
+              <h3 className="text-sm font-bold text-foreground">Receita {filterLabels[periodFilter]}</h3>
+              <p className="text-[10px] text-muted-foreground/50">{periodSubtitle[activeFilter]}</p>
             </div>
             <div className="flex items-center gap-3 text-[10px] text-muted-foreground/50">
               <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-emerald-400" /> {paidCount} pagos</span>
@@ -165,7 +288,7 @@ const PaymentsPage = () => {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={revenueByDay}>
+            <AreaChart data={revenueData}>
               <defs>
                 <linearGradient id="payRevenueGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="hsl(152, 69%, 55%)" stopOpacity={0.3} />
@@ -173,7 +296,7 @@ const PaymentsPage = () => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsla(240,6%,30%,0.2)" />
-              <XAxis dataKey="day" tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="label" tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsla(240,6%,50%,0.1)' }} />
               <Area type="monotone" dataKey="value" name="Receita" stroke="hsl(152, 69%, 55%)" strokeWidth={2.5} fill="url(#payRevenueGrad)" />
@@ -209,7 +332,7 @@ const PaymentsPage = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Status Filters + Search */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
@@ -240,6 +363,11 @@ const PaymentsPage = () => {
 
       {/* Payments List */}
       <div className="space-y-2.5">
+        {filtered.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground/40 text-sm">
+            Nenhum pagamento encontrado para o período selecionado.
+          </div>
+        )}
         {filtered.map(payment => {
           const sc = statusConfig[payment.status];
           const pc = planConfig[payment.plan];
@@ -281,7 +409,7 @@ const PaymentsPage = () => {
                 </span>
                 <span className="opacity-30">•</span>
                 <span className="flex items-center gap-1">
-                  <Calendar size={10} />
+                  <CalendarIcon size={10} />
                   {date.toLocaleDateString('pt-BR')} {date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
