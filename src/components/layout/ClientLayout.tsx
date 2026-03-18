@@ -6,10 +6,10 @@ import { Zap, LayoutGrid, Clock, User, LogOut, Menu, X, ChevronLeft, ChevronRigh
 import logo from '@/assets/logo.png';
 
 const navItems = [
-  { label: 'Sinais', icon: Zap, path: '/client' },
-  { label: 'Catálogo', icon: LayoutGrid, path: '/client/catalog' },
-  { label: 'Histórico', icon: Clock, path: '/client/history' },
-  { label: 'Perfil', icon: User, path: '/client/profile' },
+  { label: 'Sinais', icon: Zap, path: '/client', requiresSub: true },
+  { label: 'Catálogo', icon: LayoutGrid, path: '/client/catalog', requiresSub: false },
+  { label: 'Histórico', icon: Clock, path: '/client/history', requiresSub: true },
+  { label: 'Perfil', icon: User, path: '/client/profile', requiresSub: false },
 ];
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
