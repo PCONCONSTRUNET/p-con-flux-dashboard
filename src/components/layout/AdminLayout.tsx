@@ -1,13 +1,12 @@
 import { ReactNode, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, Layers, Users, LogOut, Menu, X, Shield, UserCheck, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Layers, LogOut, Menu, X, Shield, UserCheck, CreditCard } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
   { label: 'Padrões', icon: Layers, path: '/admin/patterns' },
-  { label: 'Usuários', icon: Users, path: '/admin/users' },
   { label: 'Clientes', icon: UserCheck, path: '/admin/clients' },
   { label: 'Pagamentos', icon: CreditCard, path: '/admin/payments' },
 ];
