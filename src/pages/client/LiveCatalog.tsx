@@ -275,116 +275,59 @@ const LiveCatalog = () => {
         </div>
       </div>
 
-      {/* Rounds display */}
-      {columnView ? (
-        /* Column view — blocks stack vertically, newest on top, each block is a horizontal strip */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px] space-y-1">
-          {minuteBlocks.map((block) => {
-            // Find the max rows needed for this block
-            const maxInBlock = Math.max(...block.columns.map(c => c.length), 0);
-            const rows = Math.max(maxInBlock, MAX_PER_MINUTE);
+      {/* Fixed columns view — 10 columns (00-09) side by side, results stack down */}
+      <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px]">
+        {/* Column headers */}
+        <div className="grid grid-cols-10 gap-1 mb-1 sticky top-0 z-10 bg-card/95 backdrop-blur-sm pb-1">
+          {Array.from({ length: 10 }, (_, i) => (
+            <div key={`hdr-${i}`} className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono">
+              {String(i).padStart(2, '0')}
+            </div>
+          ))}
+        </div>
 
-            return (
-              <div key={block.key}>
-                {/* Block header with label + minute columns */}
-                <div className="flex items-end gap-0 mb-0.5">
-                  {/* Block time label */}
-                  <div className="w-12 shrink-0 text-[9px] font-bold text-primary/70 font-mono text-right pr-2 pb-0.5">
-                    {block.label}
-                  </div>
-                  {/* 10 minute column headers: 00-09 */}
-                  <div className="flex-1 grid grid-cols-10 gap-0.5">
-                    {Array.from({ length: 10 }, (_, i) => (
-                      <div key={`hdr-${i}`} className="text-center text-[9px] font-bold text-muted-foreground/50 font-mono">
-                        {String(i).padStart(2, '0')}
+        {/* Rows — find max column height */}
+        {(() => {
+          const maxRows = Math.max(...minuteDigitColumns.map(c => c.length), 2);
+          return Array.from({ length: maxRows }, (_, row) => (
+            <div key={`row-${row}`} className="grid grid-cols-10 gap-1 mb-1">
+              {minuteDigitColumns.map((colRounds, col) => {
+                const r = colRounds[row];
+
+                if (r) {
+                  const style = colorStyles[r.color];
+                  const dimmed = highlighted && !isHighlighted(r);
+
+                  return (
+                    <div key={`${col}-${row}`} className="flex flex-col items-center">
+                      <div
+                        onClick={() => handleClickRound(r)}
+                        className={`w-full aspect-square max-w-[42px] rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                          dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                        } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                      >
+                        {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
+                        {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                       </div>
-                    ))}
-                  </div>
-                </div>
-                {/* Rows for this block */}
-                {Array.from({ length: rows }, (_, row) => (
-                  <div key={`row-${row}`} className="flex gap-0 mb-0.5">
-                    <div className="w-12 shrink-0" />
-                    <div className="flex-1 grid grid-cols-10 gap-0.5">
-                      {Array.from({ length: 10 }, (_, col) => {
-                        const r = block.columns[col][row];
-
-                        if (r) {
-                          const style = colorStyles[r.color];
-                          const dimmed = highlighted && !isHighlighted(r);
-
-                          return (
-                            <div key={`${block.key}-${col}-${row}`} className="flex flex-col items-center">
-                              <div
-                                onClick={() => handleClickRound(r)}
-                                className={`w-full aspect-square max-w-[42px] rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                                  dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                                } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                              >
-                                {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
-                              </div>
-                              {showTimestamps && (
-                                <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                                  {formatTime(r.timestamp)}
-                                </span>
-                              )}
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div key={`${block.key}-${col}-${row}`} className="flex items-center justify-center">
-                            <div className="w-full aspect-square max-w-[42px] rounded-lg border border-border/15 bg-muted/5" />
-                          </div>
-                        );
-                      })}
+                      {showTimestamps && (
+                        <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                          {formatTime(r.timestamp)}
+                        </span>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        /* Grid view — 22 per row */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[500px] overflow-x-auto">
-          <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(22, minmax(0, 1fr))' }}>
-            {displayed.map((r) => {
-              const style = colorStyles[r.color];
-              const dimmed = highlighted && !isHighlighted(r);
-              const time = formatTime(r.timestamp);
+                  );
+                }
 
-              return (
-                <div
-                  key={r.id}
-                  onClick={() => handleClickRound(r)}
-                  className="flex flex-col items-center cursor-pointer group"
-                >
-                  <div
-                    className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
-                      dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                    } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                  >
-                    {showNumbers && (
-                      <span className={`text-[11px] font-bold ${style.text}`}>
-                        {r.roll}
-                      </span>
-                    )}
-                    {!showNumbers && r.color === 'white' && (
-                      <div className="w-2 h-2 rounded-full bg-secondary/60" />
-                    )}
+                return (
+                  <div key={`${col}-${row}`} className="flex items-center justify-center">
+                    <div className="w-full aspect-square max-w-[42px] rounded-lg border border-border/15 bg-muted/5" />
                   </div>
-                  {showTimestamps && (
-                    <span className={`text-[8px] mt-0.5 font-mono transition-opacity ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                      {time}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+                );
+              })}
+            </div>
+          ));
+        })()}
+      </div>
     </div>
   );
 };
