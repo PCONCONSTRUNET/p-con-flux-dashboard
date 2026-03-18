@@ -26,6 +26,10 @@ const History = () => {
   const lossCount = mockSignals.filter(s => s.result === 'loss').length;
   const winRate = mockSignals.length > 0 ? Math.round((greenCount / mockSignals.length) * 100) : 0;
 
+  if (!hasActiveSubscription) {
+    return <LockedFeature feature="Histórico de sinais e rodadas" />;
+  }
+
   return (
     <div className="space-y-6 animate-fade-in pb-8">
       {/* Header */}
