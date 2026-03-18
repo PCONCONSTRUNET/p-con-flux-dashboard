@@ -350,123 +350,88 @@ const LiveCatalog = () => {
         </div>
       </div>
 
-      {/* Main content area */}
-      <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
-        <div className="flex-1 min-w-0">
-          {fixedColumns ? (
-            /* Fixed columns — scrollable on mobile */
-            <div className="rounded-2xl border border-border/50 bg-card/50 p-2 lg:p-3 overflow-auto max-h-[500px] lg:max-h-[600px]">
-              {/* Header row — responsive column widths */}
-              <div className="grid gap-1 lg:gap-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 108px))' }}>
-                {Array.from({ length: 10 }, (_, col) => (
-                  <div key={`head-${col}`} className="text-center text-[10px] lg:text-[11px] font-bold text-muted-foreground/70 font-mono py-1 lg:py-1.5 border border-border/30 bg-muted/15">
-                    {String(col).padStart(2, '0')}
-                  </div>
-                ))}
+      {fixedColumns ? (
+        /* Fixed columns — scrollable on mobile */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-2 lg:p-3 overflow-auto max-h-[500px] lg:max-h-[600px]">
+          {/* Header row — responsive column widths */}
+          <div className="grid gap-1 lg:gap-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 108px))' }}>
+            {Array.from({ length: 10 }, (_, col) => (
+              <div key={`head-${col}`} className="text-center text-[10px] lg:text-[11px] font-bold text-muted-foreground/70 font-mono py-1 lg:py-1.5 border border-border/30 bg-muted/15">
+                {String(col).padStart(2, '0')}
               </div>
+            ))}
+          </div>
 
-              {fixedGrid.map((block, rowIdx) => (
-                <div key={`block-${rowIdx}`} className="grid gap-1 lg:gap-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 108px))' }}>
-                  {block.rounds.map((cell, col) => (
-                    <div key={`cell-${rowIdx}-${col}`} className="flex gap-0.5 lg:gap-1 items-start justify-center">
-                      {cell.map((r, slot) => {
-                        if (!r) {
-                          return (
-                            <div key={`empty-${rowIdx}-${col}-${slot}`} className="w-[38px] lg:w-[52px]" style={{ height: '58px' }}>
-                              <div className="w-full rounded-lg border border-border/20 bg-muted/8 h-[36px] lg:h-[50px]" />
-                            </div>
-                          );
-                        }
-                        const dimmed = !!(highlighted && !isHighlighted(r));
-                        return (
-                          <div key={r.id} className="hidden lg:block">
-                            <Stone round={r} showNumbers={showNumbers} showTimestamps={showTimestamps} dimmed={dimmed} isSelected={r.id === highlighted} onClick={() => handleClickRound(r)} formatTime={formatTime} />
-                          </div>
-                        );
-                      })}
-                      {/* Mobile version of stones in cell */}
-                      {cell.map((r, slot) => {
-                        if (!r) {
-                          return (
-                            <div key={`m-empty-${rowIdx}-${col}-${slot}`} className="lg:hidden w-[38px]" style={{ height: '58px' }}>
-                              <div className="w-full rounded-lg border border-border/20 bg-muted/8 h-[36px]" />
-                            </div>
-                          );
-                        }
-                        const dimmed = !!(highlighted && !isHighlighted(r));
-                        return (
-                          <div key={`m-${r.id}`} className="lg:hidden">
-                            <Stone round={r} showNumbers={showNumbers} showTimestamps={showTimestamps} dimmed={dimmed} isSelected={r.id === highlighted} onClick={() => handleClickRound(r)} formatTime={formatTime} mobile />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              ))}
-
-              {fixedGrid.length === 0 && (
-                <div className="grid gap-1 lg:gap-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 108px))' }}>
-                  {Array.from({ length: 10 }, (_, col) => (
-                    <div key={`empty-row-${col}`} className="flex gap-0.5 lg:gap-1 items-stretch">
-                      <div className="rounded-lg border border-border/20 bg-muted/8 w-[38px] lg:w-[52px] h-[36px] lg:h-[50px]" />
-                      <div className="rounded-lg border border-border/20 bg-muted/8 w-[38px] lg:w-[52px] h-[36px] lg:h-[50px]" />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            /* Grid view — responsive stones */
-            <div className="rounded-2xl border border-border/50 bg-card/50 p-2 lg:p-3 overflow-y-auto max-h-[500px] lg:max-h-[600px]">
-              <div className="flex flex-wrap gap-0.5 lg:gap-1">
-                {displayed.map((r) => {
-                  const dimmed = !!(highlighted && !isHighlighted(r));
-                  return (
-                    <div key={r.id}>
-                      {/* Mobile stone */}
-                      <div className="lg:hidden">
-                        <Stone round={r} showNumbers={showNumbers} showTimestamps={showTimestamps} dimmed={dimmed} isSelected={r.id === highlighted} onClick={() => handleClickRound(r)} formatTime={formatTime} mobile />
-                      </div>
-                      {/* Desktop stone */}
-                      <div className="hidden lg:block">
+          {fixedGrid.map((block, rowIdx) => (
+            <div key={`block-${rowIdx}`} className="grid gap-1 lg:gap-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 108px))' }}>
+              {block.rounds.map((cell, col) => (
+                <div key={`cell-${rowIdx}-${col}`} className="flex gap-0.5 lg:gap-1 items-start justify-center">
+                  {cell.map((r, slot) => {
+                    if (!r) {
+                      return (
+                        <div key={`empty-${rowIdx}-${col}-${slot}`} className="w-[38px] lg:w-[52px]" style={{ height: '58px' }}>
+                          <div className="w-full rounded-lg border border-border/20 bg-muted/8 h-[36px] lg:h-[50px]" />
+                        </div>
+                      );
+                    }
+                    const dimmed = !!(highlighted && !isHighlighted(r));
+                    return (
+                      <div key={r.id} className="hidden lg:block">
                         <Stone round={r} showNumbers={showNumbers} showTimestamps={showTimestamps} dimmed={dimmed} isSelected={r.id === highlighted} onClick={() => handleClickRound(r)} formatTime={formatTime} />
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                  {cell.map((r, slot) => {
+                    if (!r) {
+                      return (
+                        <div key={`m-empty-${rowIdx}-${col}-${slot}`} className="lg:hidden w-[38px]" style={{ height: '58px' }}>
+                          <div className="w-full rounded-lg border border-border/20 bg-muted/8 h-[36px]" />
+                        </div>
+                      );
+                    }
+                    const dimmed = !!(highlighted && !isHighlighted(r));
+                    return (
+                      <div key={`m-${r.id}`} className="lg:hidden">
+                        <Stone round={r} showNumbers={showNumbers} showTimestamps={showTimestamps} dimmed={dimmed} isSelected={r.id === highlighted} onClick={() => handleClickRound(r)} formatTime={formatTime} mobile />
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          ))}
+
+          {fixedGrid.length === 0 && (
+            <div className="grid gap-1 lg:gap-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 108px))' }}>
+              {Array.from({ length: 10 }, (_, col) => (
+                <div key={`empty-row-${col}`} className="flex gap-0.5 lg:gap-1 items-stretch">
+                  <div className="rounded-lg border border-border/20 bg-muted/8 w-[38px] lg:w-[52px] h-[36px] lg:h-[50px]" />
+                  <div className="rounded-lg border border-border/20 bg-muted/8 w-[38px] lg:w-[52px] h-[36px] lg:h-[50px]" />
+                </div>
+              ))}
             </div>
           )}
         </div>
-
-        {/* Ad banners — below on mobile, side on desktop */}
-        <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 lg:w-[280px] shrink-0 overflow-x-auto lg:overflow-x-visible">
-          <div className="min-w-[200px] lg:min-w-0 rounded-2xl border border-border/50 bg-card/50 overflow-hidden flex flex-col items-center justify-center h-[160px] lg:h-[300px] relative group cursor-pointer transition-all hover:border-primary/30 flex-1 lg:flex-none">
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, hsl(240 6% 8%) 0%, hsl(210 40% 12%) 100%)' }} />
-            <div className="relative z-10 flex flex-col items-center gap-2 lg:gap-3 p-3 lg:p-4 text-center">
-              <div className="w-10 h-10 lg:w-16 lg:h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                <span className="text-lg lg:text-2xl">📢</span>
-              </div>
-              <p className="text-xs lg:text-sm font-bold text-foreground">Espaço Publicitário</p>
-              <p className="text-[10px] lg:text-[11px] text-muted-foreground leading-relaxed hidden sm:block">Anuncie aqui para milhares de usuários ativos</p>
-              <span className="text-[9px] lg:text-[10px] uppercase tracking-widest font-semibold text-primary border border-primary/30 rounded-lg px-2 lg:px-3 py-1 lg:py-1.5 bg-primary/5">Anuncie Aqui</span>
-            </div>
-          </div>
-
-          <div className="min-w-[200px] lg:min-w-0 rounded-2xl border border-border/50 bg-card/50 overflow-hidden flex flex-col items-center justify-center h-[160px] lg:h-[280px] relative group cursor-pointer transition-all hover:border-secondary/30 flex-1 lg:flex-none">
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, hsl(240 6% 8%) 0%, hsl(345 40% 12%) 100%)' }} />
-            <div className="relative z-10 flex flex-col items-center gap-2 lg:gap-3 p-3 lg:p-4 text-center">
-              <div className="w-10 h-10 lg:w-16 lg:h-16 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-center justify-center">
-                <span className="text-lg lg:text-2xl">🎯</span>
-              </div>
-              <p className="text-xs lg:text-sm font-bold text-foreground">Patrocinador</p>
-              <p className="text-[10px] lg:text-[11px] text-muted-foreground leading-relaxed hidden sm:block">Destaque sua marca neste espaço premium</p>
-              <span className="text-[9px] lg:text-[10px] uppercase tracking-widest font-semibold text-secondary border border-secondary/30 rounded-lg px-2 lg:px-3 py-1 lg:py-1.5 bg-secondary/5">Saiba Mais</span>
-            </div>
+      ) : (
+        /* Grid view — responsive stones */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-2 lg:p-3 overflow-y-auto max-h-[500px] lg:max-h-[600px]">
+          <div className="flex flex-wrap gap-0.5 lg:gap-1">
+            {displayed.map((r) => {
+              const dimmed = !!(highlighted && !isHighlighted(r));
+              return (
+                <div key={r.id}>
+                  <div className="lg:hidden">
+                    <Stone round={r} showNumbers={showNumbers} showTimestamps={showTimestamps} dimmed={dimmed} isSelected={r.id === highlighted} onClick={() => handleClickRound(r)} formatTime={formatTime} mobile />
+                  </div>
+                  <div className="hidden lg:block">
+                    <Stone round={r} showNumbers={showNumbers} showTimestamps={showTimestamps} dimmed={dimmed} isSelected={r.id === highlighted} onClick={() => handleClickRound(r)} formatTime={formatTime} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
