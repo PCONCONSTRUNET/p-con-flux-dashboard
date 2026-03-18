@@ -295,10 +295,10 @@ const LiveCatalog = () => {
       {fixedColumns ? (
         /* Fixed columns — 10 columns (00-09), 2 stones per minute side by side */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px]">
-          <div className="flex items-start gap-0">
+          <div className="inline-flex items-start gap-0">
             {minuteDigitColumns.map((colRounds, col) => (
-              <div key={`minute-col-${col}`} className="flex flex-col items-center">
-                <div className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono mb-1 w-full">
+              <div key={`minute-col-${col}`} className="flex flex-col items-center flex-shrink-0">
+                <div className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono mb-1" style={{ width: `${MAX_PER_MINUTE * 36}px` }}>
                   {String(col).padStart(2, '0')}
                 </div>
                 <div className="flex items-start gap-0">
@@ -308,7 +308,7 @@ const LiveCatalog = () => {
                       const style = colorStyles[r.color];
                       const dimmed = highlighted && !isHighlighted(r);
                       return (
-                        <div key={`${col}-${slot}`} className="flex flex-col items-center">
+                        <div key={`${col}-${slot}`} className="flex flex-col items-center flex-shrink-0">
                           <div
                             onClick={() => handleClickRound(r)}
                             className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
@@ -326,7 +326,7 @@ const LiveCatalog = () => {
                       );
                     }
                     return (
-                      <div key={`${col}-${slot}`} className="flex items-center justify-center">
+                      <div key={`${col}-${slot}`} className="flex items-center justify-center flex-shrink-0">
                         <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
                       </div>
                     );
