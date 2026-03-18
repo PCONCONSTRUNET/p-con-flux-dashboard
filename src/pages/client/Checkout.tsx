@@ -319,14 +319,14 @@ export default function Checkout() {
           <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 text-center border-b border-border/10">
-            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3" />
+          <div className="px-6 pt-6 pb-4 text-center border-b border-white/[0.05]">
+            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3 drop-shadow-[0_0_12px_hsla(187,100%,50%,0.3)]" />
             <h1 className="text-lg font-display font-bold text-foreground">Checkout Seguro</h1>
             <p className="text-sm text-muted-foreground/50 mt-1">Finalize sua assinatura</p>
           </div>
 
           {/* Plan Summary */}
-          <div className="px-6 py-4 border-b border-border/10" style={{ background: 'hsla(240, 5%, 8%, 0.5)' }}>
+          <div className="px-6 py-4 border-b border-white/[0.05]" style={{ background: 'hsla(187, 100%, 50%, 0.02)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/10 border border-primary/20' : 'bg-emerald-400/10 border border-emerald-400/20'}`}>
