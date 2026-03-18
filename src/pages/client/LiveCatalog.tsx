@@ -326,7 +326,7 @@ const LiveCatalog = () => {
         /* Fixed columns — horizontal grid: rows = 10-min blocks, cols = 00-09, 2 stones per cell */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
           {/* Header row */}
-          <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+          <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 108px)' }}>
             {Array.from({ length: 10 }, (_, col) => (
               <div key={`head-${col}`} className="text-center text-[11px] font-bold text-muted-foreground/70 font-mono py-1.5 border border-border/30 bg-muted/15">
                 {String(col).padStart(2, '0')}
@@ -336,15 +336,14 @@ const LiveCatalog = () => {
 
           {/* Data rows — each row = 10-min block */}
           {fixedGrid.map((block, rowIdx) => (
-            <div key={`block-${rowIdx}`} className="grid gap-1 mt-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+            <div key={`block-${rowIdx}`} className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 108px)' }}>
               {block.rounds.map((cell, col) => (
                 <div key={`cell-${rowIdx}-${col}`} className="flex gap-1 items-start justify-center">
                   {cell.map((r, slot) => {
                     if (!r) {
                       return (
-                        <div key={`empty-${rowIdx}-${col}-${slot}`} className="flex-1">
-                          <div className="w-full rounded-md border border-border/20 bg-muted/8" style={{ height: '65px' }} />
-                          {showTimestamps && <div className="h-[18px]" />}
+                        <div key={`empty-${rowIdx}-${col}-${slot}`} style={{ width: '52px', height: '78px' }}>
+                          <div className="w-full rounded-md border border-border/20 bg-muted/8" style={{ height: '50px' }} />
                         </div>
                       );
                     }
@@ -353,13 +352,13 @@ const LiveCatalog = () => {
                     const dimmed = highlighted && !isHighlighted(r);
 
                     return (
-                      <div key={r.id} className="flex-1 flex flex-col items-center">
+                      <div key={r.id} className="flex flex-col items-center" style={{ width: '52px', height: '78px' }}>
                         <div
                           onClick={() => handleClickRound(r)}
                           className={`w-full rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
                             dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                           } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                          style={{ height: '65px' }}
+                          style={{ height: '50px' }}
                         >
                           {showNumbers && <span className={`text-sm font-bold ${style.text}`}>{r.roll}</span>}
                           {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
@@ -379,11 +378,11 @@ const LiveCatalog = () => {
 
           {/* Empty pending row at top */}
           {fixedGrid.length === 0 && (
-            <div className="grid gap-1 mt-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+            <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 108px)' }}>
               {Array.from({ length: 10 }, (_, col) => (
                 <div key={`empty-row-${col}`} className="flex gap-1 items-stretch">
-                  <div className="flex-1 rounded-md border border-border/20 bg-muted/8" style={{ height: '65px' }} />
-                  <div className="flex-1 rounded-md border border-border/20 bg-muted/8" style={{ height: '65px' }} />
+                  <div className="rounded-md border border-border/20 bg-muted/8" style={{ width: '52px', height: '50px' }} />
+                  <div className="rounded-md border border-border/20 bg-muted/8" style={{ width: '52px', height: '50px' }} />
                 </div>
               ))}
             </div>
