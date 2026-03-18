@@ -608,7 +608,7 @@ export default function Checkout() {
 
                   <button
                     onClick={() => { setPixGenerated(false); setPixQrCode(''); setPixQrCodeBase64(''); }}
-                    className="w-full h-10 rounded-xl border border-border/20 text-muted-foreground/50 text-xs font-display font-semibold hover:text-foreground/70 transition-colors"
+                    className="w-full h-11 rounded-2xl border border-white/[0.08] text-white/40 text-xs font-display font-semibold hover:text-white/60 transition-colors"
                   >
                     Gerar novo PIX
                   </button>
