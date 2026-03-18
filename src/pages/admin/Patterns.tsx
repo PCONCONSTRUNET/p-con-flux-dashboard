@@ -383,11 +383,75 @@ const Patterns = () => {
               {/* Summary */}
               {(config.colors.length > 0 || config.numbers.length > 0) && (
                 <div className="rounded-2xl p-4 border border-primary/15 bg-primary/[0.03]">
-                  <p className="text-[10px] uppercase tracking-widest text-primary/60 font-semibold mb-2">Resumo do padrão</p>
-                  <div className="space-y-1 text-xs text-muted-foreground/60">
-                    {config.colors.length > 0 && <p>Cores: <span className="text-foreground font-semibold">{config.colors.join(', ')}</span></p>}
-                    {config.numbers.length > 0 && <p>Números: <span className="text-foreground font-semibold">{config.numbers.join(', ')}</span></p>}
-                    <p>Gales: <span className="text-foreground font-semibold">{config.gales}</span> | Vitória: <span className="text-foreground font-semibold">{config.victoryTarget}</span></p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[10px] uppercase tracking-widest text-primary/60 font-semibold">Sequência montada</p>
+                    <button
+                      onClick={() => setConfig(c => ({ ...c, colors: [], numbers: [] }))}
+                      className="text-[10px] text-secondary/60 hover:text-secondary transition-all"
+                    >
+                      Limpar tudo
+                    </button>
+                  </div>
+
+                  {config.colors.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-[10px] text-muted-foreground/40 mb-1.5">Cores:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {config.colors.map((c, i) => {
+                          const ct = colorTokens.find(t => t.id === c);
+                          if (!ct) return null;
+                          return (
+                            <div key={i} className="relative group">
+                              <div className={`w-8 h-8 rounded-full border ${ct.border} flex items-center justify-center overflow-hidden`}>
+                                {ct.split ? (
+                                  <div className="w-full h-full flex">
+                                    <div className={`w-1/2 h-full ${ct.split[0]}`} />
+                                    <div className={`w-1/2 h-full ${ct.split[1]}`} />
+                                  </div>
+                                ) : ct.inner ? (
+                                  <div className={`w-full h-full ${ct.bg} flex items-center justify-center text-xs`}>{ct.inner}</div>
+                                ) : (
+                                  <div className={`w-6 h-6 rounded-full ${ct.bg}`} />
+                                )}
+                              </div>
+                              <button
+                                onClick={() => removeColorAt(i)}
+                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X size={10} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {config.numbers.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-[10px] text-muted-foreground/40 mb-1.5">Números:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {config.numbers.map((n, i) => {
+                          const nc = numberColors[n];
+                          return (
+                            <div key={i} className="relative group">
+                              <div className={`w-8 h-8 rounded-full ${nc.bg} ${nc.text} flex items-center justify-center text-[11px] font-bold border border-border/20`}>
+                                {n}
+                              </div>
+                              <button
+                                onClick={() => removeNumberAt(i)}
+                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X size={10} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <p className="text-xs text-muted-foreground/50">Gales: <span className="text-foreground font-semibold">{config.gales}</span> | Vitória: <span className="text-foreground font-semibold">{config.victoryTarget}</span></p>
                   </div>
                 </div>
               )}
