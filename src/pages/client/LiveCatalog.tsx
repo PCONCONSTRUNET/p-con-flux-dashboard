@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, memo } from 'react';
 import { Filter, Clock, Trash2 } from 'lucide-react';
 import { mockBlazeRounds, type BlazeColor, type BlazeRound } from '@/data/mockData';
 import blazeIcon from '@/assets/blaze-icon.png';
