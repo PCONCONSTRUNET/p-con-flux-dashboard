@@ -187,7 +187,7 @@ const Login = () => {
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="input-neon"
                   placeholder="Mínimo 6 caracteres"
                 />
               </div>
