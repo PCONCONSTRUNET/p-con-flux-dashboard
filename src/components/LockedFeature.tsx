@@ -10,8 +10,8 @@ export default function LockedFeature({ feature }: LockedFeatureProps) {
 
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 animate-fade-in">
-      <div className="w-20 h-20 rounded-3xl bg-secondary/10 border border-secondary/20 flex items-center justify-center mb-6 shadow-lg shadow-secondary/5">
-        <Lock size={36} className="text-secondary/60" />
+      <div className="w-20 h-20 rounded-3xl bg-muted/20 border border-border/30 flex items-center justify-center mb-6 shadow-lg shadow-muted/5">
+        <Lock size={36} className="text-muted-foreground/50" />
       </div>
       <h2 className="text-xl font-bold text-foreground text-center">
         Acesso Bloqueado
