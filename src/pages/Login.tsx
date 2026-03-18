@@ -68,7 +68,7 @@ const Login = () => {
             <button
               type="button"
               onClick={() => switchMode('login')}
-              className={`flex-1 pb-2 text-xs font-display font-semibold tracking-wider transition-colors relative ${
+              className={`flex-1 pb-2 text-xs font-body font-semibold tracking-wider transition-colors relative ${
                 mode === 'login'
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
