@@ -87,7 +87,7 @@ const ClientsPage = () => {
     const now = new Date();
     let expiresAt: Date;
     if (editPlan === 'trial') {
-      expiresAt = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+      expiresAt = new Date(now.getTime() + editDays * 24 * 60 * 60 * 1000);
     } else if (editPlan === 'monthly') {
       expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
     } else {
