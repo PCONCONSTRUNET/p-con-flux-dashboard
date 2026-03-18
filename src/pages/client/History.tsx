@@ -74,7 +74,7 @@ const History = () => {
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-card/60 backdrop-blur-xl rounded-2xl p-4 border border-border/30">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-display">Total</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{mockSignals.length}</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{allSignals.length}</p>
         </div>
         <div className="bg-emerald-500/10 backdrop-blur-xl rounded-2xl p-4 border border-emerald-500/20">
           <p className="text-[10px] uppercase tracking-widest text-emerald-400/70 font-display">Win Rate</p>
