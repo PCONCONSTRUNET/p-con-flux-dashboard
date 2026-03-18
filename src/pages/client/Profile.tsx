@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Mail, Shield, LogOut, ChevronRight, Phone, Send, Save, Check } from 'lucide-react';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { User, Mail, LogOut, Phone, Send, Save, Check, Clock, Crown, Zap, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+const planConfig = {
+  trial: { label: 'Teste Grátis (3h)', color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20', icon: Clock },
+  monthly: { label: 'P-CON FLUX Mensal', color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/20', icon: Zap },
+  annual: { label: 'P-CON FLUX Anual', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', icon: Crown },
+};
+
 const Profile = () => {
   const { user, logout } = useAuth();
+  const { subscription } = useSubscription();
   const [whatsapp, setWhatsapp] = useState('');
   const [telegram, setTelegram] = useState('');
   const [saving, setSaving] = useState(false);
@@ -14,7 +22,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user) return;
-    const fetch = async () => {
+    const fetchProfile = async () => {
       const { data } = await supabase
         .from('profiles')
         .select('whatsapp, telegram')
@@ -26,7 +34,7 @@ const Profile = () => {
       }
       setLoaded(true);
     };
-    fetch();
+    fetchProfile();
   }, [user]);
 
   const handleSaveContacts = async () => {
@@ -50,15 +58,17 @@ const Profile = () => {
     }
   };
 
+  const plan = subscription ? planConfig[subscription.plan] : planConfig.trial;
+  const PlanIcon = plan.icon;
+
   return (
     <div className="space-y-6 animate-fade-in pb-8">
-      {/* Header */}
       <div>
         <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground tracking-tight">Perfil</h1>
         <p className="text-sm text-muted-foreground/70 mt-1">Gerencie suas informações</p>
       </div>
 
-      {/* Avatar + Name Card */}
+      {/* Avatar + Name */}
       <div className="flex items-center gap-4 bg-card/60 backdrop-blur-xl rounded-2xl p-5 border border-border/30">
         <div className="w-16 h-16 rounded-2xl bg-primary/15 border border-primary/25 flex items-center justify-center shadow-lg shadow-primary/10">
           <User size={28} className="text-primary" />
@@ -93,18 +103,37 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 bg-card/40 backdrop-blur-sm rounded-2xl p-4 border border-border/20">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Shield size={18} className="text-primary/60" />
+        {/* Plan */}
+        <div className={`flex items-center gap-4 backdrop-blur-sm rounded-2xl p-4 border ${plan.border} ${plan.bg}`}>
+          <div className={`w-10 h-10 rounded-xl ${plan.bg} border ${plan.border} flex items-center justify-center`}>
+            <PlanIcon size={18} className={plan.color} />
           </div>
           <div className="flex-1">
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold">Plano</p>
-            <p className="text-sm font-bold text-primary mt-0.5">Premium</p>
+            <p className={`text-sm font-bold mt-0.5 ${plan.color}`}>{plan.label}</p>
           </div>
         </div>
+
+        {/* Subscription Time */}
+        {subscription && (
+          <div className="flex items-center gap-4 bg-card/40 backdrop-blur-sm rounded-2xl p-4 border border-border/20">
+            <div className="w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
+              <Calendar size={18} className="text-muted-foreground/60" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold">Tempo Restante</p>
+              <p className={`text-sm font-bold mt-0.5 ${subscription.isExpired ? 'text-secondary' : 'text-emerald-400'}`}>
+                {subscription.isExpired ? '⚠ Expirado' : `⏱ ${subscription.timeRemaining}`}
+              </p>
+              <p className="text-[10px] text-muted-foreground/40 mt-0.5">
+                Expira: {new Date(subscription.expires_at).toLocaleDateString('pt-BR')} às {new Date(subscription.expires_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Contact Section */}
+      {/* Contacts */}
       <div className="space-y-3">
         <div className="flex items-center gap-2 px-1">
           <Phone size={14} className="text-primary" />
