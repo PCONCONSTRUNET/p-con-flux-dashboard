@@ -391,8 +391,8 @@ const LiveCatalog = () => {
         </div>
       ) : (
         /* Grid view — 22 per row */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[500px] overflow-x-auto">
-          <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(22, minmax(0, 1fr))' }}>
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px] overflow-x-auto">
+          <div className="flex flex-wrap gap-1">
             {displayed.map((r) => {
               const style = colorStyles[r.color];
               const dimmed = highlighted && !isHighlighted(r);
@@ -401,15 +401,17 @@ const LiveCatalog = () => {
                 <div
                   key={r.id}
                   onClick={() => handleClickRound(r)}
-                  className="flex flex-col items-center cursor-pointer group"
+                  className="flex flex-col items-center cursor-pointer"
+                  style={{ width: '52px', height: '78px' }}
                 >
                   <div
-                    className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
+                    className={`w-full rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
                       dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                     } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                    style={{ height: '50px' }}
                   >
-                    <div className={`w-[22px] h-[22px] rounded-full border-2 ${r.color === 'red' ? 'border-white/30' : r.color === 'white' ? 'border-[hsl(240_6%_30%)]/40' : 'border-white/15'} flex items-center justify-center`}>
-                      {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
+                    <div className={`w-[30px] h-[30px] rounded-full border-2 ${r.color === 'red' ? 'border-white/30' : r.color === 'white' ? 'border-[hsl(240_6%_30%)]/40' : 'border-white/15'} flex items-center justify-center`}>
+                      {showNumbers && <span className={`text-xs font-bold ${style.text}`}>{r.roll}</span>}
                     </div>
                   </div>
                   {showTimestamps && (
