@@ -54,9 +54,6 @@ const AdminLogin = () => {
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
 
           <div className="relative z-10">
-            <h2 className="text-center text-sm font-display font-bold text-foreground tracking-wider mb-4">
-              ACESSO ADMINISTRATIVO
-            </h2>
 
             <form onSubmit={handleLogin} className="space-y-3.5">
               <div>
