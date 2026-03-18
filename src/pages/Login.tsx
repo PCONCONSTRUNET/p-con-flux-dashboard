@@ -19,10 +19,10 @@ const Login = () => {
   const { login, register, loading, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect when authenticated
+  // Client login always goes to /client
   useEffect(() => {
     if (isAuthenticated && user) {
-      navigate(user.role === 'admin' ? '/admin' : '/client', { replace: true });
+      navigate('/client', { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
 

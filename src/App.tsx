@@ -23,9 +23,9 @@ import NotFound from "@/pages/NotFound";
 const queryClient = new QueryClient();
 
 const AuthRedirect = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return <Navigate to={user?.role === 'admin' ? '/admin' : '/client'} replace />;
+  return <Navigate to="/client" replace />;
 };
 
 const App = () => (

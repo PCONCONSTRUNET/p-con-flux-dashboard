@@ -17,8 +17,8 @@ const ProtectedRoute = ({ children, role }: Props) => {
     );
   }
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (role && user?.role !== role) {
-    return <Navigate to={user?.role === 'admin' ? '/admin' : '/client'} replace />;
+  if (role === 'admin' && user?.role !== 'admin') {
+    return <Navigate to="/admin/login" replace />;
   }
   return <>{children}</>;
 };
