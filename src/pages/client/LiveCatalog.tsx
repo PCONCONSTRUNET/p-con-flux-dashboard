@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, memo } from 'react';
 import { Filter, Clock, Trash2 } from 'lucide-react';
 import { mockBlazeRounds, type BlazeColor, type BlazeRound } from '@/data/mockData';
 import blazeIcon from '@/assets/blaze-icon.png';
@@ -24,7 +24,10 @@ const LiveCatalog = () => {
   const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
   const [fixedColumns, setFixedColumns] = useState(false);
 
-  // Simulate real-time incoming rounds
+  // Simulate real-time incoming rounds — stable interval, no dependency on rounds
+  const roundsRef = useRef(rounds);
+  roundsRef.current = rounds;
+
   useEffect(() => {
     if (!realtime) return;
     const interval = setInterval(() => {
@@ -35,15 +38,15 @@ const LiveCatalog = () => {
 
       const newRound: BlazeRound = {
         id: `br-rt-${Date.now()}`,
-        number: rounds.length + 1,
+        number: roundsRef.current.length + 1,
         color,
         timestamp: new Date().toISOString(),
         roll,
       };
-      setRounds(prev => [newRound, ...prev]);
+      setRounds(prev => [newRound, ...prev].slice(0, 600));
     }, 8000 + Math.random() * 12000);
     return () => clearInterval(interval);
-  }, [realtime, rounds.length]);
+  }, [realtime]);
 
   const displayed = useMemo(() => {
     let data = rounds.slice(0, limit);
@@ -65,9 +68,10 @@ const LiveCatalog = () => {
   }, [rounds, limit]);
 
   const fixedColumnSource = useMemo(() => {
-    if (colorFilter === 'all') return rounds;
-    return rounds.filter((round) => round.color === colorFilter);
-  }, [rounds, colorFilter]);
+    const sliced = rounds.slice(0, limit);
+    if (colorFilter === 'all') return sliced;
+    return sliced.filter((round) => round.color === colorFilter);
+  }, [rounds, colorFilter, limit]);
 
   // Build grid: rows = 10-min blocks, cols = minute last digit (0-9), each cell = up to 2 rounds
   const fixedGrid = useMemo(() => {
@@ -111,13 +115,17 @@ const LiveCatalog = () => {
     }
   }, [highlighted]);
 
+  // Build a lookup map for highlighted target to avoid O(n) .find() per stone
+  const highlightedTarget = useMemo(() => {
+    if (!highlighted) return null;
+    return rounds.find(r => r.id === highlighted) || null;
+  }, [highlighted, rounds]);
+
   const isHighlighted = useCallback((round: BlazeRound) => {
-    if (!highlighted) return false;
-    const target = rounds.find(r => r.id === highlighted);
-    if (!target) return false;
-    if (highlightMode === 'same_color') return round.color === target.color;
-    return round.roll === target.roll;
-  }, [highlighted, highlightMode, rounds]);
+    if (!highlightedTarget) return false;
+    if (highlightMode === 'same_color') return round.color === highlightedTarget.color;
+    return round.roll === highlightedTarget.roll;
+  }, [highlightedTarget, highlightMode]);
 
   const formatTime = (ts: string) => {
     return new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
