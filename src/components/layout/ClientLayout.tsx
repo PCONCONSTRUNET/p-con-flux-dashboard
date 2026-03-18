@@ -170,11 +170,11 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-4 lg:p-6 pb-20 lg:pb-6 overflow-auto relative">
+        <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 overflow-auto relative min-h-0">
           <div className="absolute inset-0 pointer-events-none opacity-30"
             style={{ background: 'radial-gradient(ellipse at 80% 20%, hsla(187,100%,50%,0.04) 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, hsla(345,100%,50%,0.04) 0%, transparent 50%)' }}
           />
-          <div className="relative z-10">{children}</div>
+          <div className="relative z-10 pb-safe">{children}</div>
         </main>
       </div>
 
