@@ -260,31 +260,6 @@ const ClientDashboard = () => {
         </div>
       }
 
-      {/* Locked overlay */}
-      {isLocked && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center">
-          {/* Blur layer */}
-          <div className="absolute inset-0 backdrop-blur-md bg-background/40" />
-          {/* Modal */}
-          <div className="relative z-10 w-full max-w-sm mx-4 rounded-3xl border border-primary/20 p-8 text-center animate-scale-in shadow-2xl shadow-primary/10"
-            style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.97) 0%, hsla(240,6%,8%,0.99) 100%)' }}>
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
-              <Lock size={30} className="text-primary" />
-            </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">Assine um Plano</h3>
-            <p className="text-sm text-muted-foreground/60 mb-6">
-              Seu período de teste expirou. Assine para desbloquear os sinais em tempo real e todas as funcionalidades.
-            </p>
-            <button
-              onClick={() => setShowUpgradeModal(true)}
-              className="w-full py-3.5 rounded-2xl bg-primary/15 text-primary border border-primary/30 text-sm font-bold tracking-wide hover:bg-primary/25 transition-all flex items-center justify-center gap-2"
-            >
-              <Shield size={16} />
-              Ver Planos Disponíveis
-            </button>
-          </div>
-        </div>
-      )}
     </div>);
 
 };
