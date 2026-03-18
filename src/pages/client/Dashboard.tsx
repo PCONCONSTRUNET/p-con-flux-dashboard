@@ -116,7 +116,7 @@ const ClientDashboard = () => {
 
     cycle();
     return () => clearTimeout(timeout);
-  }, [maxGale]);
+  }, [maxGale, saveSignalToDB]);
 
   const isLocked = !hasActiveSubscription;
 
