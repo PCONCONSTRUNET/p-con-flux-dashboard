@@ -343,7 +343,7 @@ const LiveCatalog = () => {
                     if (!r) {
                       return (
                         <div key={`empty-${rowIdx}-${col}-${slot}`} style={{ width: '52px', height: '78px' }}>
-                          <div className="w-full rounded-md border border-border/20 bg-muted/8" style={{ height: '50px' }} />
+                          <div className="w-full rounded-lg border border-border/20 bg-muted/8" style={{ height: '50px' }} />
                         </div>
                       );
                     }
