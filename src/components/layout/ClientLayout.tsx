@@ -182,22 +182,28 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-border/50 flex justify-around py-1.5 z-40 backdrop-blur-xl"
         style={{ background: 'linear-gradient(180deg, hsla(240,6%,7%,0.92) 0%, hsla(240,6%,5%,0.98) 100%)' }}>
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-        {navItems.map(item => (
-          <button
-            key={item.path}
-            onClick={() => navigate(item.path)}
-            className={`flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] transition-all rounded-lg ${
-              isActive(item.path)
-                ? 'text-primary'
-                : 'text-muted-foreground active:scale-95'
-            }`}
-          >
-            <div className={`p-1 rounded-lg transition-all ${isActive(item.path) ? 'bg-primary/10 glow-primary' : ''}`}>
-              <item.icon size={20} />
-            </div>
-            <span className="font-semibold">{item.label}</span>
-          </button>
-        ))}
+        {navItems.map(item => {
+          const locked = item.requiresSub && !hasActiveSubscription;
+          return (
+            <button
+              key={item.path}
+              onClick={() => handleNavClick(item)}
+              className={`flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] transition-all rounded-lg ${
+                locked
+                  ? 'text-muted-foreground/25'
+                  : isActive(item.path)
+                    ? 'text-primary'
+                    : 'text-muted-foreground active:scale-95'
+              }`}
+            >
+              <div className={`p-1 rounded-lg transition-all relative ${isActive(item.path) && !locked ? 'bg-primary/10 glow-primary' : ''}`}>
+                <item.icon size={20} />
+                {locked && <Lock size={8} className="absolute -top-0.5 -right-0.5 text-muted-foreground/40" />}
+              </div>
+              <span className="font-semibold">{item.label}</span>
+            </button>
+          );
+        })}
       </nav>
     </div>
   );
