@@ -53,6 +53,7 @@ const App = () => (
             <Route path="/client/catalog" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><LiveCatalog /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
             <Route path="/client/history" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><History /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
             <Route path="/client/profile" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><Profile /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
+            <Route path="/client/checkout" element={<ProtectedRoute role="client"><Checkout /></ProtectedRoute>} />
 
             {/* Admin routes */}
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout><AdminDashboard /></AdminLayout></ProtectedRoute>} />
