@@ -230,6 +230,11 @@ const Login = () => {
         </div>
       </div>
 
+      {/* Social Icons */}
+      <div className="fixed bottom-[72px] left-0 right-0 z-20 flex justify-center px-4">
+        <SocialIcons />
+      </div>
+
       {/* Legal Banner +18 */}
       <div className="fixed bottom-0 left-0 right-0 z-20 flex justify-center pb-4 px-4">
         <div className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-2xl border border-foreground/15 backdrop-blur-sm bg-background/30">
