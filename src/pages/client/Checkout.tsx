@@ -253,6 +253,56 @@ export default function Checkout() {
     );
   }
 
+  // Awaiting confirmation screen (for card payments without PIX QR)
+  if (awaitingConfirmation && paymentMethod === 'card') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+        <LoginBackground />
+        <div className="relative z-10 text-center space-y-6 max-w-md">
+          {/* Pulsing loader */}
+          <div className="relative mx-auto w-28 h-28">
+            <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping" style={{ animationDuration: '2s' }} />
+            <div className="absolute inset-2 rounded-full border border-primary/20 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center border border-primary/20"
+                style={{
+                  background: 'linear-gradient(135deg, hsla(187,100%,50%,0.1), hsla(187,100%,50%,0.03))',
+                  boxShadow: '0 0 30px hsla(187,100%,50%,0.15)',
+                }}
+              >
+                <Loader2 size={32} className="text-primary animate-spin" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl font-display font-bold text-white">Processando Pagamento</h2>
+            <p className="text-white/60 text-sm">Aguardando confirmação do Mercado Pago...</p>
+          </div>
+
+          {/* Progress steps */}
+          <div className="space-y-3 text-left mx-auto max-w-xs">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={18} className="text-emerald-400" />
+              <span className="text-sm text-white/70">Dados do cartão enviados</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={18} className="text-emerald-400" />
+              <span className="text-sm text-white/70">Pagamento processado</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Loader2 size={18} className="text-primary animate-spin" />
+              <span className="text-sm text-white font-semibold">Confirmando assinatura...</span>
+            </div>
+          </div>
+
+          <p className="text-xs text-white/30">Isso pode levar alguns segundos</p>
+        </div>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
