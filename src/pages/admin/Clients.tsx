@@ -142,9 +142,64 @@ const ClientsPage = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground tracking-tight">Clientes</h1>
-        <p className="text-sm text-muted-foreground/70 mt-1">Gerencie os clientes e planos da plataforma</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground tracking-tight">Clientes</h1>
+          <p className="text-sm text-muted-foreground/70 mt-1">Gerencie os clientes e planos da plataforma</p>
+        </div>
+
+        <ExportImportBar
+          onExportPDF={() => {
+            const cols = [
+              { header: 'Nome', key: 'name' },
+              { header: 'Email', key: 'email' },
+              { header: 'Plano', key: 'plan' },
+              { header: 'Status', key: 'status' },
+              { header: 'Expira em', key: 'expires' },
+              { header: 'WhatsApp', key: 'whatsapp' },
+              { header: 'Telegram', key: 'telegram' },
+            ];
+            const data = filtered.map(c => ({
+              name: c.name || 'Sem nome',
+              email: c.email,
+              plan: planConfig[c.plan].label,
+              status: isExpired(c.expires_at) ? 'Expirado' : 'Ativo',
+              expires: new Date(c.expires_at).toLocaleDateString('pt-BR'),
+              whatsapp: c.whatsapp || '-',
+              telegram: c.telegram || '-',
+            }));
+            exportToPDF('Clientes - P-CON FLUX', cols, data, 'clientes-pcon-flux');
+            toast.success('PDF exportado com sucesso!');
+          }}
+          onExportExcel={() => {
+            const cols = [
+              { header: 'Nome', key: 'name' },
+              { header: 'Email', key: 'email' },
+              { header: 'Plano', key: 'plan' },
+              { header: 'Status', key: 'status' },
+              { header: 'Expira em', key: 'expires' },
+              { header: 'WhatsApp', key: 'whatsapp' },
+              { header: 'Telegram', key: 'telegram' },
+            ];
+            const data = filtered.map(c => ({
+              name: c.name || 'Sem nome',
+              email: c.email,
+              plan: planConfig[c.plan].label,
+              status: isExpired(c.expires_at) ? 'Expirado' : 'Ativo',
+              expires: new Date(c.expires_at).toLocaleDateString('pt-BR'),
+              whatsapp: c.whatsapp || '-',
+              telegram: c.telegram || '-',
+            }));
+            exportToExcel(cols, data, 'clientes-pcon-flux', 'Clientes');
+            toast.success('Excel exportado com sucesso!');
+          }}
+          onImportFile={(file) => {
+            importFromExcel(file, (rows) => {
+              toast.success(`${rows.length} clientes importados do arquivo!`);
+              console.log('Imported clients:', rows);
+            });
+          }}
+        />
       </div>
 
       {/* Stats */}
