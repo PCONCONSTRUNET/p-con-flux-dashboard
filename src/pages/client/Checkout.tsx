@@ -405,18 +405,18 @@ export default function Checkout() {
           </div>
 
           {/* Plan Summary */}
-          <div className="px-6 py-4 border-b border-white/[0.05]" style={{ background: 'hsla(187, 100%, 50%, 0.02)' }}>
+          <div className="px-6 py-4 border-b border-white/[0.08] relative" style={{ background: 'linear-gradient(90deg, hsla(187, 100%, 50%, 0.04), transparent)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/10 border border-primary/20' : 'bg-emerald-400/10 border border-emerald-400/20'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/15 border border-primary/30' : 'bg-emerald-400/15 border border-emerald-400/30'}`}>
                   <PlanIcon size={18} className={planColor} />
                 </div>
                 <div>
-                  <p className="text-sm font-display font-bold text-foreground">{planLabel}</p>
-                  <p className="text-xs text-muted-foreground/40">{planDuration}</p>
+                  <p className="text-sm font-display font-bold text-white">{planLabel}</p>
+                  <p className="text-xs text-white/40">{planDuration}</p>
                 </div>
               </div>
-              <p className={`text-xl font-display font-bold ${planColor}`}>
+              <p className={`text-xl font-display font-bold ${planColor} drop-shadow-[0_0_8px_hsla(187,100%,50%,0.3)]`}>
                 R$ {price}
               </p>
             </div>
