@@ -48,7 +48,9 @@ const LiveCatalog = () => {
     return () => clearInterval(interval);
   }, [realtime]);
 
+  // Only compute displayed for the active view
   const displayed = useMemo(() => {
+    if (fixedColumns) return []; // Not used in fixed view
     let data = rounds.slice(0, limit);
     if (colorFilter !== 'all') {
       data = data.filter(r => r.color === colorFilter);
