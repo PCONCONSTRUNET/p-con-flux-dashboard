@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
@@ -16,8 +16,15 @@ const Login = () => {
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const { login, register, loading } = useAuth();
+  const { login, register, loading, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(user.role === 'admin' ? '/admin' : '/client', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const switchMode = (m: Mode) => {
     setMode(m);

@@ -23,8 +23,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 async function fetchUserRole(userId: string): Promise<UserRole> {
-  const { data } = await supabase.rpc('has_role', { _user_id: userId, _role: 'admin' });
-  return data ? 'admin' : 'client';
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching role:', error);
+      return 'client';
+    }
+    return data ? 'admin' : 'client';
+  } catch (e) {
+    console.error('Role fetch failed:', e);
+    return 'client';
+  }
 }
 
 async function buildUser(supabaseUser: SupabaseUser): Promise<User> {
@@ -43,19 +58,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     // Listen for auth changes FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return;
       if (session?.user) {
-        const u = await buildUser(session.user);
-        setUser(u);
+        // Defer role fetch to avoid Supabase deadlock
+        setTimeout(async () => {
+          if (!mounted) return;
+          const u = await buildUser(session.user);
+          setUser(u);
+          setLoading(false);
+        }, 0);
       } else {
         setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     // Then check existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
       if (session?.user) {
         const u = await buildUser(session.user);
         setUser(u);
@@ -63,7 +87,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string, _remember: boolean) => {
