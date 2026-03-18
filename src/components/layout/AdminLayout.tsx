@@ -63,16 +63,16 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <button
               key={item.path}
               onClick={() => { navigate(item.path); onNavigate?.(); }}
-              className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm transition-all duration-200 group relative ${
+              className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm transition-all duration-200 group relative ${
                 active
                   ? 'text-primary'
-                  : 'text-muted-foreground/60 hover:text-foreground hover:bg-muted/20'
+                  : 'text-muted-foreground/70 hover:text-foreground hover:bg-muted/20'
               }`}
             >
               {/* Active indicator bar */}
               {active && (
                 <div
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-primary"
                   style={{ boxShadow: '0 0 8px hsla(187, 100%, 50%, 0.5)' }}
                 />
               )}
@@ -85,15 +85,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 />
               )}
 
-              <div className={`relative z-10 w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+              <div className={`relative z-10 w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
                 active ? 'bg-primary/15' : 'bg-muted/10 group-hover:bg-muted/20'
               }`}>
-                <item.icon size={16} className={active ? 'text-primary' : 'text-muted-foreground/50 group-hover:text-foreground/70'} />
+                <item.icon size={18} className={active ? 'text-primary' : 'text-muted-foreground/60 group-hover:text-foreground/80'} />
               </div>
-              <span className={`relative z-10 font-display text-[11px] font-semibold tracking-wider ${active ? 'text-primary' : ''}`}>
+              <span className={`relative z-10 font-display text-[13px] font-semibold tracking-wide ${active ? 'text-primary' : ''}`}>
                 {item.label}
               </span>
-              {active && <ChevronRight size={12} className="ml-auto text-primary/50 relative z-10" />}
+              {active && <ChevronRight size={14} className="ml-auto text-primary/50 relative z-10" />}
             </button>
           );
         })}
