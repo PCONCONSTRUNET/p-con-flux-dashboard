@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Zap, Trophy, XCircle, Percent, ChevronDown, ExternalLink, Loader2, CheckCircle2, Radio } from 'lucide-react';
+import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radio } from 'lucide-react';
 import { mockSignals, type Signal } from '@/data/mockData';
 import flameIcon from '@/assets/flame-icon.png';
+import BlazeRoulette from '@/components/BlazeRoulette';
 
 type AnalysisState = 'scanning' | 'pattern_found' | 'confirmed' | 'idle';
 
