@@ -280,54 +280,52 @@ const LiveCatalog = () => {
         </div>
       </div>
 
-      {/* Fixed columns view — 10 columns (00-09) side by side, results stack down */}
+      {/* Fixed columns view — 10 columns (00-09), 2 stones per minute side by side */}
       <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px]">
-        {/* Column headers */}
-        <div className="grid grid-cols-10 gap-1 mb-1 sticky top-0 z-10 bg-card/95 backdrop-blur-sm pb-1">
-          {Array.from({ length: 10 }, (_, i) => (
-            <div key={`hdr-${i}`} className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono">
-              {String(i).padStart(2, '0')}
-            </div>
-          ))}
-        </div>
-
-        {/* 2 stones per minute side by side (horizontal) */}
-        <div className="grid grid-cols-10 gap-1">
+        {/* All 20 stones in one row: header on top spanning each pair */}
+        <div className="flex items-start gap-0">
           {minuteDigitColumns.map((colRounds, col) => (
-            <div key={`minute-col-${col}`} className="flex items-start justify-center gap-1.5">
-              {Array.from({ length: MAX_PER_MINUTE }, (_, slot) => {
-                const r = colRounds[slot];
+            <div key={`minute-col-${col}`} className="flex flex-col items-center">
+              {/* Minute header centered over the 2 stones */}
+              <div className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono mb-1 w-full">
+                {String(col).padStart(2, '0')}
+              </div>
+              {/* 2 stones side by side, no gap */}
+              <div className="flex items-start gap-0">
+                {Array.from({ length: MAX_PER_MINUTE }, (_, slot) => {
+                  const r = colRounds[slot];
 
-                if (r) {
-                  const style = colorStyles[r.color];
-                  const dimmed = highlighted && !isHighlighted(r);
+                  if (r) {
+                    const style = colorStyles[r.color];
+                    const dimmed = highlighted && !isHighlighted(r);
+
+                    return (
+                      <div key={`${col}-${slot}`} className="flex flex-col items-center">
+                        <div
+                          onClick={() => handleClickRound(r)}
+                          className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                            dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                          } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                        >
+                          {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
+                          {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+                        </div>
+                        {showTimestamps && (
+                          <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                            {formatTime(r.timestamp)}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  }
 
                   return (
-                    <div key={`${col}-${slot}`} className="flex flex-col items-center">
-                      <div
-                        onClick={() => handleClickRound(r)}
-                        className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                          dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                        } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                      >
-                        {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
-                        {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
-                      </div>
-                      {showTimestamps && (
-                        <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                          {formatTime(r.timestamp)}
-                        </span>
-                      )}
+                    <div key={`${col}-${slot}`} className="flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
                     </div>
                   );
-                }
-
-                return (
-                  <div key={`${col}-${slot}`} className="flex items-center justify-center">
-                    <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
-                  </div>
-                );
-              })}
+                })}
+              </div>
             </div>
           ))}
         </div>
