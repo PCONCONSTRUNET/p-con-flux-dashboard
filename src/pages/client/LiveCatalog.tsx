@@ -353,7 +353,7 @@ const LiveCatalog = () => {
                           {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                         </div>
                         {showTimestamps && (
-                          <span className="text-[7px] font-mono text-muted-foreground/70">
+                          <span className="text-[9px] font-sans font-semibold text-muted-foreground tracking-tight">
                             {formatTime(r.timestamp)}
                           </span>
                         )}
