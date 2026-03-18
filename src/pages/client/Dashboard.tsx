@@ -3,6 +3,8 @@ import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radi
 import { mockSignals, mockBlazeRounds, type Signal, type BlazeColor } from '@/data/mockData';
 import flameIcon from '@/assets/flame-icon.png';
 import BlazeRouletteStrip from '@/components/BlazeRouletteStrip';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import LockedFeature from '@/components/LockedFeature';
 
 type AnalysisState = 'scanning' | 'pattern_found' | 'confirmed' | 'idle';
 
@@ -14,6 +16,7 @@ const stateLabels: Record<AnalysisState, string> = {
 };
 
 const ClientDashboard = () => {
+  const { hasActiveSubscription } = useSubscription();
   const [maxGale, setMaxGale] = useState(1);
   const [minAssert, setMinAssert] = useState(95);
   const [signals, setSignals] = useState<Signal[]>(mockSignals.filter((s) => s.result !== 'pending'));
@@ -74,6 +77,10 @@ const ClientDashboard = () => {
     cycle();
     return () => clearTimeout(timeout);
   }, [maxGale]);
+
+  if (!hasActiveSubscription) {
+    return <LockedFeature feature="Sinais em tempo real" />;
+  }
 
   return (
     <div className="space-y-4 animate-fade-in max-w-lg mx-auto">

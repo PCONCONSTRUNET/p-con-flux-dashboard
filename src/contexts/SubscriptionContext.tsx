@@ -15,6 +15,8 @@ interface SubscriptionContextType {
   loading: boolean;
   showUpgradeModal: boolean;
   setShowUpgradeModal: (show: boolean) => void;
+  /** True if user has an active, non-expired subscription (trial or paid) */
+  hasActiveSubscription: boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -81,8 +83,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     fetchSub();
   }, [user]);
 
+  const hasActiveSubscription = !!subscription && !subscription.isExpired && subscription.is_active;
+
   return (
-    <SubscriptionContext.Provider value={{ subscription, loading, showUpgradeModal, setShowUpgradeModal }}>
+    <SubscriptionContext.Provider value={{ subscription, loading, showUpgradeModal, setShowUpgradeModal, hasActiveSubscription }}>
       {children}
     </SubscriptionContext.Provider>
   );

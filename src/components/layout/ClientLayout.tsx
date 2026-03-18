@@ -1,24 +1,34 @@
 import { ReactNode, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Zap, LayoutGrid, Clock, User, LogOut, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { Zap, LayoutGrid, Clock, User, LogOut, Menu, X, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const navItems = [
-  { label: 'Sinais', icon: Zap, path: '/client' },
-  { label: 'Catálogo', icon: LayoutGrid, path: '/client/catalog' },
-  { label: 'Histórico', icon: Clock, path: '/client/history' },
-  { label: 'Perfil', icon: User, path: '/client/profile' },
+  { label: 'Sinais', icon: Zap, path: '/client', requiresSub: true },
+  { label: 'Catálogo', icon: LayoutGrid, path: '/client/catalog', requiresSub: false },
+  { label: 'Histórico', icon: Clock, path: '/client/history', requiresSub: true },
+  { label: 'Perfil', icon: User, path: '/client/profile', requiresSub: false },
 ];
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
+  const { hasActiveSubscription, setShowUpgradeModal } = useSubscription();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.requiresSub && !hasActiveSubscription) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    navigate(item.path);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -52,20 +62,26 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
             <nav className="space-y-1">
-              {navItems.map(item => (
-                <button
-                  key={item.path}
-                  onClick={() => { navigate(item.path); setSidebarOpen(false); }}
-                  className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm transition-all ${
-                    isActive(item.path)
-                      ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  }`}
-                >
-                  <item.icon size={18} />
-                  {item.label}
-                </button>
-              ))}
+              {navItems.map(item => {
+                const locked = item.requiresSub && !hasActiveSubscription;
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => { handleNavClick(item); if (!locked) setSidebarOpen(false); }}
+                    className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm transition-all ${
+                      locked
+                        ? 'text-muted-foreground/30 cursor-not-allowed'
+                        : isActive(item.path)
+                          ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    <item.icon size={18} />
+                    {item.label}
+                    {locked && <Lock size={12} className="ml-auto text-muted-foreground/30" />}
+                  </button>
+                );
+              })}
             </nav>
             <div className="absolute bottom-6 left-5 right-5">
               <div className="border-t border-border/50 pt-4">
@@ -108,25 +124,31 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
           </div>
 
           <nav className="space-y-1 flex-1 min-h-0">
-            {navItems.map(item => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                title={desktopCollapsed ? item.label : undefined}
-                className={`flex items-center w-full py-3 rounded-xl text-sm transition-all ${
-                  desktopCollapsed ? 'justify-center px-2' : 'gap-3 px-3'
-                } ${
-                  isActive(item.path)
-                    ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-              >
-                <item.icon size={18} className="shrink-0" />
-                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${desktopCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
-                  {item.label}
-                </span>
-              </button>
-            ))}
+            {navItems.map(item => {
+              const locked = item.requiresSub && !hasActiveSubscription;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => handleNavClick(item)}
+                  title={desktopCollapsed ? (locked ? `${item.label} (Bloqueado)` : item.label) : undefined}
+                  className={`flex items-center w-full py-3 rounded-xl text-sm transition-all ${
+                    desktopCollapsed ? 'justify-center px-2' : 'gap-3 px-3'
+                  } ${
+                    locked
+                      ? 'text-muted-foreground/30 cursor-not-allowed'
+                      : isActive(item.path)
+                        ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  <item.icon size={18} className="shrink-0" />
+                  <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${desktopCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                    {item.label}
+                  </span>
+                  {locked && !desktopCollapsed && <Lock size={12} className="ml-auto text-muted-foreground/30 shrink-0" />}
+                </button>
+              );
+            })}
           </nav>
 
           <div className="border-t border-border/50 pt-4 mt-auto shrink-0">
@@ -160,22 +182,28 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-border/50 flex justify-around py-1.5 z-40 backdrop-blur-xl"
         style={{ background: 'linear-gradient(180deg, hsla(240,6%,7%,0.92) 0%, hsla(240,6%,5%,0.98) 100%)' }}>
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-        {navItems.map(item => (
-          <button
-            key={item.path}
-            onClick={() => navigate(item.path)}
-            className={`flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] transition-all rounded-lg ${
-              isActive(item.path)
-                ? 'text-primary'
-                : 'text-muted-foreground active:scale-95'
-            }`}
-          >
-            <div className={`p-1 rounded-lg transition-all ${isActive(item.path) ? 'bg-primary/10 glow-primary' : ''}`}>
-              <item.icon size={20} />
-            </div>
-            <span className="font-semibold">{item.label}</span>
-          </button>
-        ))}
+        {navItems.map(item => {
+          const locked = item.requiresSub && !hasActiveSubscription;
+          return (
+            <button
+              key={item.path}
+              onClick={() => handleNavClick(item)}
+              className={`flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] transition-all rounded-lg ${
+                locked
+                  ? 'text-muted-foreground/25'
+                  : isActive(item.path)
+                    ? 'text-primary'
+                    : 'text-muted-foreground active:scale-95'
+              }`}
+            >
+              <div className={`p-1 rounded-lg transition-all relative ${isActive(item.path) && !locked ? 'bg-primary/10 glow-primary' : ''}`}>
+                <item.icon size={20} />
+                {locked && <Lock size={8} className="absolute -top-0.5 -right-0.5 text-muted-foreground/40" />}
+              </div>
+              <span className="font-semibold">{item.label}</span>
+            </button>
+          );
+        })}
       </nav>
     </div>
   );

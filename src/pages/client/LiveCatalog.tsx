@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Filter, Clock, Trash2 } from 'lucide-react';
+import { Filter, Clock, Trash2, Lock } from 'lucide-react';
 import { mockBlazeRounds, type BlazeColor, type BlazeRound } from '@/data/mockData';
 import blazeIcon from '@/assets/blaze-icon.png';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 const colorStyles: Record<BlazeColor, { bg: string; ring: string; text: string; label: string }> = {
   red: { bg: 'bg-secondary', ring: 'ring-secondary/40', text: 'text-white', label: 'Vermelho' },
@@ -62,6 +63,7 @@ const Stone = ({
 };
 
 const LiveCatalog = () => {
+  const { hasActiveSubscription, setShowUpgradeModal } = useSubscription();
   const [rounds, setRounds] = useState<BlazeRound[]>(mockBlazeRounds);
   const [limit, setLimit] = useState<number>(200);
   const [colorFilter, setColorFilter] = useState<BlazeColor | 'all'>('all');
@@ -193,19 +195,27 @@ const LiveCatalog = () => {
             <span className="text-xs font-bold text-primary">{clock}</span>
           </div>
           <button
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => {
+              if (!hasActiveSubscription) {
+                setShowUpgradeModal(true);
+                return;
+              }
+              setShowFilters(!showFilters);
+            }}
             className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-2.5 lg:px-3 py-1.5 lg:py-2 rounded-xl border transition-all ${
-              showFilters ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
+              !hasActiveSubscription
+                ? 'bg-muted/20 text-muted-foreground/40 border-border/30 cursor-not-allowed'
+                : showFilters ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
             }`}
           >
-            <Filter size={12} />
-            <span className="hidden sm:inline">Filtros</span>
+            {!hasActiveSubscription ? <Lock size={12} /> : <Filter size={12} />}
+            <span className="hidden sm:inline">{!hasActiveSubscription ? 'Bloqueado' : 'Filtros'}</span>
           </button>
         </div>
       </div>
 
-      {/* Filters */}
-      {showFilters && (
+      {/* Filters - only for active subscriptions */}
+      {showFilters && hasActiveSubscription && (
         <div className="rounded-2xl p-3 lg:p-4 border border-border/50 bg-card/80 backdrop-blur-sm animate-slide-up flex flex-col lg:flex-row gap-4">
           <div className="flex-1 space-y-3 lg:space-y-4">
             {/* Round limits */}

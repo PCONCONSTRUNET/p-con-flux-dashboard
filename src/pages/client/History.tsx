@@ -1,8 +1,11 @@
 import { useState, useMemo } from 'react';
 import { Search, CheckCircle2, XCircle, Clock, TrendingUp } from 'lucide-react';
 import { mockSignals, mockBlazeRounds, type SignalResult } from '@/data/mockData';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import LockedFeature from '@/components/LockedFeature';
 
 const History = () => {
+  const { hasActiveSubscription } = useSubscription();
   const [tab, setTab] = useState<'signals' | 'rounds'>('signals');
   const [search, setSearch] = useState('');
   const [resultFilter, setResultFilter] = useState<'all' | SignalResult>('all');
@@ -22,6 +25,10 @@ const History = () => {
   const greenCount = mockSignals.filter(s => s.result === 'green').length;
   const lossCount = mockSignals.filter(s => s.result === 'loss').length;
   const winRate = mockSignals.length > 0 ? Math.round((greenCount / mockSignals.length) * 100) : 0;
+
+  if (!hasActiveSubscription) {
+    return <LockedFeature feature="Histórico de sinais e rodadas" />;
+  }
 
   return (
     <div className="space-y-6 animate-fade-in pb-8">
