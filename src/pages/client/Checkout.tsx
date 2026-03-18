@@ -695,7 +695,7 @@ export default function Checkout() {
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full h-12 rounded-xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+                className="w-full h-13 rounded-2xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
                 style={{
                   background: 'linear-gradient(135deg, hsl(187, 100%, 45%), hsl(187, 100%, 35%))',
                   boxShadow: '0 4px 25px hsla(187, 100%, 50%, 0.35), inset 0 1px 0 hsla(0,0%,100%,0.15)',
