@@ -52,7 +52,7 @@ export default function UpgradeModal() {
 
         {/* Subtle radial glow behind icon */}
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-40 pointer-events-none"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-40 pointer-events-none z-0"
           style={{ background: 'radial-gradient(ellipse at center, hsla(187,100%,50%,0.06) 0%, transparent 70%)' }}
         />
 
