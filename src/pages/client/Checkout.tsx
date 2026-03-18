@@ -133,10 +133,11 @@ export default function Checkout() {
       setPixQrCodeBase64(data.qr_code_base64 || '');
       setPixPaymentId(data.payment_id || '');
       setPixGenerated(true);
+      setAwaitingConfirmation(true);
 
       // Start polling for payment confirmation
       if (data.payment_id) {
-        startPolling(data.payment_id);
+        startPolling('pix');
       }
 
       toast.success('PIX gerado! Escaneie o QR Code ou copie o código.');
