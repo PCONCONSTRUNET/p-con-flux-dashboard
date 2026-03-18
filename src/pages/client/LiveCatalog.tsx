@@ -23,6 +23,14 @@ const LiveCatalog = () => {
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
   const [fixedColumns, setFixedColumns] = useState(false);
+  const [clock, setClock] = useState(() => new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setClock(new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Simulate real-time incoming rounds — stable interval, no dependency on rounds
   const roundsRef = useRef(rounds);
