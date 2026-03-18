@@ -26,6 +26,12 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [userDismissed, setUserDismissed] = useState(false);
+
+  const handleSetShowUpgradeModal = (show: boolean) => {
+    if (!show) setUserDismissed(true);
+    setShowUpgradeModal(show);
+  };
 
   useEffect(() => {
     if (!user || user.role === 'admin') {
