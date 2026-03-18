@@ -369,6 +369,8 @@ const Patterns = () => {
                       <option value="reds">🔴 Vermelhos</option>
                       <option value="blacks">⚫ Pretos</option>
                       <option value="whites">⚪ Brancos</option>
+                      <option value="blacks-whites">⚫⚪ Preto + Branco</option>
+                      <option value="reds-whites">🔴⚪ Vermelho + Branco</option>
                       <option value="any">🎯 Qualquer</option>
                     </select>
                     <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/40 pointer-events-none" />
