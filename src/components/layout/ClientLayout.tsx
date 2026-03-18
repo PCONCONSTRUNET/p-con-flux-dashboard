@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Zap, LayoutGrid, Clock, User, LogOut, Menu, X } from 'lucide-react';
+import { Zap, LayoutGrid, Clock, User, LogOut, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const navItems = [
@@ -16,6 +16,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -82,17 +83,27 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <div className="flex flex-1">
         {/* Desktop sidebar */}
         <aside
-          className="hidden lg:flex flex-col w-64 border-r border-border/50 p-5 relative overflow-hidden"
+          className={`hidden lg:flex flex-col border-r border-border/50 relative overflow-hidden transition-all duration-300 ease-in-out ${
+            desktopCollapsed ? 'w-[68px] p-3' : 'w-64 p-5'
+          }`}
           style={{ background: 'linear-gradient(180deg, hsla(240,6%,7%,0.98) 0%, hsla(345,100%,50%,0.03) 50%, hsla(187,100%,50%,0.03) 100%)' }}
         >
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-secondary/40 via-primary/20 to-transparent" />
           <div className="absolute bottom-0 left-0 top-0 w-px bg-gradient-to-b from-secondary/20 via-transparent to-primary/20" />
 
-          <div className="flex items-center gap-3 mb-8">
-            <img src={logo} alt="P-CON FLUX" className="w-10 h-10 object-contain" />
-            <div>
-              <span className="font-display text-sm font-bold text-foreground block tracking-wider">P-CON FLUX</span>
-              <span className="text-[10px] text-muted-foreground">Painel do Cliente</span>
+          {/* Collapse toggle */}
+          <button
+            onClick={() => setDesktopCollapsed(!desktopCollapsed)}
+            className="absolute -right-3 top-7 z-20 w-6 h-6 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all shadow-md"
+          >
+            {desktopCollapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+          </button>
+
+          <div className={`flex items-center mb-8 transition-all ${desktopCollapsed ? 'justify-center' : 'gap-3'}`}>
+            <img src={logo} alt="P-CON FLUX" className={`object-contain shrink-0 transition-all ${desktopCollapsed ? 'w-8 h-8' : 'w-10 h-10'}`} />
+            <div className={`overflow-hidden transition-all duration-300 ${desktopCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+              <span className="font-display text-sm font-bold text-foreground block tracking-wider whitespace-nowrap">P-CON FLUX</span>
+              <span className="text-[10px] text-muted-foreground whitespace-nowrap">Painel do Cliente</span>
             </div>
           </div>
 
@@ -101,23 +112,37 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm transition-all ${
+                title={desktopCollapsed ? item.label : undefined}
+                className={`flex items-center w-full py-3 rounded-xl text-sm transition-all ${
+                  desktopCollapsed ? 'justify-center px-2' : 'gap-3 px-3'
+                } ${
                   isActive(item.path)
                     ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 }`}
               >
-                <item.icon size={18} />
-                {item.label}
+                <item.icon size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${desktopCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                  {item.label}
+                </span>
               </button>
             ))}
           </nav>
 
           <div className="border-t border-border/50 pt-4">
-            <div className="text-xs text-muted-foreground mb-1">{user?.name}</div>
-            <div className="text-[10px] text-muted-foreground/60 mb-3">{user?.email}</div>
-            <button onClick={logout} className="flex items-center gap-2 text-sm text-secondary hover:text-secondary/80 transition-colors">
-              <LogOut size={16} /> Sair
+            <div className={`overflow-hidden transition-all duration-300 ${desktopCollapsed ? 'h-0 opacity-0 mb-0' : 'h-auto opacity-100 mb-3'}`}>
+              <div className="text-xs text-muted-foreground mb-1 whitespace-nowrap">{user?.name}</div>
+              <div className="text-[10px] text-muted-foreground/60 whitespace-nowrap">{user?.email}</div>
+            </div>
+            <button
+              onClick={logout}
+              title={desktopCollapsed ? 'Sair' : undefined}
+              className={`flex items-center text-sm text-secondary hover:text-secondary/80 transition-colors ${desktopCollapsed ? 'justify-center w-full' : 'gap-2'}`}
+            >
+              <LogOut size={16} className="shrink-0" />
+              <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${desktopCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                Sair
+              </span>
             </button>
           </div>
         </aside>
