@@ -25,7 +25,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+    <div className="h-screen bg-background flex flex-col relative overflow-hidden">
       {/* Ambient background glow */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-[0.04] blur-[180px]" style={{ background: 'hsl(187, 100%, 50%)' }} />
