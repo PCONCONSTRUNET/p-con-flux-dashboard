@@ -22,7 +22,7 @@ const LiveCatalog = () => {
   const [showNumbers, setShowNumbers] = useState(true);
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
-  
+  const [fixedColumns, setFixedColumns] = useState(false);
 
   // Simulate real-time incoming rounds
   useEffect(() => {
