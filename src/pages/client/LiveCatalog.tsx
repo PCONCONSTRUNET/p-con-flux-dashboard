@@ -24,7 +24,10 @@ const LiveCatalog = () => {
   const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
   const [fixedColumns, setFixedColumns] = useState(false);
 
-  // Simulate real-time incoming rounds
+  // Simulate real-time incoming rounds — stable interval, no dependency on rounds
+  const roundsRef = useRef(rounds);
+  roundsRef.current = rounds;
+
   useEffect(() => {
     if (!realtime) return;
     const interval = setInterval(() => {
@@ -35,7 +38,7 @@ const LiveCatalog = () => {
 
       const newRound: BlazeRound = {
         id: `br-rt-${Date.now()}`,
-        number: rounds.length + 1,
+        number: roundsRef.current.length + 1,
         color,
         timestamp: new Date().toISOString(),
         roll,
@@ -43,7 +46,7 @@ const LiveCatalog = () => {
       setRounds(prev => [newRound, ...prev]);
     }, 8000 + Math.random() * 12000);
     return () => clearInterval(interval);
-  }, [realtime, rounds.length]);
+  }, [realtime]);
 
   const displayed = useMemo(() => {
     let data = rounds.slice(0, limit);
