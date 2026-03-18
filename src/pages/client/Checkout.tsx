@@ -500,7 +500,7 @@ export default function Checkout() {
               </button>
               <button
                 onClick={() => setPaymentMethod('card')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-display font-bold transition-all ${
                   paymentMethod === 'card'
                     ? 'text-white border border-primary/30'
                     : 'text-white/40 hover:text-white/60'
