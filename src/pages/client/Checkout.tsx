@@ -23,6 +23,7 @@ export default function Checkout() {
 
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [success, setSuccess] = useState(false);
   const [publicKey, setPublicKey] = useState('');
   const [price, setPrice] = useState('');
@@ -132,10 +133,11 @@ export default function Checkout() {
       setPixQrCodeBase64(data.qr_code_base64 || '');
       setPixPaymentId(data.payment_id || '');
       setPixGenerated(true);
+      setAwaitingConfirmation(true);
 
       // Start polling for payment confirmation
       if (data.payment_id) {
-        startPolling(data.payment_id);
+        startPolling('pix');
       }
 
       toast.success('PIX gerado! Escaneie o QR Code ou copie o código.');
@@ -146,10 +148,9 @@ export default function Checkout() {
     setProcessing(false);
   };
 
-  const startPolling = (paymentId: string) => {
+  const startPolling = (source: string) => {
     if (pollingRef.current) clearInterval(pollingRef.current);
     
-    // Poll subscription status every 5 seconds
     pollingRef.current = setInterval(async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -162,15 +163,22 @@ export default function Checkout() {
 
       if (sub && sub.is_active && sub.plan !== 'trial') {
         if (pollingRef.current) clearInterval(pollingRef.current);
+        setAwaitingConfirmation(false);
         setSuccess(true);
-        toast.success('Pagamento PIX confirmado!');
+        toast.success('Pagamento confirmado!');
         setTimeout(() => navigate('/client'), 3000);
       }
-    }, 5000);
+    }, 4000);
 
     // Stop polling after 10 minutes
     setTimeout(() => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        if (!success) {
+          toast.info('Tempo de espera expirou. Verifique seu painel para o status.');
+          setAwaitingConfirmation(false);
+        }
+      }
     }, 600000);
   };
 
@@ -225,20 +233,72 @@ export default function Checkout() {
         return;
       }
 
-      setSuccess(true);
-      toast.success('Assinatura realizada com sucesso!');
-      setTimeout(() => navigate('/client'), 3000);
+      // Card payment sent - now wait for webhook confirmation
+      setProcessing(false);
+      setAwaitingConfirmation(true);
+      toast.info('Pagamento enviado! Aguardando confirmação...');
+      startPolling('card');
     } catch (err: any) {
       console.error('Checkout error:', err);
       toast.error(err?.message || 'Erro ao processar pagamento.');
+      setProcessing(false);
     }
-    setProcessing(false);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 size={32} className="text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  // Awaiting confirmation screen (for card payments without PIX QR)
+  if (awaitingConfirmation && paymentMethod === 'card') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+        <LoginBackground />
+        <div className="relative z-10 text-center space-y-6 max-w-md">
+          {/* Pulsing loader */}
+          <div className="relative mx-auto w-28 h-28">
+            <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping" style={{ animationDuration: '2s' }} />
+            <div className="absolute inset-2 rounded-full border border-primary/20 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center border border-primary/20"
+                style={{
+                  background: 'linear-gradient(135deg, hsla(187,100%,50%,0.1), hsla(187,100%,50%,0.03))',
+                  boxShadow: '0 0 30px hsla(187,100%,50%,0.15)',
+                }}
+              >
+                <Loader2 size={32} className="text-primary animate-spin" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl font-display font-bold text-white">Processando Pagamento</h2>
+            <p className="text-white/60 text-sm">Aguardando confirmação do Mercado Pago...</p>
+          </div>
+
+          {/* Progress steps */}
+          <div className="space-y-3 text-left mx-auto max-w-xs">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={18} className="text-emerald-400" />
+              <span className="text-sm text-white/70">Dados do cartão enviados</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={18} className="text-emerald-400" />
+              <span className="text-sm text-white/70">Pagamento processado</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Loader2 size={18} className="text-primary animate-spin" />
+              <span className="text-sm text-white font-semibold">Confirmando assinatura...</span>
+            </div>
+          </div>
+
+          <p className="text-xs text-white/30">Isso pode levar alguns segundos</p>
+        </div>
       </div>
     );
   }
@@ -540,9 +600,9 @@ export default function Checkout() {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2 justify-center py-2">
-                    <Loader2 size={14} className="text-primary animate-spin" />
-                    <p className="text-xs text-muted-foreground/50">Aguardando confirmação do pagamento...</p>
+                  <div className="flex items-center gap-3 justify-center py-3 px-4 rounded-xl border border-primary/15" style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.06), transparent)' }}>
+                    <Loader2 size={16} className="text-primary animate-spin" />
+                    <p className="text-xs text-white/70 font-display font-semibold">Aguardando confirmação do pagamento...</p>
                   </div>
 
                   <button
