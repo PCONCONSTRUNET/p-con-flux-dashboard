@@ -43,7 +43,7 @@ const LiveCatalog = () => {
         timestamp: new Date().toISOString(),
         roll,
       };
-      setRounds(prev => [newRound, ...prev]);
+      setRounds(prev => [newRound, ...prev].slice(0, 600));
     }, 8000 + Math.random() * 12000);
     return () => clearInterval(interval);
   }, [realtime]);
