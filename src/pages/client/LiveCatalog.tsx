@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Filter, Clock, RefreshCw, Eye, EyeOff, Trash2, Columns3, LayoutGrid } from 'lucide-react';
+import { Filter, Clock, Trash2 } from 'lucide-react';
 import { mockBlazeRounds, type BlazeColor, type BlazeRound } from '@/data/mockData';
 import blazeIcon from '@/assets/blaze-icon.png';
 
