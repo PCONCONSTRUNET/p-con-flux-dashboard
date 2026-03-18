@@ -78,12 +78,10 @@ const ClientDashboard = () => {
     return () => clearTimeout(timeout);
   }, [maxGale]);
 
-  if (!hasActiveSubscription) {
-    return <LockedFeature feature="Sinais em tempo real" />;
-  }
+  const isLocked = !hasActiveSubscription;
 
   return (
-    <div className="space-y-4 animate-fade-in max-w-lg mx-auto">
+    <div className="space-y-4 animate-fade-in max-w-lg mx-auto relative">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
