@@ -30,8 +30,8 @@ export default function Integrations() {
           accessToken: parsed.accessToken || '',
           publicKey: parsed.publicKey || '',
           webhookUrl: parsed.webhookUrl || '',
-          monthlyPlanId: parsed.monthlyPlanId || '',
-          annualPlanId: parsed.annualPlanId || '',
+          monthlyPrice: parsed.monthlyPrice || '',
+          annualPrice: parsed.annualPrice || '',
         });
       } catch { /* ignore */ }
     }
