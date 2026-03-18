@@ -471,8 +471,8 @@ export default function Checkout() {
                   </div>
 
                   <div className="flex items-center gap-2 py-2">
-                    <Shield size={14} className="text-emerald-400/60" />
-                    <p className="text-[11px] text-muted-foreground/40">Pagamento instantâneo via PIX • Mercado Pago</p>
+                    <Shield size={14} className="text-emerald-400/80" />
+                    <p className="text-[11px] text-white/50">Pagamento instantâneo via PIX • Mercado Pago</p>
                   </div>
 
                   <button
