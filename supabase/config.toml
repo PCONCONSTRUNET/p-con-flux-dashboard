@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.create-subscription]
 verify_jwt = false
+
+[functions.create-pix]
+verify_jwt = false

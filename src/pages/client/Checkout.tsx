@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { CreditCard, Lock, ArrowLeft, Loader2, CheckCircle2, Shield, Zap, Crown } from 'lucide-react';
+import { CreditCard, Lock, ArrowLeft, Loader2, CheckCircle2, Shield, Zap, Crown, QrCode, Copy, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import pconLogo from '@/assets/pcon-flux-logo.png';
@@ -10,6 +10,8 @@ declare global {
     MercadoPago: any;
   }
 }
+
+type PaymentMethod = 'pix' | 'card';
 
 export default function Checkout() {
   const [params] = useSearchParams();
@@ -21,13 +23,23 @@ export default function Checkout() {
   const [success, setSuccess] = useState(false);
   const [publicKey, setPublicKey] = useState('');
   const [price, setPrice] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pix');
 
+  // Card fields
   const [cardNumber, setCardNumber] = useState('');
   const [cardName, setCardName] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
   const [docNumber, setDocNumber] = useState('');
   const [email, setEmail] = useState('');
+
+  // PIX state
+  const [pixQrCode, setPixQrCode] = useState('');
+  const [pixQrCodeBase64, setPixQrCodeBase64] = useState('');
+  const [pixCopied, setPixCopied] = useState(false);
+  const [pixGenerated, setPixGenerated] = useState(false);
+  const [pixPaymentId, setPixPaymentId] = useState('');
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!plan || !['monthly', 'annual'].includes(plan)) {
@@ -49,7 +61,6 @@ export default function Checkout() {
         });
       }
 
-      // Get user email
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.email) setEmail(user.email);
 
@@ -59,7 +70,7 @@ export default function Checkout() {
     loadConfig();
   }, [plan, navigate]);
 
-  // Load MP SDK
+  // Load MP SDK for card payments
   useEffect(() => {
     if (!publicKey) return;
     const script = document.createElement('script');
@@ -68,6 +79,13 @@ export default function Checkout() {
     document.body.appendChild(script);
     return () => { document.body.removeChild(script); };
   }, [publicKey]);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
 
   const formatCardNumber = (val: string) => {
     const nums = val.replace(/\D/g, '').slice(0, 16);
@@ -80,7 +98,88 @@ export default function Checkout() {
     return nums;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const formatCPF = (val: string) => {
+    const nums = val.replace(/\D/g, '').slice(0, 11);
+    return nums.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, (_, a, b, c, d) =>
+      d ? `${a}.${b}.${c}-${d}` : c ? `${a}.${b}.${c}` : b ? `${a}.${b}` : a
+    );
+  };
+
+  // --- PIX FLOW ---
+  const handleGeneratePix = async () => {
+    if (!plan) return;
+    if (docNumber.replace(/\D/g, '').length < 11) {
+      toast.error('Informe um CPF válido');
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-pix', {
+        body: { plan, email, doc_number: docNumber.replace(/\D/g, '') },
+      });
+
+      if (error || data?.error) {
+        toast.error(data?.error || 'Erro ao gerar PIX');
+        setProcessing(false);
+        return;
+      }
+
+      setPixQrCode(data.qr_code || '');
+      setPixQrCodeBase64(data.qr_code_base64 || '');
+      setPixPaymentId(data.payment_id || '');
+      setPixGenerated(true);
+
+      // Start polling for payment confirmation
+      if (data.payment_id) {
+        startPolling(data.payment_id);
+      }
+
+      toast.success('PIX gerado! Escaneie o QR Code ou copie o código.');
+    } catch (err: any) {
+      console.error('PIX error:', err);
+      toast.error(err?.message || 'Erro ao gerar PIX');
+    }
+    setProcessing(false);
+  };
+
+  const startPolling = (paymentId: string) => {
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    
+    // Poll subscription status every 5 seconds
+    pollingRef.current = setInterval(async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('plan, is_active')
+        .eq('user_id', user.id)
+        .single();
+
+      if (sub && sub.is_active && sub.plan !== 'trial') {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        setSuccess(true);
+        toast.success('Pagamento PIX confirmado!');
+        setTimeout(() => navigate('/client'), 3000);
+      }
+    }, 5000);
+
+    // Stop polling after 10 minutes
+    setTimeout(() => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    }, 600000);
+  };
+
+  const copyPixCode = () => {
+    navigator.clipboard.writeText(pixQrCode);
+    setPixCopied(true);
+    toast.success('Código PIX copiado!');
+    setTimeout(() => setPixCopied(false), 3000);
+  };
+
+  // --- CARD FLOW ---
+  const handleCardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!plan) return;
 
@@ -89,12 +188,11 @@ export default function Checkout() {
     if (!cardName.trim()) { toast.error('Nome no cartão obrigatório'); return; }
     if (expiry.length < 5) { toast.error('Validade inválida'); return; }
     if (cvv.length < 3) { toast.error('CVV inválido'); return; }
-    if (docNumber.length < 11) { toast.error('CPF inválido'); return; }
+    if (docNumber.replace(/\D/g, '').length < 11) { toast.error('CPF inválido'); return; }
 
     setProcessing(true);
 
     try {
-      // Create card token with MP SDK
       const mp = new window.MercadoPago(publicKey);
       const [expiryMonth, expiryYear] = expiry.split('/');
 
@@ -114,14 +212,8 @@ export default function Checkout() {
         return;
       }
 
-      // Send token to edge function
       const { data, error } = await supabase.functions.invoke('create-subscription', {
-        body: {
-          plan,
-          card_token: tokenResponse.id,
-          email,
-          doc_number: docNumber.replace(/\D/g, ''),
-        },
+        body: { plan, card_token: tokenResponse.id, email, doc_number: docNumber.replace(/\D/g, '') },
       });
 
       if (error || data?.error) {
@@ -132,7 +224,6 @@ export default function Checkout() {
 
       setSuccess(true);
       toast.success('Assinatura realizada com sucesso!');
-
       setTimeout(() => navigate('/client'), 3000);
     } catch (err: any) {
       console.error('Checkout error:', err);
@@ -178,7 +269,6 @@ export default function Checkout() {
       </div>
 
       <div className="w-full max-w-lg relative z-10">
-        {/* Back button */}
         <button
           onClick={() => navigate('/client')}
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
@@ -187,12 +277,10 @@ export default function Checkout() {
           Voltar
         </button>
 
-        {/* Main Card */}
         <div
           className="rounded-2xl border border-border/20 overflow-hidden"
           style={{ background: 'linear-gradient(160deg, hsl(240 5% 12%) 0%, hsl(240 5% 7%) 100%)', boxShadow: '0 25px 60px hsla(0,0%,0%,0.5)' }}
         >
-          {/* Top glow */}
           <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Header */}
@@ -220,109 +308,230 @@ export default function Checkout() {
             </div>
           </div>
 
+          {/* Payment Method Tabs */}
+          <div className="px-6 pt-5">
+            <div className="flex gap-2 p-1 rounded-xl border border-border/15" style={{ background: 'hsla(240, 5%, 6%, 0.8)' }}>
+              <button
+                onClick={() => { setPaymentMethod('pix'); setPixGenerated(false); }}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-semibold transition-all ${
+                  paymentMethod === 'pix'
+                    ? 'bg-primary/15 text-primary border border-primary/25'
+                    : 'text-muted-foreground/50 hover:text-muted-foreground/70'
+                }`}
+              >
+                <QrCode size={16} />
+                PIX
+              </button>
+              <button
+                onClick={() => setPaymentMethod('card')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-semibold transition-all ${
+                  paymentMethod === 'card'
+                    ? 'bg-primary/15 text-primary border border-primary/25'
+                    : 'text-muted-foreground/50 hover:text-muted-foreground/70'
+                }`}
+              >
+                <CreditCard size={16} />
+                Cartão
+              </button>
+            </div>
+          </div>
+
+          {/* PIX Form */}
+          {paymentMethod === 'pix' && (
+            <div className="px-6 py-5 space-y-4">
+              {!pixGenerated ? (
+                <>
+                  {/* CPF */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-display font-semibold text-muted-foreground/60">CPF do Titular</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="000.000.000-00"
+                      value={docNumber}
+                      onChange={(e) => setDocNumber(formatCPF(e.target.value))}
+                      className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2 py-2">
+                    <Shield size={14} className="text-emerald-400/60" />
+                    <p className="text-[11px] text-muted-foreground/40">Pagamento instantâneo via PIX • Mercado Pago</p>
+                  </div>
+
+                  <button
+                    onClick={handleGeneratePix}
+                    disabled={processing}
+                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-display font-bold tracking-wide text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    style={{ boxShadow: '0 4px 20px hsla(187, 100%, 50%, 0.25)' }}
+                  >
+                    {processing ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        Gerando PIX...
+                      </>
+                    ) : (
+                      <>
+                        <QrCode size={16} />
+                        Gerar PIX • R$ {price}
+                      </>
+                    )}
+                  </button>
+                </>
+              ) : (
+                <div className="space-y-4 animate-fade-in">
+                  {/* QR Code */}
+                  {pixQrCodeBase64 && (
+                    <div className="flex justify-center">
+                      <div className="p-3 bg-white rounded-2xl">
+                        <img
+                          src={`data:image/png;base64,${pixQrCodeBase64}`}
+                          alt="QR Code PIX"
+                          className="w-48 h-48"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <p className="text-center text-xs text-muted-foreground/50">
+                    Escaneie o QR Code ou copie o código abaixo
+                  </p>
+
+                  {/* PIX Copy-Paste */}
+                  {pixQrCode && (
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          readOnly
+                          value={pixQrCode}
+                          className="w-full h-11 px-4 pr-12 rounded-xl border border-border/20 bg-background/40 text-[10px] font-mono text-foreground/60 focus:outline-none truncate"
+                        />
+                        <button
+                          onClick={copyPixCode}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-primary/10 transition-colors"
+                        >
+                          {pixCopied ? (
+                            <Check size={16} className="text-emerald-400" />
+                          ) : (
+                            <Copy size={16} className="text-muted-foreground/40" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2 justify-center py-2">
+                    <Loader2 size={14} className="text-primary animate-spin" />
+                    <p className="text-xs text-muted-foreground/50">Aguardando confirmação do pagamento...</p>
+                  </div>
+
+                  <button
+                    onClick={() => { setPixGenerated(false); setPixQrCode(''); setPixQrCodeBase64(''); }}
+                    className="w-full h-10 rounded-xl border border-border/20 text-muted-foreground/50 text-xs font-display font-semibold hover:text-foreground/70 transition-colors"
+                  >
+                    Gerar novo PIX
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Card Form */}
-          <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
-            {/* Card Number */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-display font-semibold text-muted-foreground/60">Número do Cartão</label>
-              <div className="relative">
-                <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/30" />
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="0000 0000 0000 0000"
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                  className="w-full h-11 pl-10 pr-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
-                />
-              </div>
-            </div>
-
-            {/* Card Name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-display font-semibold text-muted-foreground/60">Nome no Cartão</label>
-              <input
-                type="text"
-                placeholder="NOME COMO ESTÁ NO CARTÃO"
-                value={cardName}
-                onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
-              />
-            </div>
-
-            {/* Expiry + CVV */}
-            <div className="grid grid-cols-2 gap-3">
+          {paymentMethod === 'card' && (
+            <form onSubmit={handleCardSubmit} className="px-6 py-5 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-display font-semibold text-muted-foreground/60">Validade</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="MM/AA"
-                  value={expiry}
-                  onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                  className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-display font-semibold text-muted-foreground/60">CVV</label>
+                <label className="text-xs font-display font-semibold text-muted-foreground/60">Número do Cartão</label>
                 <div className="relative">
+                  <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/30" />
                   <input
                     type="text"
                     inputMode="numeric"
-                    placeholder="000"
-                    maxLength={4}
-                    value={cvv}
-                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    className="w-full h-11 px-4 pr-10 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                    placeholder="0000 0000 0000 0000"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
                   />
-                  <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/20" />
                 </div>
               </div>
-            </div>
 
-            {/* CPF */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-display font-semibold text-muted-foreground/60">CPF do Titular</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                placeholder="000.000.000-00"
-                value={docNumber}
-                onChange={(e) => {
-                  const nums = e.target.value.replace(/\D/g, '').slice(0, 11);
-                  const formatted = nums.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, (_, a, b, c, d) => d ? `${a}.${b}.${c}-${d}` : c ? `${a}.${b}.${c}` : b ? `${a}.${b}` : a);
-                  setDocNumber(formatted);
-                }}
-                className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
-              />
-            </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-display font-semibold text-muted-foreground/60">Nome no Cartão</label>
+                <input
+                  type="text"
+                  placeholder="NOME COMO ESTÁ NO CARTÃO"
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                  className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                />
+              </div>
 
-            {/* Security badge */}
-            <div className="flex items-center gap-2 py-2">
-              <Shield size={14} className="text-emerald-400/60" />
-              <p className="text-[11px] text-muted-foreground/40">Pagamento seguro processado pelo Mercado Pago</p>
-            </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-display font-semibold text-muted-foreground/60">Validade</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="MM/AA"
+                    value={expiry}
+                    onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                    className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-display font-semibold text-muted-foreground/60">CVV</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="000"
+                      maxLength={4}
+                      value={cvv}
+                      onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      className="w-full h-11 px-4 pr-10 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                    />
+                    <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/20" />
+                  </div>
+                </div>
+              </div>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={processing}
-              className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-display font-bold tracking-wide text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-              style={{ boxShadow: '0 4px 20px hsla(187, 100%, 50%, 0.25)' }}
-            >
-              {processing ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" />
-                  Processando...
-                </>
-              ) : (
-                <>
-                  <Lock size={16} />
-                  Pagar R$ {price}
-                </>
-              )}
-            </button>
-          </form>
+              <div className="space-y-1.5">
+                <label className="text-xs font-display font-semibold text-muted-foreground/60">CPF do Titular</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="000.000.000-00"
+                  value={docNumber}
+                  onChange={(e) => setDocNumber(formatCPF(e.target.value))}
+                  className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 py-2">
+                <Shield size={14} className="text-emerald-400/60" />
+                <p className="text-[11px] text-muted-foreground/40">Pagamento seguro processado pelo Mercado Pago</p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={processing}
+                className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-display font-bold tracking-wide text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{ boxShadow: '0 4px 20px hsla(187, 100%, 50%, 0.25)' }}
+              >
+                {processing ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Processando...
+                  </>
+                ) : (
+                  <>
+                    <Lock size={16} />
+                    Pagar R$ {price}
+                  </>
+                )}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>
