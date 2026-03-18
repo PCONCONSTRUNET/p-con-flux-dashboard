@@ -12,7 +12,7 @@ interface PatternConfig {
   colors: ColorToken[];
   numbers: number[];
   gales: number;
-  victoryTarget: 'reds' | 'blacks' | 'whites' | 'any';
+  victoryTarget: 'reds' | 'blacks' | 'whites' | 'blacks-whites' | 'reds-whites' | 'any';
 }
 
 const colorTokens: { id: ColorToken; border: string; bg: string; inner?: string; split?: [string, string] }[] = [
