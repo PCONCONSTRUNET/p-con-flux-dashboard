@@ -369,7 +369,7 @@ const LiveCatalog = () => {
           {fixedGrid.length === 0 && (
             <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, minmax(74px, 1fr))' }}>
               {Array.from({ length: 10 }, (_, col) => (
-                <div key={`empty-row-${col}`} className="flex gap-0 items-start justify-center py-0.5">
+                <div key={`empty-row-${col}`} className="flex gap-0 items-start justify-center">
                   <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/8" />
                   <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/8" />
                 </div>
