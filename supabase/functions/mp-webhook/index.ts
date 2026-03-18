@@ -6,6 +6,64 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// Plan durations in milliseconds
+const PLAN_DURATIONS: Record<string, number> = {
+  monthly: 30 * 24 * 60 * 60 * 1000,   // 30 days
+  annual: 365 * 24 * 60 * 60 * 1000,    // 365 days
+};
+
+async function activateSubscription(
+  supabase: any,
+  userId: string,
+  plan: string,
+) {
+  const durationMs = PLAN_DURATIONS[plan];
+  if (!durationMs) {
+    console.error("Unknown plan:", plan);
+    return;
+  }
+
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + durationMs);
+
+  console.log(`Activating subscription: user=${userId}, plan=${plan}, expires=${expiresAt.toISOString()}`);
+
+  const { error } = await supabase
+    .from("subscriptions")
+    .upsert({
+      user_id: userId,
+      plan: plan,
+      started_at: now.toISOString(),
+      expires_at: expiresAt.toISOString(),
+      is_active: true,
+      updated_at: now.toISOString(),
+    }, { onConflict: "user_id" });
+
+  if (error) {
+    console.error("Error activating subscription:", error);
+  } else {
+    console.log(`Subscription activated for user: ${userId}, plan: ${plan}, expires: ${expiresAt.toISOString()}`);
+  }
+}
+
+async function getAccessToken(supabase: any): Promise<string | null> {
+  const { data } = await supabase
+    .from("platform_settings")
+    .select("key, value")
+    .eq("key", "mp_access_token")
+    .single();
+  return data?.value || null;
+}
+
+function parseExternalReference(ref: string): { user_id?: string; plan?: string } {
+  try {
+    return JSON.parse(ref);
+  } catch {
+    console.error("Failed to parse external_reference:", ref);
+    return {};
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -25,69 +83,127 @@ Deno.serve(async (req) => {
     try {
       body = await req.json();
     } catch {
-      // Body may not be JSON
+      // Body may not be JSON for some IPN types
     }
 
     const notificationType = topic || body?.type || body?.action;
     const resourceId = id || body?.data?.id;
 
-    console.log("MP Webhook received:", { type: notificationType, resourceId, body });
+    console.log("MP Webhook received:", { type: notificationType, resourceId });
 
-    // Handle payment notifications (PIX and card)
+    // ---- Handle PAYMENT notifications (PIX + single card payments) ----
     if (notificationType === "payment" && resourceId) {
-      // Fetch payment details from MP API
-      const { data: settings } = await supabase
-        .from("platform_settings")
-        .select("key, value")
-        .eq("key", "mp_access_token")
-        .single();
-
-      if (settings?.value) {
-        const paymentRes = await fetch(`https://api.mercadopago.com/v1/payments/${resourceId}`, {
-          headers: { "Authorization": `Bearer ${settings.value}` },
+      const accessToken = await getAccessToken(supabase);
+      if (!accessToken) {
+        console.error("No MP access token configured");
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-        const payment = await paymentRes.json();
-        console.log("Payment details:", payment.id, payment.status, payment.external_reference);
+      }
 
-        if (payment.status === "approved" && payment.external_reference) {
-          try {
-            const ref = JSON.parse(payment.external_reference);
-            const userId = ref.user_id;
-            const plan = ref.plan;
+      const paymentRes = await fetch(`https://api.mercadopago.com/v1/payments/${resourceId}`, {
+        headers: { "Authorization": `Bearer ${accessToken}` },
+      });
+      const payment = await paymentRes.json();
 
-            if (userId && plan) {
-              const now = new Date();
-              const expiresAt = plan === "monthly"
-                ? new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-                : new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+      console.log("Payment details:", {
+        id: payment.id,
+        status: payment.status,
+        status_detail: payment.status_detail,
+        payment_method: payment.payment_method_id,
+        amount: payment.transaction_amount,
+        external_reference: payment.external_reference,
+      });
 
-              await supabase
-                .from("subscriptions")
-                .upsert({
-                  user_id: userId,
-                  plan: plan,
-                  started_at: now.toISOString(),
-                  expires_at: expiresAt.toISOString(),
-                  is_active: true,
-                  updated_at: now.toISOString(),
-                }, { onConflict: "user_id" });
-
-              console.log("Subscription activated for user:", userId, "plan:", plan);
-            }
-          } catch (e) {
-            console.error("Error parsing external_reference:", e);
-          }
+      if (payment.status === "approved" && payment.external_reference) {
+        const { user_id, plan } = parseExternalReference(payment.external_reference);
+        if (user_id && plan) {
+          await activateSubscription(supabase, user_id, plan);
         }
       }
     }
 
-    // Handle subscription (preapproval) notifications
+    // ---- Handle PREAPPROVAL notifications (recurring card subscriptions) ----
     if (
       notificationType === "subscription_preapproval" ||
-      notificationType === "preapproval" ||
-      notificationType === "subscription_authorized_payment"
+      notificationType === "preapproval"
     ) {
-      console.log("Subscription event received:", { type: notificationType, id: resourceId, data: body });
+      const accessToken = await getAccessToken(supabase);
+      if (!accessToken) {
+        console.error("No MP access token configured");
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Fetch preapproval details
+      const preapprovalRes = await fetch(`https://api.mercadopago.com/preapproval/${resourceId}`, {
+        headers: { "Authorization": `Bearer ${accessToken}` },
+      });
+      const preapproval = await preapprovalRes.json();
+
+      console.log("Preapproval details:", {
+        id: preapproval.id,
+        status: preapproval.status,
+        reason: preapproval.reason,
+        external_reference: preapproval.external_reference,
+      });
+
+      if (
+        (preapproval.status === "authorized" || preapproval.status === "active") &&
+        preapproval.external_reference
+      ) {
+        const { user_id, plan } = parseExternalReference(preapproval.external_reference);
+        if (user_id && plan) {
+          await activateSubscription(supabase, user_id, plan);
+        }
+      }
+
+      // Handle cancellation
+      if (preapproval.status === "cancelled" && preapproval.external_reference) {
+        const { user_id } = parseExternalReference(preapproval.external_reference);
+        if (user_id) {
+          await supabase
+            .from("subscriptions")
+            .update({ is_active: false, updated_at: new Date().toISOString() })
+            .eq("user_id", user_id);
+          console.log("Subscription cancelled for user:", user_id);
+        }
+      }
+    }
+
+    // ---- Handle AUTHORIZED PAYMENT (recurring payment received) ----
+    if (notificationType === "subscription_authorized_payment" && resourceId) {
+      const accessToken = await getAccessToken(supabase);
+      if (accessToken) {
+        const paymentRes = await fetch(`https://api.mercadopago.com/authorized_payments/${resourceId}`, {
+          headers: { "Authorization": `Bearer ${accessToken}` },
+        });
+        const authPayment = await paymentRes.json();
+
+        console.log("Authorized payment:", {
+          id: authPayment.id,
+          status: authPayment.status,
+          preapproval_id: authPayment.preapproval_id,
+        });
+
+        if (authPayment.status === "approved" && authPayment.preapproval_id) {
+          // Fetch the preapproval to get external_reference
+          const preapprovalRes = await fetch(`https://api.mercadopago.com/preapproval/${authPayment.preapproval_id}`, {
+            headers: { "Authorization": `Bearer ${accessToken}` },
+          });
+          const preapproval = await preapprovalRes.json();
+
+          if (preapproval.external_reference) {
+            const { user_id, plan } = parseExternalReference(preapproval.external_reference);
+            if (user_id && plan) {
+              await activateSubscription(supabase, user_id, plan);
+            }
+          }
+        }
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
