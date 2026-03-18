@@ -173,6 +173,30 @@ const ClientDashboard = () => {
             <span className="text-[10px] text-muted-foreground/60">Monitorando rodadas em tempo real</span>
           </div>
         }
+
+        {/* Locked overlay — on top of roulette */}
+        {isLocked && (
+          <div className="absolute inset-0 z-30 flex items-end justify-center pb-6 rounded-3xl overflow-hidden">
+            <div className="absolute inset-0 backdrop-blur-md bg-background/30" />
+            <div className="relative z-10 w-full max-w-sm mx-4 rounded-2xl border border-primary/20 p-6 text-center animate-scale-in shadow-2xl shadow-primary/10"
+              style={{ background: 'linear-gradient(180deg, hsla(240,6%,12%,0.97) 0%, hsla(240,6%,8%,0.99) 100%)' }}>
+              <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-3">
+                <Lock size={22} className="text-primary" />
+              </div>
+              <h3 className="text-base font-bold text-foreground mb-1">Assine um Plano</h3>
+              <p className="text-xs text-muted-foreground/60 mb-4">
+                Desbloqueie sinais em tempo real e todas as funcionalidades.
+              </p>
+              <button
+                onClick={() => setShowUpgradeModal(true)}
+                className="w-full py-3 rounded-xl bg-primary/15 text-primary border border-primary/30 text-sm font-bold tracking-wide hover:bg-primary/25 transition-all flex items-center justify-center gap-2"
+              >
+                <Shield size={14} />
+                Ver Planos
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Stats */}
