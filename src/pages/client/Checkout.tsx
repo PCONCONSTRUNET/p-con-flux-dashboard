@@ -246,15 +246,10 @@ export default function Checkout() {
   if (success) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Background celebration glows */}
-        <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-[30%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-[0.08] blur-[180px] animate-pulse" style={{ background: 'hsl(187, 100%, 50%)' }} />
-          <div className="absolute bottom-[20%] left-[30%] w-[400px] h-[400px] rounded-full opacity-[0.05] blur-[150px] animate-pulse" style={{ background: 'hsl(150, 100%, 50%)', animationDelay: '0.5s' }} />
-          <div className="absolute top-[20%] right-[20%] w-[300px] h-[300px] rounded-full opacity-[0.04] blur-[120px] animate-pulse" style={{ background: 'hsl(260, 100%, 60%)', animationDelay: '1s' }} />
-        </div>
+        <LoginBackground />
 
         {/* Floating particles */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-[1]">
           {[...Array(20)].map((_, i) => (
             <div
               key={i}
