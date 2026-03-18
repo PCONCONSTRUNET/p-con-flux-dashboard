@@ -18,6 +18,7 @@ import Profile from "@/pages/client/Profile";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import Patterns from "@/pages/admin/Patterns";
 import PatternFlow from "@/pages/admin/PatternFlow";
+import Integrations from "@/pages/admin/Integrations";
 
 import ClientsPage from "@/pages/admin/Clients";
 import PaymentsPage from "@/pages/admin/Payments";
@@ -59,6 +60,7 @@ const App = () => (
             
             <Route path="/admin/clients" element={<ProtectedRoute role="admin"><AdminLayout><ClientsPage /></AdminLayout></ProtectedRoute>} />
             <Route path="/admin/payments" element={<ProtectedRoute role="admin"><AdminLayout><PaymentsPage /></AdminLayout></ProtectedRoute>} />
+            <Route path="/admin/integrations" element={<ProtectedRoute role="admin"><AdminLayout><Integrations /></AdminLayout></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
