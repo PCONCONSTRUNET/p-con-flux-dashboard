@@ -216,31 +216,28 @@ const ClientDashboard = () => {
 
         {/* Locked overlay — centered on roulette area */}
         {isLocked && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center rounded-3xl overflow-hidden">
-            <div className="absolute inset-0 backdrop-blur-[6px] bg-background/50" />
-            <div className="relative z-10 w-[90%] max-w-xs rounded-2xl border border-primary/25 overflow-hidden animate-scale-in shadow-2xl"
-              style={{ background: 'linear-gradient(180deg, hsla(240,6%,14%,0.98) 0%, hsla(240,6%,8%,0.99) 100%)', boxShadow: '0 0 40px hsla(187,100%,50%,0.08), 0 20px 60px hsla(0,0%,0%,0.5)' }}>
-              {/* Top accent line */}
-              <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
-              
-              <div className="p-6 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/25 flex items-center justify-center mx-auto mb-4 relative">
-                  <Lock size={24} className="text-primary" />
-                  <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ boxShadow: '0 0 20px hsla(187,100%,50%,0.15)' }} />
+          <div className="absolute inset-0 z-30 flex items-center justify-center rounded-3xl">
+            <div className="absolute inset-0 backdrop-blur-[6px] bg-background/60 rounded-3xl" />
+            <div className="relative z-10 w-[85%] max-w-[260px] rounded-2xl border border-primary/25 animate-scale-in"
+              style={{ background: 'linear-gradient(180deg, hsla(240,6%,14%,0.98) 0%, hsla(240,6%,8%,0.99) 100%)', boxShadow: '0 0 30px hsla(187,100%,50%,0.08), 0 12px 40px hsla(0,0%,0%,0.5)' }}>
+              <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent rounded-t-2xl" />
+              <div className="px-5 py-4 text-center">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/25 flex items-center justify-center mx-auto mb-3 relative">
+                  <Lock size={20} className="text-primary" />
+                  <div className="absolute inset-0 rounded-xl animate-pulse" style={{ boxShadow: '0 0 15px hsla(187,100%,50%,0.15)' }} />
                 </div>
-                <h3 className="text-lg font-bold text-foreground mb-1.5">Assine um Plano</h3>
-                <p className="text-[12px] text-muted-foreground/50 mb-5 leading-relaxed">
-                  Seu teste expirou. Desbloqueie sinais em tempo real e todas as funcionalidades premium.
+                <h3 className="text-base font-bold text-foreground mb-1">Assine um Plano</h3>
+                <p className="text-[11px] text-muted-foreground/50 mb-4 leading-relaxed">
+                  Desbloqueie sinais em tempo real e funcionalidades premium.
                 </p>
                 <button
                   onClick={() => setShowUpgradeModal(true)}
-                  className="w-full py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all flex items-center justify-center gap-2 text-background"
-                  style={{ background: 'linear-gradient(135deg, hsl(187,100%,45%) 0%, hsl(187,100%,35%) 100%)', boxShadow: '0 4px 20px hsla(187,100%,50%,0.3)' }}
+                  className="w-full py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all flex items-center justify-center gap-2 text-background"
+                  style={{ background: 'linear-gradient(135deg, hsl(187,100%,45%) 0%, hsl(187,100%,35%) 100%)', boxShadow: '0 4px 16px hsla(187,100%,50%,0.3)' }}
                 >
-                  <Shield size={15} />
-                  Ver Planos Disponíveis
+                  <Shield size={14} />
+                  Ver Planos
                 </button>
-                <p className="text-[10px] text-muted-foreground/30 mt-3">Cancele quando quiser</p>
               </div>
             </div>
           </div>
