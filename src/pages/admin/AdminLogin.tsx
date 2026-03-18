@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import LoginBackground from '@/components/LoginBackground';
+import { Shield } from 'lucide-react';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -26,41 +27,30 @@ const AdminLogin = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
       <LoginBackground />
 
-      <div className="w-full max-w-sm animate-slide-up relative z-10">
-        <div className="flex flex-col items-center mb-5">
-          <img src={logo} alt="P-CON FLUX" className="w-28 h-28 object-contain mb-1" />
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] bg-secondary/20 text-secondary px-2 py-0.5 rounded font-display tracking-widest uppercase border border-secondary/30 glow-secondary">
-              Painel Administrativo
+      <div className="w-full max-w-[360px] animate-slide-up relative z-10">
+        <div className="flex flex-col items-center mb-6">
+          <img src={logo} alt="P-CON FLUX" className="w-24 h-24 object-contain mb-2" />
+          <div className="flex items-center gap-1.5 mt-1">
+            <Shield size={12} className="text-secondary" />
+            <span className="text-[11px] text-secondary font-body font-medium tracking-wide">
+              Área restrita
             </span>
           </div>
         </div>
 
         <div
-          className="rounded-2xl p-6 border border-foreground/15 backdrop-blur-2xl shadow-[0_0_40px_hsla(345,100%,50%,0.25),0_0_80px_hsla(187,100%,50%,0.08)] relative overflow-hidden"
+          className="rounded-2xl p-5 border border-border/60 backdrop-blur-xl relative overflow-hidden"
           style={{
-            background:
-              'linear-gradient(135deg, hsla(345, 100%, 50%, 0.22) 0%, hsla(240, 6%, 10%, 0.7) 35%, hsla(240, 6%, 12%, 0.65) 65%, hsla(187, 100%, 50%, 0.08) 100%)',
+            background: 'hsla(240, 6%, 7%, 0.85)',
+            boxShadow: '0 8px 32px hsla(0, 0%, 0%, 0.4)',
           }}
         >
-          {/* Glass shine effect */}
-          <div
-            className="absolute inset-0 rounded-2xl pointer-events-none"
-            style={{
-              background:
-                'linear-gradient(105deg, hsla(0, 0%, 100%, 0.08) 0%, transparent 40%, transparent 60%, hsla(0, 0%, 100%, 0.04) 100%)',
-            }}
-          />
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
           <div className="relative z-10">
-            <h2 className="text-center text-sm font-display font-bold text-foreground tracking-wider mb-4">
-              ACESSO ADMINISTRATIVO
-            </h2>
-
-            <form onSubmit={handleLogin} className="space-y-3.5">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Email</label>
+                <label className="block text-[11px] font-medium text-muted-foreground mb-1.5 tracking-wide">Email</label>
                 <input
                   type="email"
                   value={email}
@@ -71,7 +61,7 @@ const AdminLogin = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Senha</label>
+                <label className="block text-[11px] font-medium text-muted-foreground mb-1.5 tracking-wide">Senha</label>
                 <input
                   type="password"
                   value={password}
@@ -82,7 +72,7 @@ const AdminLogin = () => {
               </div>
 
               {error && (
-                <div className="text-sm text-secondary bg-secondary/10 border border-secondary/20 rounded-md px-3 py-2">
+                <div className="text-xs text-secondary bg-secondary/10 border border-secondary/20 rounded-lg px-3 py-2">
                   {error}
                 </div>
               )}
@@ -90,22 +80,17 @@ const AdminLogin = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 rounded-[16px] text-white font-display font-semibold text-xs tracking-wider active:scale-[0.98] transition-all disabled:opacity-50 hover:animate-pulse-glow hover:bg-right"
-                style={{
-                  backgroundImage: 'linear-gradient(30deg, #0400ff, #4ce3f7)',
-                  backgroundSize: '100% auto',
-                  transition: 'background-size 0.3s, background-position 0.3s',
-                }}
+                className="w-full py-2.5 rounded-xl text-foreground font-body font-semibold text-xs tracking-wide active:scale-[0.98] transition-all disabled:opacity-50 border border-primary/30 hover:border-primary/60 bg-primary/10 hover:bg-primary/15"
               >
-                {loading ? 'ENTRANDO...' : 'ACESSAR PAINEL'}
+                {loading ? 'Entrando...' : 'Entrar no painel'}
               </button>
             </form>
 
             <button
               onClick={() => navigate('/login')}
-              className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground transition-colors text-center"
+              className="w-full mt-4 text-[11px] text-muted-foreground/60 hover:text-muted-foreground transition-colors text-center"
             >
-              ← Voltar ao login de cliente
+              ← Voltar
             </button>
           </div>
         </div>
