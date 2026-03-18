@@ -378,7 +378,7 @@ const LiveCatalog = () => {
 
           {/* Empty pending row at top */}
           {fixedGrid.length === 0 && (
-            <div className="grid gap-1 mt-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+            <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 108px)' }}>
               {Array.from({ length: 10 }, (_, col) => (
                 <div key={`empty-row-${col}`} className="flex gap-1 items-stretch">
                   <div className="rounded-md border border-border/20 bg-muted/8" style={{ width: '52px', height: '50px' }} />
