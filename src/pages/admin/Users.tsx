@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Power, X, Users, Crown, Zap, Clock } from 'lucide-react';
+import { Search, Users, Crown, Zap, Clock, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 
 interface UserData {
   id: string;
@@ -10,6 +9,9 @@ interface UserData {
   created_at: string;
   plan: 'trial' | 'monthly' | 'annual';
   is_active: boolean;
+  expires_at: string | null;
+  isExpired: boolean;
+  timeRemaining: string;
 }
 
 const planConfig = {
@@ -17,6 +19,17 @@ const planConfig = {
   monthly: { label: 'Mensal', color: 'text-primary', bg: 'bg-primary/10', icon: Zap },
   annual: { label: 'Anual', color: 'text-emerald-400', bg: 'bg-emerald-400/10', icon: Crown },
 };
+
+function calcTimeRemaining(expiresAt: string | null): { isExpired: boolean; timeRemaining: string } {
+  if (!expiresAt) return { isExpired: true, timeRemaining: 'Sem plano' };
+  const diff = new Date(expiresAt).getTime() - Date.now();
+  if (diff <= 0) return { isExpired: true, timeRemaining: 'Expirado' };
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const timeRemaining = days > 0 ? `${days}d ${hours}h` : hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  return { isExpired: false, timeRemaining };
+}
 
 const UsersPage = () => {
   const [users, setUsers] = useState<UserData[]>([]);
@@ -31,20 +44,25 @@ const UsersPage = () => {
     setLoading(true);
     const [{ data: profiles }, { data: subs }] = await Promise.all([
       supabase.from('profiles').select('id, name, email, created_at'),
-      supabase.from('subscriptions').select('user_id, plan, is_active'),
+      supabase.from('subscriptions').select('user_id, plan, is_active, expires_at'),
     ]);
 
     const subsMap = new Map(subs?.map(s => [s.user_id, s]) || []);
 
     const merged: UserData[] = (profiles || []).map(p => {
       const sub = subsMap.get(p.id);
+      const expiresAt = sub?.expires_at || null;
+      const { isExpired, timeRemaining } = calcTimeRemaining(expiresAt);
       return {
         id: p.id,
         name: p.name || 'Sem nome',
         email: p.email,
         created_at: p.created_at,
         plan: (sub?.plan as UserData['plan']) || 'trial',
-        is_active: sub?.is_active ?? true,
+        is_active: sub?.is_active ?? false,
+        expires_at: expiresAt,
+        isExpired,
+        timeRemaining,
       };
     });
 
@@ -56,6 +74,24 @@ const UsersPage = () => {
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
   );
+
+  const getStatusLabel = (u: UserData) => {
+    if (u.isExpired) return 'EXPIRADO';
+    if (!u.is_active) return 'INATIVO';
+    return 'ATIVO';
+  };
+
+  const getStatusStyle = (u: UserData) => {
+    if (u.isExpired) return 'bg-amber-500/10 text-amber-400';
+    if (!u.is_active) return 'bg-secondary/10 text-secondary';
+    return 'bg-emerald-500/10 text-emerald-400';
+  };
+
+  const getStatusDot = (u: UserData) => {
+    if (u.isExpired) return 'text-amber-400';
+    if (!u.is_active) return 'text-secondary';
+    return 'text-emerald-400';
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -94,6 +130,7 @@ const UsersPage = () => {
                     <th className="text-left text-[10px] font-display text-muted-foreground/50 tracking-widest px-4 py-3">EMAIL</th>
                     <th className="text-left text-[10px] font-display text-muted-foreground/50 tracking-widest px-4 py-3">PLANO</th>
                     <th className="text-left text-[10px] font-display text-muted-foreground/50 tracking-widest px-4 py-3">STATUS</th>
+                    <th className="text-left text-[10px] font-display text-muted-foreground/50 tracking-widest px-4 py-3">TEMPO</th>
                     <th className="text-left text-[10px] font-display text-muted-foreground/50 tracking-widest px-4 py-3">CADASTRO</th>
                   </tr>
                 </thead>
@@ -111,9 +148,20 @@ const UsersPage = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-[10px] font-bold tracking-wider px-2 py-1 rounded-lg ${u.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-secondary/10 text-secondary'}`}>
-                            {u.is_active ? 'ATIVO' : 'INATIVO'}
+                          <span className={`inline-flex items-center gap-1 text-[10px] font-bold tracking-wider px-2 py-1 rounded-lg ${getStatusStyle(u)}`}>
+                            {u.isExpired && <AlertTriangle size={10} />}
+                            {getStatusLabel(u)}
                           </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs font-semibold ${u.isExpired ? 'text-amber-400' : 'text-emerald-400'}`}>
+                            {u.isExpired ? '⚠ ' : '⏱ '}{u.timeRemaining}
+                          </span>
+                          {u.expires_at && (
+                            <p className="text-[9px] text-muted-foreground/30 mt-0.5">
+                              {new Date(u.expires_at).toLocaleDateString('pt-BR')}
+                            </p>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground/40">{new Date(u.created_at).toLocaleDateString('pt-BR')}</td>
                       </tr>
@@ -141,10 +189,16 @@ const UsersPage = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground/40">
-                    <span className={`font-bold ${u.is_active ? 'text-emerald-400' : 'text-secondary'}`}>
-                      {u.is_active ? '● Ativo' : '● Inativo'}
+                    <span className={`font-bold ${getStatusDot(u)}`}>
+                      ● {getStatusLabel(u)}
                     </span>
+                    <span className={`font-semibold ${u.isExpired ? 'text-amber-400' : 'text-emerald-400'}`}>
+                      {u.isExpired ? '⚠ ' : '⏱ '}{u.timeRemaining}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground/30">
                     <span>Cadastro: {new Date(u.created_at).toLocaleDateString('pt-BR')}</span>
+                    {u.expires_at && <span>Expira: {new Date(u.expires_at).toLocaleDateString('pt-BR')}</span>}
                   </div>
                 </div>
               );
