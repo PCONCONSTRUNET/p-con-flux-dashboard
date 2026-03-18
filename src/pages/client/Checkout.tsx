@@ -600,9 +600,9 @@ export default function Checkout() {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2 justify-center py-2">
-                    <Loader2 size={14} className="text-primary animate-spin" />
-                    <p className="text-xs text-muted-foreground/50">Aguardando confirmação do pagamento...</p>
+                  <div className="flex items-center gap-3 justify-center py-3 px-4 rounded-xl border border-primary/15" style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.06), transparent)' }}>
+                    <Loader2 size={16} className="text-primary animate-spin" />
+                    <p className="text-xs text-white/70 font-display font-semibold">Aguardando confirmação do pagamento...</p>
                   </div>
 
                   <button
