@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
+import LoginBackground from '@/components/LoginBackground';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -25,11 +26,9 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-20 blur-[120px]" style={{ background: 'hsl(187 100% 50%)' }} />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full opacity-15 blur-[120px]" style={{ background: 'hsl(345 100% 50%)' }} />
+      <LoginBackground />
 
-      <div className="w-full max-w-md animate-slide-up">
+      <div className="w-full max-w-md animate-slide-up relative z-10">
         <div className="flex flex-col items-center mb-8">
           <img src={logo} alt="P-CON FLUX" className="w-40 h-40 object-contain mb-2" />
         </div>
