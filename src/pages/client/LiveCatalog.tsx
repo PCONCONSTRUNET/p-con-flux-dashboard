@@ -64,32 +64,44 @@ const LiveCatalog = () => {
     };
   }, [rounds, limit]);
 
-  const FIXED_ROWS = 16;
-  const FIXED_COLUMN_WIDTH = 70;
-  const FIXED_SLOT_HEIGHT = 52;
-
   const fixedColumnSource = useMemo(() => {
     if (colorFilter === 'all') return rounds;
     return rounds.filter((round) => round.color === colorFilter);
   }, [rounds, colorFilter]);
 
-  // Build 00-09 columns in chronological order so each new result fills the next empty slot
-  const minuteDigitColumns = useMemo(() => {
-    const columns: BlazeRound[][] = Array.from({ length: 10 }, () => []);
+  // Build grid: rows = 10-min blocks, cols = minute last digit (0-9), each cell = up to 2 rounds
+  const fixedGrid = useMemo(() => {
+    // Group by 10-minute block key and minute digit
+    const blockMap = new Map<string, { rounds: (BlazeRound | null)[][]; blockLabel: string }>();
 
-    const ordered = [...fixedColumnSource].reverse();
+    const ordered = [...fixedColumnSource].reverse(); // oldest first
     ordered.forEach((round) => {
-      const digit = new Date(round.timestamp).getMinutes() % 10;
-      columns[digit].push(round);
+      const d = new Date(round.timestamp);
+      const minute = d.getMinutes();
+      const digit = minute % 10; // column 0-9
+      const blockStart = Math.floor(minute / 10) * 10; // e.g., 0, 10, 20, 30, 40, 50
+      const hour = d.getHours();
+      const blockKey = `${hour}-${blockStart}`;
+      const blockLabel = `${String(hour).padStart(2, '0')}:${String(blockStart).padStart(2, '0')}`;
+
+      if (!blockMap.has(blockKey)) {
+        // 10 columns, each with [null, null] (2 slots)
+        const emptyRow: (BlazeRound | null)[][] = Array.from({ length: 10 }, () => [null, null]);
+        blockMap.set(blockKey, { rounds: emptyRow, blockLabel });
+      }
+
+      const block = blockMap.get(blockKey)!;
+      const cell = block.rounds[digit];
+      // Fill first empty slot in this cell
+      const emptyIdx = cell.indexOf(null);
+      if (emptyIdx !== -1) {
+        cell[emptyIdx] = round;
+      }
     });
 
-    return columns;
+    // Convert to array, newest block first
+    return Array.from(blockMap.values()).reverse();
   }, [fixedColumnSource]);
-
-  const fixedRowsCount = useMemo(() => {
-    const maxFilledRows = Math.max(...minuteDigitColumns.map((column) => column.length), 0);
-    return Math.max(FIXED_ROWS, maxFilledRows + 1);
-  }, [minuteDigitColumns]);
 
   const handleClickRound = useCallback((round: BlazeRound) => {
     if (highlighted === round.id) {
