@@ -171,12 +171,9 @@ const ClientDashboard = () => {
           'bg-gradient-to-r from-transparent via-secondary/60 to-transparent'
         }`} />
 
-        {/* Roulette */}
-        <div className="flex justify-center mb-4">
-          <BlazeRoulette
-            spinning={analysisState === 'scanning'}
-            size={140}
-          />
+        {/* Roulette Strip */}
+        <div className="mb-4">
+          <BlazeRouletteStrip spinning={analysisState === 'scanning'} />
         </div>
 
         {/* Status */}
