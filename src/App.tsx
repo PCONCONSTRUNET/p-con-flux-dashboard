@@ -19,6 +19,7 @@ import AdminDashboard from "@/pages/admin/Dashboard";
 import Patterns from "@/pages/admin/Patterns";
 import UsersPage from "@/pages/admin/Users";
 import ClientsPage from "@/pages/admin/Clients";
+import PaymentsPage from "@/pages/admin/Payments";
 import NotFound from "@/pages/NotFound";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import UpgradeModal from "@/components/UpgradeModal";
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/admin/patterns" element={<ProtectedRoute role="admin"><AdminLayout><Patterns /></AdminLayout></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute role="admin"><AdminLayout><UsersPage /></AdminLayout></ProtectedRoute>} />
             <Route path="/admin/clients" element={<ProtectedRoute role="admin"><AdminLayout><ClientsPage /></AdminLayout></ProtectedRoute>} />
+            <Route path="/admin/payments" element={<ProtectedRoute role="admin"><AdminLayout><PaymentsPage /></AdminLayout></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

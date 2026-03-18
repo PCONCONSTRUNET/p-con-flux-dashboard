@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, Layers, Users, BarChart3, LogOut, Menu, X, Clock, Shield, UserCheck } from 'lucide-react';
+import { LayoutDashboard, Layers, Users, LogOut, Menu, X, Shield, UserCheck, CreditCard } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const navItems = [
@@ -9,6 +9,7 @@ const navItems = [
   { label: 'Padrões', icon: Layers, path: '/admin/patterns' },
   { label: 'Usuários', icon: Users, path: '/admin/users' },
   { label: 'Clientes', icon: UserCheck, path: '/admin/clients' },
+  { label: 'Pagamentos', icon: CreditCard, path: '/admin/payments' },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
