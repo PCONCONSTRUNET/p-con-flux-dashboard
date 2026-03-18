@@ -642,7 +642,7 @@ export default function Checkout() {
                   placeholder="NOME COMO ESTÁ NO CARTÃO"
                   value={cardName}
                   onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                  className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                  className="w-full h-12 px-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                 />
               </div>
 
