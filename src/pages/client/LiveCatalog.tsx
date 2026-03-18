@@ -318,7 +318,7 @@ const LiveCatalog = () => {
         /* Fixed columns — horizontal grid: rows = 10-min blocks, cols = 00-09, 2 stones per cell */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
           {/* Header row */}
-          <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+          <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
             {Array.from({ length: 10 }, (_, col) => (
               <div key={`head-${col}`} className="text-center text-[11px] font-bold text-muted-foreground/70 font-mono py-1.5 border border-border/30 bg-muted/15">
                 {String(col).padStart(2, '0')}
@@ -328,9 +328,9 @@ const LiveCatalog = () => {
 
           {/* Data rows — each row = 10-min block */}
           {fixedGrid.map((block, rowIdx) => (
-            <div key={`block-${rowIdx}`} className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+            <div key={`block-${rowIdx}`} className="grid gap-1 mt-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
               {block.rounds.map((cell, col) => (
-                <div key={`cell-${rowIdx}-${col}`} className="flex gap-0 items-stretch">
+                <div key={`cell-${rowIdx}-${col}`} className="flex gap-1 items-stretch">
                   {cell.map((r, slot) => {
                     if (!r) {
                       return (
