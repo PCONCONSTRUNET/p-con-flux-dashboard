@@ -132,6 +132,8 @@ const LiveCatalog = () => {
             {columnView ? <Columns3 size={12} /> : <LayoutGrid size={12} />}
             {columnView ? 'Colunas' : 'Grade'}
           </button>
+        </div>
+      </div>
 
       {/* Filters */}
       {showFilters && (
