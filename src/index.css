@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,43 +6,43 @@
 
 @layer base {
   :root {
-    --background: 240 6% 4%;
-    --foreground: 0 0% 100%;
+    --background: 240 6% 5%;
+    --foreground: 210 20% 95%;
 
-    --card: 240 4% 9%;
-    --card-foreground: 0 0% 100%;
+    --card: 240 5% 10%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 240 4% 9%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 240 5% 10%;
+    --popover-foreground: 210 20% 95%;
 
     --primary: 187 100% 50%;
     --primary-foreground: 240 6% 4%;
 
-    --secondary: 345 100% 50%;
+    --secondary: 345 100% 55%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 4% 14%;
-    --muted-foreground: 215 17% 72%;
+    --muted: 240 5% 16%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 240 4% 14%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 240 5% 16%;
+    --accent-foreground: 210 20% 95%;
 
-    --destructive: 345 100% 50%;
+    --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 3% 18%;
-    --input: 240 3% 18%;
+    --border: 240 4% 22%;
+    --input: 240 4% 22%;
     --ring: 187 100% 50%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 240 4% 7%;
-    --sidebar-foreground: 215 17% 63%;
+    --sidebar-background: 240 5% 8%;
+    --sidebar-foreground: 215 20% 70%;
     --sidebar-primary: 187 100% 50%;
     --sidebar-primary-foreground: 240 6% 4%;
-    --sidebar-accent: 240 4% 14%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 240 3% 18%;
+    --sidebar-accent: 240 5% 16%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 240 4% 22%;
     --sidebar-ring: 187 100% 50%;
 
     --glow-primary: 0 0 20px hsl(187 100% 50% / 0.3);
