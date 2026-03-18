@@ -244,14 +244,126 @@ export default function Checkout() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="w-20 h-20 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center mx-auto">
-            <CheckCircle2 size={40} className="text-emerald-400" />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Background celebration glows */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[30%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-[0.08] blur-[180px] animate-pulse" style={{ background: 'hsl(187, 100%, 50%)' }} />
+          <div className="absolute bottom-[20%] left-[30%] w-[400px] h-[400px] rounded-full opacity-[0.05] blur-[150px] animate-pulse" style={{ background: 'hsl(150, 100%, 50%)', animationDelay: '0.5s' }} />
+          <div className="absolute top-[20%] right-[20%] w-[300px] h-[300px] rounded-full opacity-[0.04] blur-[120px] animate-pulse" style={{ background: 'hsl(260, 100%, 60%)', animationDelay: '1s' }} />
+        </div>
+
+        {/* Floating particles */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: `${3 + (i % 4) * 2}px`,
+                height: `${3 + (i % 4) * 2}px`,
+                background: i % 3 === 0 ? 'hsl(187, 100%, 50%)' : i % 3 === 1 ? 'hsl(150, 100%, 50%)' : 'hsl(45, 100%, 60%)',
+                left: `${5 + (i * 4.7) % 90}%`,
+                bottom: '-10px',
+                opacity: 0,
+                animation: `particle-rise ${3 + (i % 3)}s ease-out ${i * 0.15}s forwards`,
+              }}
+            />
+          ))}
+          <style>{`
+            @keyframes particle-rise {
+              0% { transform: translateY(0) scale(0); opacity: 0; }
+              20% { opacity: 0.8; transform: translateY(-100px) scale(1); }
+              100% { transform: translateY(-${typeof window !== 'undefined' ? window.innerHeight + 100 : 1100}px) scale(0.3); opacity: 0; }
+            }
+            @keyframes check-draw {
+              0% { stroke-dashoffset: 100; transform: scale(0.5); opacity: 0; }
+              50% { transform: scale(1.15); opacity: 1; }
+              100% { stroke-dashoffset: 0; transform: scale(1); opacity: 1; }
+            }
+            @keyframes ring-expand {
+              0% { transform: scale(0.5); opacity: 0; border-width: 4px; }
+              50% { opacity: 1; }
+              100% { transform: scale(1); opacity: 1; border-width: 2px; }
+            }
+            @keyframes glow-pulse {
+              0%, 100% { box-shadow: 0 0 20px hsla(150, 100%, 50%, 0.2), 0 0 60px hsla(150, 100%, 50%, 0.1); }
+              50% { box-shadow: 0 0 30px hsla(150, 100%, 50%, 0.4), 0 0 80px hsla(150, 100%, 50%, 0.15); }
+            }
+            @keyframes text-reveal {
+              0% { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+              100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+            }
+            @keyframes badge-pop {
+              0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+              60% { transform: scale(1.1) rotate(2deg); }
+              100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            }
+          `}</style>
+        </div>
+
+        <div className="relative z-10 text-center space-y-6">
+          {/* Animated check circle */}
+          <div className="relative mx-auto w-28 h-28">
+            {/* Outer ring */}
+            <div
+              className="absolute inset-0 rounded-full border-2 border-emerald-400/40"
+              style={{ animation: 'ring-expand 0.6s ease-out forwards, glow-pulse 2s ease-in-out 0.8s infinite' }}
+            />
+            {/* Inner ring */}
+            <div
+              className="absolute inset-2 rounded-full border border-emerald-400/20"
+              style={{ animation: 'ring-expand 0.6s ease-out 0.15s forwards' }}
+            />
+            {/* Check icon */}
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ animation: 'check-draw 0.8s ease-out 0.3s forwards', opacity: 0 }}
+            >
+              <div className="w-16 h-16 rounded-full bg-emerald-400/10 flex items-center justify-center">
+                <CheckCircle2 size={40} className="text-emerald-400 drop-shadow-[0_0_12px_hsla(150,100%,50%,0.5)]" />
+              </div>
+            </div>
           </div>
-          <h2 className="text-2xl font-display font-bold text-foreground">Pagamento Confirmado!</h2>
-          <p className="text-muted-foreground">Sua assinatura {plan === 'monthly' ? 'mensal' : 'anual'} foi ativada.</p>
-          <p className="text-sm text-muted-foreground/50">Redirecionando...</p>
+
+          {/* Text content with staggered reveal */}
+          <div className="space-y-3">
+            <h2
+              className="text-3xl font-display font-bold text-foreground"
+              style={{ animation: 'text-reveal 0.6s ease-out 0.6s forwards', opacity: 0 }}
+            >
+              Pagamento Confirmado!
+            </h2>
+            <p
+              className="text-muted-foreground text-lg"
+              style={{ animation: 'text-reveal 0.6s ease-out 0.8s forwards', opacity: 0 }}
+            >
+              Sua assinatura {plan === 'monthly' ? 'mensal' : 'anual'} foi ativada.
+            </p>
+          </div>
+
+          {/* Plan badge */}
+          <div
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-emerald-400/20 mx-auto"
+            style={{
+              background: 'linear-gradient(135deg, hsla(150, 100%, 50%, 0.08), hsla(187, 100%, 50%, 0.05))',
+              animation: 'badge-pop 0.5s ease-out 1s forwards',
+              opacity: 0,
+            }}
+          >
+            <Crown size={16} className="text-emerald-400" />
+            <span className="text-sm font-display font-bold text-emerald-400">
+              {plan === 'monthly' ? 'Plano Mensal Ativo' : 'Plano Anual Ativo'}
+            </span>
+          </div>
+
+          {/* Redirect text */}
+          <p
+            className="text-sm text-muted-foreground/40 flex items-center justify-center gap-2"
+            style={{ animation: 'text-reveal 0.5s ease-out 1.2s forwards', opacity: 0 }}
+          >
+            <Loader2 size={12} className="animate-spin" />
+            Redirecionando para o painel...
+          </p>
         </div>
       </div>
     );
