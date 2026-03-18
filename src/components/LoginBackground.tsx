@@ -53,7 +53,7 @@ const LoginBackground = () => {
     }
 
     // Create floating blaze icons
-    const iconCount = Math.min(12, Math.floor(canvas.width / 120));
+    const iconCount = Math.min(30, Math.max(18, Math.floor(canvas.width / 60)));
     for (let i = 0; i < iconCount; i++) {
       icons.push({
         x: Math.random() * canvas.width,
