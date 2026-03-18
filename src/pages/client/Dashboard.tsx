@@ -196,27 +196,34 @@ const ClientDashboard = () => {
           {signals.slice(0, 8).map((signal) => {
           const time = new Date(signal.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
           const isGreen = signal.result === 'green';
+          const galeText = signal.protection === 'Sem proteção' ? 'Sem proteção' : signal.protection;
+          const roundText = signal.rounds > 0 ? `${signal.rounds}ª rodada` : 'Direto';
           return (
             <div
               key={signal.id}
-              className={`rounded-2xl px-4 py-3 border backdrop-blur-sm flex items-center justify-between transition-all ${
-              isGreen ? 'border-emerald-500/15 bg-emerald-500/5' : 'border-secondary/15 bg-secondary/5'}`
+              className={`rounded-2xl px-4 py-3.5 border backdrop-blur-sm transition-all ${
+              isGreen ? 'border-emerald-500/15 bg-emerald-500/[0.04]' : 'border-secondary/15 bg-secondary/[0.04]'}`
               }>
-              
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isGreen ? 'bg-emerald-500/15' : 'bg-secondary/15'}`}>
-                    {isGreen ? <Trophy size={14} className="text-emerald-400" /> : <XCircle size={14} className="text-secondary" />}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${isGreen ? 'bg-emerald-500/15 border border-emerald-500/20' : 'bg-secondary/15 border border-secondary/20'}`}>
+                      {isGreen ? <CheckCircle2 size={16} className="text-emerald-400" /> : <XCircle size={16} className="text-secondary" />}
+                    </div>
+                    <div>
+                      <div className="text-[13px] font-bold text-foreground">{signal.entry}</div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-muted-foreground/50">{galeText}</span>
+                        <span className="text-muted-foreground/20">•</span>
+                        <span className="text-[10px] text-muted-foreground/50">{roundText}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-xs font-semibold text-foreground">{signal.entry}</div>
-                    <div className="text-[10px] text-muted-foreground">{signal.protection} • {signal.rounds > 0 ? `${signal.rounds}ª rodada` : ''}</div>
+                  <div className="text-right flex flex-col items-end gap-0.5">
+                    <span className={`text-[11px] font-bold tracking-wide ${isGreen ? 'text-emerald-400' : 'text-secondary'}`}>
+                      {isGreen ? 'WIN' : 'LOSS'} {isGreen ? '✅' : '✕'}
+                    </span>
+                    <span className="text-[9px] text-muted-foreground/40 font-mono">{time}</span>
                   </div>
-                </div>
-                <div className="text-right">
-                  <span className={`text-[10px] font-bold ${isGreen ? 'text-emerald-400' : 'text-secondary'}`}>
-                    {isGreen ? 'WIN ✅' : 'LOSS ❌'}
-                  </span>
-                  <div className="text-[9px] text-muted-foreground/50 font-mono">{time}</div>
                 </div>
               </div>);
 
