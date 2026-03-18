@@ -2,6 +2,7 @@ const socials = [
   {
     name: 'WhatsApp',
     key: 'whatsapp',
+    link: '#',
     color: 'rgba(37, 211, 102, 0.6)',
     gradient: 'linear-gradient(135deg, #0a3d1a, #128c3e, #25d366, #0d2916)',
     icon: (
@@ -13,6 +14,7 @@ const socials = [
   {
     name: 'Instagram',
     key: 'instagram',
+    link: '#',
     color: 'rgba(228, 64, 95, 0.6)',
     gradient: 'linear-gradient(135deg, #3d0a1a, #833ab4, #e4405f, #fcaf45)',
     icon: (
@@ -24,6 +26,7 @@ const socials = [
   {
     name: 'Telegram',
     key: 'telegram',
+    link: 'https://t.me/+K-C9AWoh3cI4Yzcx',
     color: 'rgba(0, 136, 204, 0.6)',
     gradient: 'linear-gradient(135deg, #0a1f2d, #0f4a66, #0088cc, #0a2e44)',
     icon: (
@@ -35,6 +38,7 @@ const socials = [
   {
     name: 'Discord',
     key: 'discord',
+    link: '#',
     color: 'rgba(88, 101, 242, 0.6)',
     gradient: 'linear-gradient(135deg, #1a1a3d, #3b40a0, #5865f2, #1e2044)',
     icon: (
@@ -59,10 +63,11 @@ const SocialIcons = () => {
           </span>
           {/* Icon button */}
           <a
-            href="#"
+            href={s.link}
+            target="_blank"
+            rel="noopener noreferrer"
             className="social-glass-icon"
             style={{ borderColor: s.color }}
-            onClick={(e) => e.preventDefault()}
           >
             <span className="social-filled" style={{ background: s.gradient, backgroundSize: '400% 400%' }} />
             <span className="social-shine" />
