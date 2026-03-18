@@ -343,8 +343,8 @@ const LiveCatalog = () => {
                     if (!r) {
                       return (
                         <div key={`empty-${rowIdx}-${col}-${slot}`} className="flex-1">
-                          <div className="w-full aspect-square rounded-md border border-border/20 bg-muted/8" />
-                          {showTimestamps && <div className="h-[14px]" />}
+                          <div className="w-full rounded-md border border-border/20 bg-muted/8" style={{ height: '65px' }} />
+                          {showTimestamps && <div className="h-[18px]" />}
                         </div>
                       );
                     }
@@ -356,15 +356,16 @@ const LiveCatalog = () => {
                       <div key={r.id} className="flex-1 flex flex-col items-center">
                         <div
                           onClick={() => handleClickRound(r)}
-                          className={`w-full aspect-square rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                          className={`w-full rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
                             dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                           } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                          style={{ height: '65px' }}
                         >
                           {showNumbers && <span className={`text-sm font-bold ${style.text}`}>{r.roll}</span>}
                           {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                         </div>
                         {showTimestamps && (
-                          <span className="text-[9px] font-sans font-semibold text-muted-foreground tracking-tight leading-[14px] bg-muted/30 px-1 py-0.5 rounded mt-0.5">
+                          <span className="text-[10px] font-sans font-bold text-muted-foreground tracking-tight leading-[16px] bg-muted/30 px-1.5 py-0.5 rounded mt-0.5">
                             {formatTime(r.timestamp)}
                           </span>
                         )}
@@ -381,8 +382,8 @@ const LiveCatalog = () => {
             <div className="grid gap-1 mt-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
               {Array.from({ length: 10 }, (_, col) => (
                 <div key={`empty-row-${col}`} className="flex gap-1 items-stretch">
-                  <div className="flex-1 aspect-square rounded-md border border-border/20 bg-muted/8" />
-                  <div className="flex-1 aspect-square rounded-md border border-border/20 bg-muted/8" />
+                  <div className="flex-1 rounded-md border border-border/20 bg-muted/8" style={{ height: '65px' }} />
+                  <div className="flex-1 rounded-md border border-border/20 bg-muted/8" style={{ height: '65px' }} />
                 </div>
               ))}
             </div>
@@ -411,7 +412,7 @@ const LiveCatalog = () => {
                     {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                   </div>
                   {showTimestamps && (
-                    <span className={`text-[9px] mt-0.5 font-sans font-semibold tracking-tight transition-opacity bg-muted/30 px-1 py-0.5 rounded ${dimmed ? 'opacity-10' : 'text-muted-foreground'}`}>
+                    <span className={`text-[10px] mt-0.5 font-sans font-bold tracking-tight transition-opacity bg-muted/30 px-1.5 py-0.5 rounded ${dimmed ? 'opacity-10' : 'text-muted-foreground'}`}>
                       {time}
                     </span>
                   )}
