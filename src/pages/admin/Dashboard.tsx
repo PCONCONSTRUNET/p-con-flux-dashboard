@@ -4,6 +4,9 @@ import { Users, TrendingUp, Crown, Zap, Clock, DollarSign, Activity, ArrowRight,
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import ExportImportBar from '@/components/ExportImportBar';
+import { exportToPDF, exportToExcel, importFromExcel } from '@/utils/exportImport';
+import { toast } from 'sonner';
 
 type FilterType = 'today' | 'weekly' | 'monthly' | 'custom';
 
