@@ -23,6 +23,14 @@ const LiveCatalog = () => {
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
   const [fixedColumns, setFixedColumns] = useState(false);
+  const [clock, setClock] = useState(() => new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setClock(new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Simulate real-time incoming rounds — stable interval, no dependency on rounds
   const roundsRef = useRef(rounds);
@@ -150,7 +158,11 @@ const LiveCatalog = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col items-end">
+            <span className="text-sm font-bold font-mono text-primary tracking-wider">{clock}</span>
+            <span className="text-[9px] text-muted-foreground uppercase tracking-widest">Brasília</span>
+          </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-3 py-2 rounded-xl border transition-all ${
@@ -160,7 +172,6 @@ const LiveCatalog = () => {
             <Filter size={12} />
             Filtros
           </button>
-        
         </div>
       </div>
 
