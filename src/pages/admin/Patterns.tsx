@@ -363,16 +363,7 @@ const Patterns = () => {
                           return (
                             <div key={i} className="relative group">
                               <div className={`w-8 h-8 rounded-full border ${ct.border} flex items-center justify-center overflow-hidden`}>
-                                {ct.split ? (
-                                  <div className="w-full h-full flex">
-                                    <div className={`w-1/2 h-full ${ct.split[0]}`} />
-                                    <div className={`w-1/2 h-full ${ct.split[1]}`} />
-                                  </div>
-                                ) : ct.inner ? (
-                                  <div className={`w-full h-full ${ct.bg} flex items-center justify-center text-xs`}>{ct.inner}</div>
-                                ) : (
-                                  <div className={`w-6 h-6 rounded-full ${ct.bg}`} />
-                                )}
+                                <div className={`w-6 h-6 rounded-full ${ct.bg}`} />
                               </div>
                               <button
                                 onClick={() => removeColorAt(i)}
