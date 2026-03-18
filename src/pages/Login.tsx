@@ -126,7 +126,7 @@ const Login = () => {
                     type="checkbox"
                     checked={remember}
                     onChange={e => setRemember(e.target.checked)}
-                    className="w-4 h-4 rounded border-border bg-muted accent-primary"
+                    className="w-3.5 h-3.5 rounded border-border bg-muted accent-primary"
                   />
                   <span className="text-sm text-muted-foreground">Lembrar acesso</span>
                 </label>
