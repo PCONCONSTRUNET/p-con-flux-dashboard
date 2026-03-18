@@ -3,6 +3,7 @@ import { Crown, Zap, X, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import fluxFlame from '@/assets/flux-flame.png';
 import pconLogo from '@/assets/pcon-flux-logo.png';
 
 export default function UpgradeModal() {
