@@ -75,12 +75,13 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
         setSubscription(sub);
 
-        if (isExpired) {
+        if (isExpired && !userDismissed) {
           setShowUpgradeModal(true);
         }
       } else {
-        // No subscription found — show upgrade
-        setShowUpgradeModal(true);
+        if (!userDismissed) {
+          setShowUpgradeModal(true);
+        }
       }
 
       setLoading(false);
