@@ -303,49 +303,52 @@ const LiveCatalog = () => {
       </div>
 
       {fixedColumns ? (
-        /* Fixed columns — table style, 10 columns (00-09) with persistent slots */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
-          <div className="min-w-max">
-            <div className="grid grid-cols-10 gap-1.5 mb-1.5">
-              {Array.from({ length: 10 }, (_, col) => (
-                <div
-                  key={`minute-head-${col}`}
-                  className="w-9 text-center text-[10px] font-bold text-muted-foreground/60 font-mono"
-                >
+        /* Fixed columns — 10 persistent columns with progressive slot fill */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto max-h-[600px]">
+          <div
+            className="grid grid-cols-10 gap-3"
+            style={{ minWidth: `${(FIXED_COLUMN_WIDTH * 10) + (9 * 12)}px` }}
+          >
+            {minuteDigitColumns.map((columnRounds, col) => (
+              <div key={`minute-col-${col}`} className="flex flex-col items-center" style={{ width: `${FIXED_COLUMN_WIDTH}px` }}>
+                <div className="w-full rounded-lg border border-border/40 bg-muted/20 py-2 text-center text-[10px] font-bold text-muted-foreground/80 font-mono">
                   {String(col).padStart(2, '0')}
                 </div>
-              ))}
-            </div>
 
-            <div className="grid grid-cols-10 gap-1.5">
-              {Array.from({ length: fixedRowsCount }, (_, row) =>
-                Array.from({ length: 10 }, (_, col) => {
-                  const r = minuteDigitColumns[col][row];
+                <div className="mt-2 flex w-full flex-col gap-2">
+                  {Array.from({ length: fixedRowsCount }, (_, row) => {
+                    const r = columnRounds[row];
 
-                  if (!r) {
+                    if (!r) {
+                      return (
+                        <div
+                          key={`slot-${col}-${row}`}
+                          className="w-full rounded-xl border border-border/30 bg-muted/10"
+                          style={{ height: `${FIXED_SLOT_HEIGHT}px` }}
+                        />
+                      );
+                    }
+
+                    const style = colorStyles[r.color];
+                    const dimmed = highlighted && !isHighlighted(r);
+
                     return (
-                      <div key={`slot-${col}-${row}`} className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
+                      <div
+                        key={`slot-${col}-${row}`}
+                        onClick={() => handleClickRound(r)}
+                        className={`w-full rounded-xl ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                          dimmed ? 'opacity-20' : 'opacity-100 hover:scale-[1.02]'
+                        } ${r.id === highlighted ? 'ring-primary ring-2 scale-[1.02]' : ''}`}
+                        style={{ height: `${FIXED_SLOT_HEIGHT}px` }}
+                      >
+                        {showNumbers && <span className={`text-base font-bold ${style.text}`}>{r.roll}</span>}
+                        {!showNumbers && r.color === 'white' && <div className="w-2.5 h-2.5 rounded-full bg-secondary/60" />}
+                      </div>
                     );
-                  }
-
-                  const style = colorStyles[r.color];
-                  const dimmed = highlighted && !isHighlighted(r);
-
-                  return (
-                    <div
-                      key={r.id}
-                      onClick={() => handleClickRound(r)}
-                      className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                        dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                      } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                    >
-                      {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
-                      {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
-                    </div>
-                  );
-                })
-              )}
-            </div>
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       ) : (
