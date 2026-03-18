@@ -31,6 +31,7 @@ const ClientsPage = () => {
   const [loading, setLoading] = useState(true);
   const [editingClient, setEditingClient] = useState<ClientData | null>(null);
   const [editPlan, setEditPlan] = useState<'trial' | 'monthly' | 'annual'>('trial');
+  const [editDays, setEditDays] = useState(1);
 
   useEffect(() => {
     fetchClients();
