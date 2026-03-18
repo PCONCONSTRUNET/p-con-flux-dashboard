@@ -1,5 +1,6 @@
 import { Crown, Zap, Shield, X, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import pconLogo from '@/assets/pcon-flux-logo.png';
 
 export default function UpgradeModal() {
   const { showUpgradeModal, setShowUpgradeModal, subscription } = useSubscription();
