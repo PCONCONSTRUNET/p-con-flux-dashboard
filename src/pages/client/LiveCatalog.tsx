@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Filter, Clock, RefreshCw, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { Filter, Clock, RefreshCw, Eye, EyeOff, Trash2, Columns3, LayoutGrid } from 'lucide-react';
 import { mockBlazeRounds, type BlazeColor, type BlazeRound } from '@/data/mockData';
 import blazeIcon from '@/assets/blaze-icon.png';
 
@@ -22,6 +22,7 @@ const LiveCatalog = () => {
   const [showNumbers, setShowNumbers] = useState(true);
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
+  const [columnView, setColumnView] = useState(false);
 
   // Simulate real-time incoming rounds
   useEffect(() => {
@@ -62,6 +63,16 @@ const LiveCatalog = () => {
       total,
     };
   }, [rounds, limit]);
+
+  // Group rounds by roll number for column view (0-14)
+  const columnData = useMemo(() => {
+    const columns: Record<number, BlazeRound[]> = {};
+    for (let i = 0; i <= 14; i++) columns[i] = [];
+    displayed.forEach(r => {
+      columns[r.roll].push(r);
+    });
+    return columns;
+  }, [displayed]);
 
   const handleClickRound = useCallback((round: BlazeRound) => {
     if (highlighted === round.id) {
@@ -111,6 +122,15 @@ const LiveCatalog = () => {
           >
             <Filter size={12} />
             Filtros
+          </button>
+          <button
+            onClick={() => setColumnView(!columnView)}
+            className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-3 py-2 rounded-xl border transition-all ${
+              columnView ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
+            }`}
+          >
+            {columnView ? <Columns3 size={12} /> : <LayoutGrid size={12} />}
+            {columnView ? 'Colunas' : 'Grade'}
           </button>
         </div>
       </div>
@@ -261,45 +281,97 @@ const LiveCatalog = () => {
         </div>
       </div>
 
-      {/* Rounds grid — like Blaze cataloger */}
-      <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[500px] overflow-x-auto">
-        <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(22, minmax(0, 1fr))' }}>
-          {displayed.map((r) => {
-            const style = colorStyles[r.color];
-            const active = highlighted ? isHighlighted(r) : true;
-            const dimmed = highlighted && !active;
-            const time = formatTime(r.timestamp);
+      {/* Rounds display */}
+      {columnView ? (
+        /* Column view — fixed columns per number (0-14) */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto">
+          <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(15, minmax(40px, 1fr))' }}>
+            {/* Column headers */}
+            {Array.from({ length: 15 }, (_, i) => (
+              <div key={`header-${i}`} className="text-center text-[10px] font-bold text-muted-foreground/60 pb-1.5 border-b border-border/30 font-mono">
+                {String(i).padStart(2, '0')}
+              </div>
+            ))}
+            {/* Column cells — find max column height */}
+            {(() => {
+              const maxRows = Math.max(...Object.values(columnData).map(c => c.length), 1);
+              const cells = [];
+              for (let row = 0; row < maxRows; row++) {
+                for (let col = 0; col <= 14; col++) {
+                  const r = columnData[col][row];
+                  if (r) {
+                    const style = colorStyles[r.color];
+                    const dimmed = highlighted && !isHighlighted(r);
+                    cells.push(
+                      <div key={`${col}-${row}`} className="flex flex-col items-center pt-1">
+                        <div
+                          onClick={() => handleClickRound(r)}
+                          className={`w-8 h-8 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                            dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                          } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                        >
+                          <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>
+                        </div>
+                        {showTimestamps && (
+                          <span className={`text-[7px] mt-0.5 font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                            {formatTime(r.timestamp)}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  } else {
+                    cells.push(
+                      <div key={`${col}-${row}`} className="flex items-center justify-center pt-1">
+                        <div className="w-8 h-8 rounded-lg border border-border/20 bg-muted/5" />
+                      </div>
+                    );
+                  }
+                }
+              }
+              return cells;
+            })()}
+          </div>
+        </div>
+      ) : (
+        /* Grid view — 22 per row */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[500px] overflow-x-auto">
+          <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(22, minmax(0, 1fr))' }}>
+            {displayed.map((r) => {
+              const style = colorStyles[r.color];
+              const dimmed = highlighted && !isHighlighted(r);
+              const time = formatTime(r.timestamp);
 
-            return (
-              <div
-                key={r.id}
-                onClick={() => handleClickRound(r)}
-                className="flex flex-col items-center cursor-pointer group"
-              >
+              return (
                 <div
-                  className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
-                    dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                  } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                  key={r.id}
+                  onClick={() => handleClickRound(r)}
+                  className="flex flex-col items-center cursor-pointer group"
                 >
-                  {showNumbers && (
-                    <span className={`text-[11px] font-bold ${style.text}`}>
-                      {r.roll}
+                  <div
+                    className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
+                      dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                    } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                  >
+                    {showNumbers && (
+                      <span className={`text-[11px] font-bold ${style.text}`}>
+                        {r.roll}
+                      </span>
+                    )}
+                    {!showNumbers && r.color === 'white' && (
+                      <div className="w-2 h-2 rounded-full bg-secondary/60" />
+                    )}
+                  </div>
+                  {showTimestamps && (
+                    <span className={`text-[8px] mt-0.5 font-mono transition-opacity ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                      {time}
                     </span>
                   )}
-                  {!showNumbers && r.color === 'white' && (
-                    <div className="w-2 h-2 rounded-full bg-secondary/60" />
-                  )}
                 </div>
-                {showTimestamps && (
-                  <span className={`text-[8px] mt-0.5 font-mono transition-opacity ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                    {time}
-                  </span>
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
