@@ -42,6 +42,10 @@ export default function Integrations() {
           monthlyPrice: parsed.monthlyPrice || '',
           annualPrice: parsed.annualPrice || '',
         });
+        // Restore connection status if credentials were saved
+        if (parsed.accessToken && parsed.publicKey) {
+          setConnectionStatus('success');
+        }
       } catch { /* ignore */ }
     }
   }, []);
@@ -51,6 +55,9 @@ export default function Integrations() {
     localStorage.setItem('mp_config', JSON.stringify(config));
     await new Promise(r => setTimeout(r, 600));
     setIsSaving(false);
+    if (config.accessToken && config.publicKey) {
+      setConnectionStatus('success');
+    }
     toast.success('Configurações salvas com sucesso!');
   };
 
