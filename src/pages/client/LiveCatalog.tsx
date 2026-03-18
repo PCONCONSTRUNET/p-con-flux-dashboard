@@ -404,12 +404,13 @@ const LiveCatalog = () => {
                   className="flex flex-col items-center cursor-pointer group"
                 >
                   <div
-                    className={`w-9 h-9 rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
+                    className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
                       dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                     } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                   >
-                    {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
-                    {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+                    <div className={`w-[22px] h-[22px] rounded-full border-2 ${r.color === 'red' ? 'border-white/30' : r.color === 'white' ? 'border-[hsl(240_6%_30%)]/40' : 'border-white/15'} flex items-center justify-center`}>
+                      {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
+                    </div>
                   </div>
                   {showTimestamps && (
                     <span className={`text-[10px] mt-0.5 font-sans font-bold tracking-tight transition-opacity bg-muted/30 px-1.5 py-0.5 rounded ${dimmed ? 'opacity-10' : 'text-muted-foreground'}`}>
