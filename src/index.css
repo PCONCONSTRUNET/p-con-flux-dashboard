@@ -118,4 +118,26 @@
   .animate-fade-in {
     animation: fade-in 0.2s ease-out;
   }
+
+  .input-neon {
+    color: white;
+    border: 2px solid hsl(var(--primary));
+    border-radius: 10px;
+    padding: 10px 16px;
+    background: transparent;
+    width: 100%;
+    font-size: 0.875rem;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .input-neon::placeholder {
+    color: hsl(var(--muted-foreground) / 0.4);
+  }
+  .input-neon:focus {
+    outline: none;
+    border-color: hsl(var(--secondary));
+    box-shadow: 0 0 12px hsl(var(--secondary) / 0.4), 0 0 4px hsl(var(--primary) / 0.3) inset;
+  }
+  .input-neon:active {
+    box-shadow: 2px 2px 15px hsl(var(--primary) / 0.5) inset;
+  }
 }
