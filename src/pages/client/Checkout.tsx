@@ -466,7 +466,7 @@ export default function Checkout() {
                       placeholder="000.000.000-00"
                       value={docNumber}
                       onChange={(e) => setDocNumber(formatCPF(e.target.value))}
-                      className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                      className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                     />
                   </div>
 
