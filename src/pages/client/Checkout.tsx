@@ -446,7 +446,7 @@ export default function Checkout() {
 
         {/* Glassmorphism Card */}
         <div
-          className="rounded-2xl border border-white/[0.12] overflow-hidden backdrop-blur-xl relative"
+          className="rounded-[28px] border border-white/[0.12] overflow-hidden backdrop-blur-xl relative"
           style={{
             background: 'linear-gradient(160deg, hsla(187, 80%, 20%, 0.25) 0%, hsla(240, 10%, 12%, 0.7) 40%, hsla(345, 60%, 15%, 0.15) 100%)',
             boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), inset 0 1px 0 hsla(187,100%,70%,0.1), 0 0 100px hsla(187, 100%, 50%, 0.05)',
@@ -456,7 +456,7 @@ export default function Checkout() {
           <div className="h-[2px] w-full" style={{ background: 'linear-gradient(90deg, hsl(345, 100%, 50%), hsl(187, 100%, 50%), hsl(260, 100%, 60%))' }} />
 
           {/* Subtle inner gradient overlay */}
-          <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{ background: 'radial-gradient(ellipse at top center, hsla(187,100%,50%,0.04) 0%, transparent 60%)' }} />
+          <div className="absolute inset-0 pointer-events-none rounded-[28px]" style={{ background: 'radial-gradient(ellipse at top center, hsla(187,100%,50%,0.04) 0%, transparent 60%)' }} />
 
           {/* Header */}
           <div className="px-6 pt-6 pb-4 text-center border-b border-white/[0.08] relative">
@@ -469,7 +469,7 @@ export default function Checkout() {
           <div className="px-6 py-4 border-b border-white/[0.08] relative" style={{ background: 'linear-gradient(90deg, hsla(187, 100%, 50%, 0.04), transparent)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/15 border border-primary/30' : 'bg-emerald-400/15 border border-emerald-400/30'}`}>
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/15 border border-primary/30' : 'bg-emerald-400/15 border border-emerald-400/30'}`}>
                   <img src={fluxFlame} alt="" className="w-6 h-6 object-contain" />
                 </div>
                 <div>
@@ -485,10 +485,10 @@ export default function Checkout() {
 
           {/* Payment Method Tabs */}
           <div className="px-6 pt-5">
-            <div className="flex gap-2 p-1.5 rounded-xl border border-white/[0.08] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.4)' }}>
+            <div className="flex gap-2 p-1.5 rounded-2xl border border-white/[0.08] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.4)' }}>
               <button
                 onClick={() => { setPaymentMethod('pix'); setPixGenerated(false); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-display font-bold transition-all ${
                   paymentMethod === 'pix'
                     ? 'text-white border border-primary/30'
                     : 'text-white/40 hover:text-white/60'
@@ -500,7 +500,7 @@ export default function Checkout() {
               </button>
               <button
                 onClick={() => setPaymentMethod('card')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-display font-bold transition-all ${
                   paymentMethod === 'card'
                     ? 'text-white border border-primary/30'
                     : 'text-white/40 hover:text-white/60'
@@ -527,7 +527,7 @@ export default function Checkout() {
                       placeholder="000.000.000-00"
                       value={docNumber}
                       onChange={(e) => setDocNumber(formatCPF(e.target.value))}
-                      className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                      className="w-full h-12 px-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                     />
                   </div>
 
@@ -539,7 +539,7 @@ export default function Checkout() {
                   <button
                     onClick={handleGeneratePix}
                     disabled={processing}
-                    className="w-full h-12 rounded-xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+                    className="w-full h-13 rounded-2xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
                     style={{
                       background: 'linear-gradient(135deg, hsl(187, 100%, 45%), hsl(187, 100%, 35%))',
                       boxShadow: '0 4px 25px hsla(187, 100%, 50%, 0.35), inset 0 1px 0 hsla(0,0%,100%,0.15)',
@@ -585,7 +585,7 @@ export default function Checkout() {
                           type="text"
                           readOnly
                           value={pixQrCode}
-                          className="w-full h-11 px-4 pr-12 rounded-xl border border-border/20 bg-background/40 text-[10px] font-mono text-foreground/60 focus:outline-none truncate"
+                          className="w-full h-12 px-4 pr-12 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-[10px] font-mono text-white/60 focus:outline-none truncate"
                         />
                         <button
                           onClick={copyPixCode}
@@ -601,14 +601,14 @@ export default function Checkout() {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-3 justify-center py-3 px-4 rounded-xl border border-primary/15" style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.06), transparent)' }}>
+                  <div className="flex items-center gap-3 justify-center py-3 px-4 rounded-2xl border border-primary/15" style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.06), transparent)' }}>
                     <Loader2 size={16} className="text-primary animate-spin" />
                     <p className="text-xs text-white/70 font-display font-semibold">Aguardando confirmação do pagamento...</p>
                   </div>
 
                   <button
                     onClick={() => { setPixGenerated(false); setPixQrCode(''); setPixQrCodeBase64(''); }}
-                    className="w-full h-10 rounded-xl border border-border/20 text-muted-foreground/50 text-xs font-display font-semibold hover:text-foreground/70 transition-colors"
+                    className="w-full h-11 rounded-2xl border border-white/[0.08] text-white/40 text-xs font-display font-semibold hover:text-white/60 transition-colors"
                   >
                     Gerar novo PIX
                   </button>
@@ -630,7 +630,7 @@ export default function Checkout() {
                     placeholder="0000 0000 0000 0000"
                     value={cardNumber}
                     onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                    className="w-full h-12 pl-10 pr-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -642,7 +642,7 @@ export default function Checkout() {
                   placeholder="NOME COMO ESTÁ NO CARTÃO"
                   value={cardName}
                   onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                  className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                  className="w-full h-12 px-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                 />
               </div>
 
@@ -655,7 +655,7 @@ export default function Checkout() {
                     placeholder="MM/AA"
                     value={expiry}
                     onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                    className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                    className="w-full h-12 px-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -668,7 +668,7 @@ export default function Checkout() {
                       maxLength={4}
                       value={cvv}
                       onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                      className="w-full h-11 px-4 pr-10 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                      className="w-full h-12 px-4 pr-10 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                     />
                     <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25" />
                   </div>
@@ -683,7 +683,7 @@ export default function Checkout() {
                   placeholder="000.000.000-00"
                   value={docNumber}
                   onChange={(e) => setDocNumber(formatCPF(e.target.value))}
-                  className="w-full h-11 px-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
+                  className="w-full h-12 px-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-sm font-mono text-white placeholder:text-white/25 focus:border-primary/50 focus:outline-none transition-colors"
                 />
               </div>
 
@@ -695,7 +695,7 @@ export default function Checkout() {
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full h-12 rounded-xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+                className="w-full h-13 rounded-2xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
                 style={{
                   background: 'linear-gradient(135deg, hsl(187, 100%, 45%), hsl(187, 100%, 35%))',
                   boxShadow: '0 4px 25px hsla(187, 100%, 50%, 0.35), inset 0 1px 0 hsla(0,0%,100%,0.15)',
