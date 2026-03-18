@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radio, Lock, Shield } from 'lucide-react';
-import { mockSignals, mockBlazeRounds, type Signal, type BlazeColor } from '@/data/mockData';
+import { mockBlazeRounds, type Signal, type BlazeColor } from '@/data/mockData';
 import flameIcon from '@/assets/flame-icon.png';
 import BlazeRouletteStrip from '@/components/BlazeRouletteStrip';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import LockedFeature from '@/components/LockedFeature';
+import { supabase } from '@/integrations/supabase/client';
 
 type AnalysisState = 'scanning' | 'pattern_found' | 'confirmed' | 'idle';
 
@@ -19,11 +20,49 @@ const ClientDashboard = () => {
   const { hasActiveSubscription, setShowUpgradeModal } = useSubscription();
   const [maxGale, setMaxGale] = useState(1);
   const [minAssert, setMinAssert] = useState(95);
-  const [signals, setSignals] = useState<Signal[]>(mockSignals.filter((s) => s.result !== 'pending'));
+  const [signals, setSignals] = useState<Signal[]>([]);
   const [analysisState, setAnalysisState] = useState<AnalysisState>('scanning');
   const [currentEntry, setCurrentEntry] = useState<string | null>(null);
   const [showGaleDropdown, setShowGaleDropdown] = useState(false);
   const [showAssertDropdown, setShowAssertDropdown] = useState(false);
+
+  // Load today's signals from DB
+  useEffect(() => {
+    const loadSignals = async () => {
+      const { data, error } = await supabase
+        .from('signals')
+        .select('*')
+        .eq('archived', false)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        const mapped: Signal[] = data.map((s: any) => ({
+          id: s.id,
+          type: s.signal_type,
+          entry: s.entry,
+          protection: s.protection,
+          result: s.result,
+          timestamp: s.created_at,
+          rounds: s.rounds,
+          target: s.target,
+        }));
+        setSignals(mapped);
+      }
+    };
+    loadSignals();
+  }, []);
+
+  // Save signal to DB
+  const saveSignalToDB = useCallback(async (signal: Signal) => {
+    await supabase.from('signals').insert({
+      signal_type: signal.type,
+      entry: signal.entry,
+      protection: signal.protection,
+      result: signal.result,
+      rounds: signal.rounds,
+      target: signal.target,
+    });
+  }, []);
 
   const greens = signals.filter((s) => s.result === 'green').length;
   const losses = signals.filter((s) => s.result === 'loss').length;
