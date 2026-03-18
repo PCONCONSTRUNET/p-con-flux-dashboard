@@ -446,7 +446,7 @@ export default function Checkout() {
 
         {/* Glassmorphism Card */}
         <div
-          className="rounded-2xl border border-white/[0.12] overflow-hidden backdrop-blur-xl relative"
+          className="rounded-[28px] border border-white/[0.12] overflow-hidden backdrop-blur-xl relative"
           style={{
             background: 'linear-gradient(160deg, hsla(187, 80%, 20%, 0.25) 0%, hsla(240, 10%, 12%, 0.7) 40%, hsla(345, 60%, 15%, 0.15) 100%)',
             boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), inset 0 1px 0 hsla(187,100%,70%,0.1), 0 0 100px hsla(187, 100%, 50%, 0.05)',
