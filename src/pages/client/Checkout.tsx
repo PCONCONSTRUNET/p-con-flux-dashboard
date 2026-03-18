@@ -459,7 +459,7 @@ export default function Checkout() {
                 <>
                   {/* CPF */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-display font-semibold text-muted-foreground/60">CPF do Titular</label>
+                    <label className="text-xs font-display font-semibold text-white/70">CPF do Titular</label>
                     <input
                       type="text"
                       inputMode="numeric"
