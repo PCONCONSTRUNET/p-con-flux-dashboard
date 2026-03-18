@@ -91,54 +91,6 @@ const ClientDashboard = () => {
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Max Gale */}
-        <div className="relative">
-          <button
-            onClick={() => { setShowGaleDropdown(!showGaleDropdown); setShowAssertDropdown(false); }}
-            className="w-full rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center gap-1 active:scale-[0.97] transition-all"
-          >
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Max Gale</span>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xl font-bold text-foreground">{maxGale}</span>
-              <ChevronDown size={14} className="text-muted-foreground" />
-            </div>
-          </button>
-          {showGaleDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 z-30 rounded-xl border border-border/50 bg-card shadow-lg overflow-hidden animate-slide-up">
-              {[0, 1, 2, 3].map(g => (
-                <button key={g} onClick={() => { setMaxGale(g); setShowGaleDropdown(false); }}
-                  className={`w-full py-2.5 text-sm text-center transition-colors ${maxGale === g ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/50'}`}
-                >{g}</button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Filter Assert */}
-        <div className="relative">
-          <button
-            onClick={() => { setShowAssertDropdown(!showAssertDropdown); setShowGaleDropdown(false); }}
-            className="w-full rounded-2xl p-3.5 border border-border/50 bg-card/80 backdrop-blur-sm flex flex-col items-center gap-1 active:scale-[0.97] transition-all"
-          >
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Filtro Assert.</span>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xl font-bold text-foreground">{minAssert}%</span>
-              <ChevronDown size={14} className="text-muted-foreground" />
-            </div>
-          </button>
-          {showAssertDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 z-30 rounded-xl border border-border/50 bg-card shadow-lg overflow-hidden animate-slide-up">
-              {[80, 85, 90, 95, 100].map(a => (
-                <button key={a} onClick={() => { setMinAssert(a); setShowAssertDropdown(false); }}
-                  className={`w-full py-2.5 text-sm text-center transition-colors ${minAssert === a ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/50'}`}
-                >{a}%</button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
 
 
       {/* Analysis area */}
