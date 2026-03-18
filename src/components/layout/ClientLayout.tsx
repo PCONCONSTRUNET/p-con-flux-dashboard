@@ -83,7 +83,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <div className="flex flex-1">
         {/* Desktop sidebar */}
         <aside
-          className={`hidden lg:flex flex-col border-r border-border/50 relative overflow-hidden transition-all duration-300 ease-in-out ${
+          className={`hidden lg:flex flex-col border-r border-border/50 relative overflow-hidden transition-all duration-300 ease-in-out h-screen sticky top-0 ${
             desktopCollapsed ? 'w-[68px] p-3' : 'w-64 p-5'
           }`}
           style={{ background: 'linear-gradient(180deg, hsla(240,6%,7%,0.98) 0%, hsla(345,100%,50%,0.03) 50%, hsla(187,100%,50%,0.03) 100%)' }}
@@ -107,7 +107,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
 
-          <nav className="space-y-1 flex-1">
+          <nav className="space-y-1 flex-1 min-h-0">
             {navItems.map(item => (
               <button
                 key={item.path}
@@ -129,9 +129,9 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             ))}
           </nav>
 
-          <div className="border-t border-border/50 pt-4">
+          <div className="border-t border-border/50 pt-4 mt-auto shrink-0">
             <div className={`overflow-hidden transition-all duration-300 ${desktopCollapsed ? 'h-0 opacity-0 mb-0' : 'h-auto opacity-100 mb-3'}`}>
-              <div className="text-xs text-muted-foreground mb-1 whitespace-nowrap">{user?.name}</div>
+              <div className="text-xs text-foreground font-semibold mb-0.5 whitespace-nowrap">{user?.name}</div>
               <div className="text-[10px] text-muted-foreground/60 whitespace-nowrap">{user?.email}</div>
             </div>
             <button
