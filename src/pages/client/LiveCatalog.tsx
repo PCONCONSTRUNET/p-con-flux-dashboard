@@ -318,7 +318,7 @@ const LiveCatalog = () => {
         /* Fixed columns — horizontal grid: rows = 10-min blocks, cols = 00-09, 2 stones per cell */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
           {/* Header row */}
-          <div className="inline-grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 72px)' }}>
+          <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
             {Array.from({ length: 10 }, (_, col) => (
               <div key={`head-${col}`} className="text-center text-[11px] font-bold text-muted-foreground/70 font-mono py-1.5 border border-border/30 bg-muted/15">
                 {String(col).padStart(2, '0')}
@@ -328,13 +328,13 @@ const LiveCatalog = () => {
 
           {/* Data rows — each row = 10-min block */}
           {fixedGrid.map((block, rowIdx) => (
-            <div key={`block-${rowIdx}`} className="inline-grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 72px)' }}>
+            <div key={`block-${rowIdx}`} className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
               {block.rounds.map((cell, col) => (
-                <div key={`cell-${rowIdx}-${col}`} className="flex gap-0 items-start justify-center">
+                <div key={`cell-${rowIdx}-${col}`} className="flex gap-0 items-stretch">
                   {cell.map((r, slot) => {
                     if (!r) {
                       return (
-                        <div key={`empty-${rowIdx}-${col}-${slot}`} className="w-9 h-9 rounded-lg border border-border/20 bg-muted/8" />
+                        <div key={`empty-${rowIdx}-${col}-${slot}`} className="flex-1 aspect-square rounded-lg border border-border/20 bg-muted/8" />
                       );
                     }
 
@@ -342,14 +342,14 @@ const LiveCatalog = () => {
                     const dimmed = highlighted && !isHighlighted(r);
 
                     return (
-                      <div key={r.id} className="flex flex-col items-center">
+                      <div key={r.id} className="flex-1 flex flex-col items-center">
                         <div
                           onClick={() => handleClickRound(r)}
-                          className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                          className={`w-full aspect-square rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
                             dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                           } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                         >
-                          {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
+                          {showNumbers && <span className={`text-sm font-bold ${style.text}`}>{r.roll}</span>}
                           {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                         </div>
                         {showTimestamps && (
@@ -367,11 +367,11 @@ const LiveCatalog = () => {
 
           {/* Empty pending row at top */}
           {fixedGrid.length === 0 && (
-            <div className="inline-grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 72px)' }}>
+            <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
               {Array.from({ length: 10 }, (_, col) => (
-                <div key={`empty-row-${col}`} className="flex gap-0 items-start justify-center">
-                  <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/8" />
-                  <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/8" />
+                <div key={`empty-row-${col}`} className="flex gap-0 items-stretch">
+                  <div className="flex-1 aspect-square rounded-lg border border-border/20 bg-muted/8" />
+                  <div className="flex-1 aspect-square rounded-lg border border-border/20 bg-muted/8" />
                 </div>
               ))}
             </div>
