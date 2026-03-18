@@ -110,7 +110,7 @@ const Login = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Senha</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Senha</label>
                 <input
                   type="password"
                   value={password}
