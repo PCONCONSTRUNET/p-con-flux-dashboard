@@ -318,7 +318,7 @@ const LiveCatalog = () => {
         /* Fixed columns — horizontal grid: rows = 10-min blocks, cols = 00-09, 2 stones per cell */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
           {/* Header row */}
-          <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, minmax(74px, 1fr))' }}>
+          <div className="inline-grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 72px)' }}>
             {Array.from({ length: 10 }, (_, col) => (
               <div key={`head-${col}`} className="text-center text-[11px] font-bold text-muted-foreground/70 font-mono py-1.5 border border-border/30 bg-muted/15">
                 {String(col).padStart(2, '0')}
@@ -328,7 +328,7 @@ const LiveCatalog = () => {
 
           {/* Data rows — each row = 10-min block */}
           {fixedGrid.map((block, rowIdx) => (
-            <div key={`block-${rowIdx}`} className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, minmax(74px, 1fr))' }}>
+            <div key={`block-${rowIdx}`} className="inline-grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 72px)' }}>
               {block.rounds.map((cell, col) => (
                 <div key={`cell-${rowIdx}-${col}`} className="flex gap-0 items-start justify-center">
                   {cell.map((r, slot) => {
@@ -367,7 +367,7 @@ const LiveCatalog = () => {
 
           {/* Empty pending row at top */}
           {fixedGrid.length === 0 && (
-            <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, minmax(74px, 1fr))' }}>
+            <div className="inline-grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 72px)' }}>
               {Array.from({ length: 10 }, (_, col) => (
                 <div key={`empty-row-${col}`} className="flex gap-0 items-start justify-center">
                   <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/8" />
