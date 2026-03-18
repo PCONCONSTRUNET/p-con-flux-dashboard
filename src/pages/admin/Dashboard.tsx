@@ -1,5 +1,5 @@
 import { mockPatterns, mockAlerts, mockUsers } from '@/data/mockData';
-import { Layers, Bell, Users, Activity } from 'lucide-react';
+import { Layers, Bell, Users, Activity, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -9,16 +9,16 @@ const AdminDashboard = () => {
   const activeUsers = mockUsers.filter(u => u.status === 'active').length;
 
   const stats = [
-    { label: 'Padrões Ativos', value: activePatterns, icon: Layers, color: 'text-primary', glow: 'glow-primary', path: '/admin/patterns' },
-    { label: 'Eventos Hoje', value: todayAlerts, icon: Bell, color: 'text-secondary', glow: 'glow-secondary animate-pulse-glow', path: '/admin/catalog' },
-    { label: 'Usuários Ativos', value: activeUsers, icon: Users, color: 'text-primary', glow: 'glow-primary', path: '/admin/users' },
-    { label: 'Total Padrões', value: mockPatterns.length, icon: Activity, color: 'text-foreground', glow: '', path: '/admin/patterns' },
+    { label: 'Padrões Ativos', value: activePatterns, icon: Layers, color: 'text-primary', glowClass: 'glow-primary', borderColor: 'border-primary/20', path: '/admin/patterns' },
+    { label: 'Eventos Hoje', value: todayAlerts, icon: Bell, color: 'text-secondary', glowClass: 'glow-secondary animate-pulse-glow', borderColor: 'border-secondary/20', path: '/admin/catalog' },
+    { label: 'Usuários Ativos', value: activeUsers, icon: Users, color: 'text-primary', glowClass: 'glow-primary', borderColor: 'border-primary/20', path: '/admin/users' },
+    { label: 'Total Padrões', value: mockPatterns.length, icon: Activity, color: 'text-foreground', glowClass: '', borderColor: 'border-border/50', path: '/admin/patterns' },
   ];
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-display font-bold text-foreground">Dashboard Administrativo</h1>
+        <h1 className="text-2xl font-display font-bold text-foreground text-glow-primary">Dashboard Administrativo</h1>
         <p className="text-sm text-muted-foreground mt-1">Visão geral do sistema P-CON FLUX</p>
       </div>
 
@@ -28,11 +28,13 @@ const AdminDashboard = () => {
           <button
             key={stat.label}
             onClick={() => navigate(stat.path)}
-            className={`card-glass ${stat.glow} rounded-lg p-4 text-left hover:scale-[1.02] transition-transform`}
+            className={`rounded-xl p-4 text-left hover:scale-[1.03] transition-all border ${stat.borderColor} ${stat.glowClass} backdrop-blur-sm relative overflow-hidden group`}
+            style={{ background: 'linear-gradient(135deg, hsla(240, 6%, 10%, 0.8) 0%, hsla(240, 6%, 8%, 0.6) 100%)' }}
           >
-            <stat.icon size={20} className={`${stat.color} mb-2`} />
-            <div className={`text-2xl font-display font-bold ${stat.color}`}>{stat.value}</div>
-            <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'linear-gradient(135deg, hsla(187, 100%, 50%, 0.05) 0%, transparent 100%)' }} />
+            <stat.icon size={20} className={`${stat.color} mb-2 relative z-10`} />
+            <div className={`text-2xl font-display font-bold ${stat.color} relative z-10`}>{stat.value}</div>
+            <div className="text-xs text-muted-foreground mt-1 relative z-10">{stat.label}</div>
           </button>
         ))}
       </div>
@@ -44,7 +46,11 @@ const AdminDashboard = () => {
           {mockAlerts.slice(0, 4).map(alert => {
             const time = new Date(alert.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             return (
-              <div key={alert.id} className="card-glass rounded-lg p-3 flex items-center justify-between">
+              <div
+                key={alert.id}
+                className="rounded-xl p-3 flex items-center justify-between border border-border/30 backdrop-blur-sm hover:border-primary/20 transition-colors"
+                style={{ background: 'linear-gradient(135deg, hsla(240, 6%, 10%, 0.6) 0%, hsla(240, 6%, 8%, 0.4) 100%)' }}
+              >
                 <div>
                   <span className="text-sm font-semibold text-foreground">{alert.patternName}</span>
                   <p className="text-xs text-muted-foreground line-clamp-1">{alert.details}</p>
@@ -60,11 +66,19 @@ const AdminDashboard = () => {
       <div>
         <h2 className="text-sm font-display font-semibold text-muted-foreground tracking-wider uppercase mb-3">Ações Rápidas</h2>
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => navigate('/admin/patterns')} className="py-3 rounded-md bg-primary text-primary-foreground font-display text-sm tracking-wider hover:opacity-90 active:scale-[0.98] transition-all glow-primary">
-            GERENCIAR PADRÕES
+          <button
+            onClick={() => navigate('/admin/patterns')}
+            className="py-3 rounded-xl font-display text-sm tracking-wider active:scale-[0.98] transition-all border border-primary/30 text-primary glow-primary flex items-center justify-center gap-2 hover:bg-primary/5"
+            style={{ background: 'linear-gradient(135deg, hsla(187, 100%, 50%, 0.1) 0%, hsla(240, 6%, 8%, 0.8) 100%)' }}
+          >
+            GERENCIAR PADRÕES <ArrowRight size={14} />
           </button>
-          <button onClick={() => navigate('/admin/users')} className="py-3 rounded-md bg-muted text-foreground font-display text-sm tracking-wider hover:bg-muted/80 active:scale-[0.98] transition-all">
-            GERENCIAR USUÁRIOS
+          <button
+            onClick={() => navigate('/admin/users')}
+            className="py-3 rounded-xl font-display text-sm tracking-wider active:scale-[0.98] transition-all border border-secondary/30 text-secondary flex items-center justify-center gap-2 hover:bg-secondary/5"
+            style={{ background: 'linear-gradient(135deg, hsla(345, 100%, 50%, 0.08) 0%, hsla(240, 6%, 8%, 0.8) 100%)' }}
+          >
+            GERENCIAR USUÁRIOS <ArrowRight size={14} />
           </button>
         </div>
       </div>
