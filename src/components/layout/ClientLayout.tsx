@@ -62,20 +62,26 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
             <nav className="space-y-1">
-              {navItems.map(item => (
-                <button
-                  key={item.path}
-                  onClick={() => { navigate(item.path); setSidebarOpen(false); }}
-                  className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm transition-all ${
-                    isActive(item.path)
-                      ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  }`}
-                >
-                  <item.icon size={18} />
-                  {item.label}
-                </button>
-              ))}
+              {navItems.map(item => {
+                const locked = item.requiresSub && !hasActiveSubscription;
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => { handleNavClick(item); if (!locked) setSidebarOpen(false); }}
+                    className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm transition-all ${
+                      locked
+                        ? 'text-muted-foreground/30 cursor-not-allowed'
+                        : isActive(item.path)
+                          ? 'bg-primary/10 text-primary border border-primary/20 glow-primary'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    <item.icon size={18} />
+                    {item.label}
+                    {locked && <Lock size={12} className="ml-auto text-muted-foreground/30" />}
+                  </button>
+                );
+              })}
             </nav>
             <div className="absolute bottom-6 left-5 right-5">
               <div className="border-t border-border/50 pt-4">
