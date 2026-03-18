@@ -264,10 +264,39 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background effects */}
+      {/* Background glows */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full opacity-[0.03] blur-[150px]" style={{ background: 'hsl(187, 100%, 50%)' }} />
-        <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] rounded-full opacity-[0.03] blur-[120px]" style={{ background: 'hsl(345, 100%, 50%)' }} />
+        <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] rounded-full opacity-[0.06] blur-[180px]" style={{ background: 'hsl(187, 100%, 50%)' }} />
+        <div className="absolute bottom-[-10%] right-[20%] w-[500px] h-[500px] rounded-full opacity-[0.04] blur-[150px]" style={{ background: 'hsl(345, 100%, 50%)' }} />
+        <div className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full opacity-[0.03] blur-[120px]" style={{ background: 'hsl(260, 100%, 60%)' }} />
+      </div>
+
+      {/* Floating FLUX icons */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {[...Array(12)].map((_, i) => (
+          <img
+            key={i}
+            src={pconLogo}
+            alt=""
+            className="absolute opacity-[0.04] select-none"
+            style={{
+              width: `${28 + (i % 4) * 12}px`,
+              height: `${28 + (i % 4) * 12}px`,
+              top: `${8 + (i * 7.5) % 85}%`,
+              left: `${5 + (i * 13.7) % 88}%`,
+              transform: `rotate(${i * 30}deg)`,
+              animation: `float-icon ${6 + (i % 3) * 2}s ease-in-out ${i * 0.5}s infinite alternate`,
+              filter: 'drop-shadow(0 0 6px hsla(187, 100%, 50%, 0.3))',
+            }}
+          />
+        ))}
+        <style>{`
+          @keyframes float-icon {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.03; }
+            50% { opacity: 0.06; }
+            100% { transform: translateY(-20px) rotate(15deg); opacity: 0.03; }
+          }
+        `}</style>
       </div>
 
       <div className="w-full max-w-lg relative z-10">
@@ -279,9 +308,13 @@ export default function Checkout() {
           Voltar
         </button>
 
+        {/* Glassmorphism Card */}
         <div
-          className="rounded-2xl border border-border/20 overflow-hidden"
-          style={{ background: 'linear-gradient(160deg, hsl(240 5% 12%) 0%, hsl(240 5% 7%) 100%)', boxShadow: '0 25px 60px hsla(0,0%,0%,0.5)' }}
+          className="rounded-2xl border border-white/[0.08] overflow-hidden backdrop-blur-xl"
+          style={{
+            background: 'linear-gradient(160deg, hsla(240, 5%, 15%, 0.6) 0%, hsla(240, 5%, 8%, 0.7) 100%)',
+            boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), inset 0 1px 0 hsla(0,0%,100%,0.05), 0 0 80px hsla(187, 100%, 50%, 0.03)',
+          }}
         >
           <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
 
