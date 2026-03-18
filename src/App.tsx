@@ -15,6 +15,7 @@ import ClientDashboard from "@/pages/client/Dashboard";
 import LiveCatalog from "@/pages/client/LiveCatalog";
 import History from "@/pages/client/History";
 import Profile from "@/pages/client/Profile";
+import Checkout from "@/pages/client/Checkout";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import Patterns from "@/pages/admin/Patterns";
 import PatternFlow from "@/pages/admin/PatternFlow";
