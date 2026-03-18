@@ -209,6 +209,18 @@ const LiveCatalog = () => {
               </div>
               <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Numerado</span>
             </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={fixedColumns}
+                onChange={() => setFixedColumns(!fixedColumns)}
+                className="sr-only peer"
+              />
+              <div className="w-8 h-4 rounded-full bg-muted/50 peer-checked:bg-primary/30 relative transition-all">
+                <div className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${fixedColumns ? 'left-[18px] bg-primary' : 'left-0.5 bg-muted-foreground/50'}`} />
+              </div>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Coluna fixa</span>
+            </label>
           </div>
 
           {/* Highlight mode */}
