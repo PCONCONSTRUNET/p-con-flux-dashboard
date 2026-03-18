@@ -64,7 +64,7 @@ const Login = () => {
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
           <div className="relative z-10">
           {/* Tabs */}
-          <div className="flex mb-6 border-b border-border">
+          <div className="flex mb-4 border-b border-border">
             <button
               type="button"
               onClick={() => switchMode('login')}
