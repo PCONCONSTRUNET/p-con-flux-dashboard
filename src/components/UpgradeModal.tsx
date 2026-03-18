@@ -64,7 +64,8 @@ export default function UpgradeModal() {
 
         {canDismiss && (
           <button
-            onClick={() => setShowUpgradeModal(false)}
+            type="button"
+            onClick={handleCloseModal}
             className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-muted/10 border border-border/20 flex items-center justify-center text-muted-foreground/40 hover:text-foreground hover:bg-muted/20 transition-all z-10"
           >
             <X size={16} />
