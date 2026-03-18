@@ -78,6 +78,10 @@ const ClientDashboard = () => {
     return () => clearTimeout(timeout);
   }, [maxGale]);
 
+  if (!hasActiveSubscription) {
+    return <LockedFeature feature="Sinais em tempo real" />;
+  }
+
   return (
     <div className="space-y-4 animate-fade-in max-w-lg mx-auto">
       {/* Header */}

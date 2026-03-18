@@ -5,6 +5,7 @@ import { useSubscription } from '@/contexts/SubscriptionContext';
 import LockedFeature from '@/components/LockedFeature';
 
 const History = () => {
+  const { hasActiveSubscription } = useSubscription();
   const [tab, setTab] = useState<'signals' | 'rounds'>('signals');
   const [search, setSearch] = useState('');
   const [resultFilter, setResultFilter] = useState<'all' | SignalResult>('all');
