@@ -325,7 +325,7 @@ const Patterns = () => {
                     return (
                       <button
                         key={n}
-                        onClick={() => toggleNumber(n)}
+                        onClick={() => addNumber(n)}
                         className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all duration-200 ${nc.bg} ${nc.text} ${
                           isSelected
                             ? 'border-primary ring-2 ring-primary/40 scale-110'
