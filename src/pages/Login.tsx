@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import LoginBackground from '@/components/LoginBackground';
+import SocialIcons from '@/components/SocialIcons';
 
 type Mode = 'login' | 'register';
 
@@ -227,6 +228,11 @@ const Login = () => {
           )}
           </div>
         </div>
+      </div>
+
+      {/* Social Icons */}
+      <div className="fixed bottom-[72px] left-0 right-0 z-20 flex justify-center px-4">
+        <SocialIcons />
       </div>
 
       {/* Legal Banner +18 */}
