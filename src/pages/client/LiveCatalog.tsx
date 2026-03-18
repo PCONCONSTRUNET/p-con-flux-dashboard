@@ -291,44 +291,46 @@ const LiveCatalog = () => {
           ))}
         </div>
 
-        {/* Rows — fixed 2 stones per minute column */}
-        {Array.from({ length: MAX_PER_MINUTE }, (_, row) => (
-          <div key={`row-${row}`} className="grid grid-cols-10 gap-1 mb-1">
-            {minuteDigitColumns.map((colRounds, col) => {
-              const r = colRounds[row];
+        {/* 2 stones per minute side by side (horizontal) */}
+        <div className="grid grid-cols-10 gap-1">
+          {minuteDigitColumns.map((colRounds, col) => (
+            <div key={`minute-col-${col}`} className="flex items-start justify-center gap-1">
+              {Array.from({ length: MAX_PER_MINUTE }, (_, slot) => {
+                const r = colRounds[slot];
 
-              if (r) {
-                const style = colorStyles[r.color];
-                const dimmed = highlighted && !isHighlighted(r);
+                if (r) {
+                  const style = colorStyles[r.color];
+                  const dimmed = highlighted && !isHighlighted(r);
+
+                  return (
+                    <div key={`${col}-${slot}`} className="flex flex-col items-center">
+                      <div
+                        onClick={() => handleClickRound(r)}
+                        className={`w-full aspect-square max-w-[42px] rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                          dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                        } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                      >
+                        {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
+                        {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+                      </div>
+                      {showTimestamps && (
+                        <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                          {formatTime(r.timestamp)}
+                        </span>
+                      )}
+                    </div>
+                  );
+                }
 
                 return (
-                  <div key={`${col}-${row}`} className="flex flex-col items-center">
-                    <div
-                      onClick={() => handleClickRound(r)}
-                      className={`w-full aspect-square max-w-[42px] rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                        dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                      } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                    >
-                      {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
-                      {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
-                    </div>
-                    {showTimestamps && (
-                      <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                        {formatTime(r.timestamp)}
-                      </span>
-                    )}
+                  <div key={`${col}-${slot}`} className="flex items-center justify-center">
+                    <div className="w-full aspect-square max-w-[42px] rounded-lg border border-border/15 bg-muted/5" />
                   </div>
                 );
-              }
-
-              return (
-                <div key={`${col}-${row}`} className="flex items-center justify-center">
-                  <div className="w-full aspect-square max-w-[42px] rounded-lg border border-border/15 bg-muted/5" />
-                </div>
-              );
-            })}
-          </div>
-        ))}
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
