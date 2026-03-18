@@ -58,7 +58,7 @@ const LoginBackground = () => {
       icons.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: 28 + Math.random() * 36,
+        size: 40 + Math.random() * 30,
         alpha: 0.08 + Math.random() * 0.12,
         vy: -0.08 - Math.random() * 0.15,
         vx: (Math.random() - 0.5) * 0.1,
