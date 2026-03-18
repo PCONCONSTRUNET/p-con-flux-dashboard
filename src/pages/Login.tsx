@@ -148,7 +148,8 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-display font-semibold text-sm tracking-wider hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 glow-primary"
+                className="w-full py-3.5 rounded-[20px] text-white font-display font-semibold text-sm tracking-wider active:scale-[0.98] transition-all disabled:opacity-50 hover:animate-pulse-glow hover:bg-right"
+                style={{ backgroundImage: 'linear-gradient(30deg, #0400ff, #4ce3f7)', backgroundSize: '100% auto', transition: 'background-size 0.3s, background-position 0.3s' }}
               >
                 {loading ? 'ENTRANDO...' : 'ENTRAR'}
               </button>
