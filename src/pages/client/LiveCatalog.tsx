@@ -414,7 +414,7 @@ const LiveCatalog = () => {
         </div>
       ) : (
         /* Grid view — responsive stones */
-        <div className="rounded-2xl border border-border/50 bg-card/50 p-2 lg:p-3 overflow-y-auto max-h-[500px] lg:max-h-[600px]">
+        <div className="overflow-x-auto">
           <div className="flex flex-wrap gap-0.5 lg:gap-1">
             {displayed.map((r) => {
               const dimmed = !!(highlighted && !isHighlighted(r));
