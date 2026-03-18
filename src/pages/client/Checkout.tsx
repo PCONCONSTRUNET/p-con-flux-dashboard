@@ -264,10 +264,39 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background effects */}
+      {/* Background glows */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full opacity-[0.03] blur-[150px]" style={{ background: 'hsl(187, 100%, 50%)' }} />
-        <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] rounded-full opacity-[0.03] blur-[120px]" style={{ background: 'hsl(345, 100%, 50%)' }} />
+        <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] rounded-full opacity-[0.06] blur-[180px]" style={{ background: 'hsl(187, 100%, 50%)' }} />
+        <div className="absolute bottom-[-10%] right-[20%] w-[500px] h-[500px] rounded-full opacity-[0.04] blur-[150px]" style={{ background: 'hsl(345, 100%, 50%)' }} />
+        <div className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full opacity-[0.03] blur-[120px]" style={{ background: 'hsl(260, 100%, 60%)' }} />
+      </div>
+
+      {/* Floating FLUX icons */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {[...Array(12)].map((_, i) => (
+          <img
+            key={i}
+            src={pconLogo}
+            alt=""
+            className="absolute opacity-[0.04] select-none"
+            style={{
+              width: `${28 + (i % 4) * 12}px`,
+              height: `${28 + (i % 4) * 12}px`,
+              top: `${8 + (i * 7.5) % 85}%`,
+              left: `${5 + (i * 13.7) % 88}%`,
+              transform: `rotate(${i * 30}deg)`,
+              animation: `float-icon ${6 + (i % 3) * 2}s ease-in-out ${i * 0.5}s infinite alternate`,
+              filter: 'drop-shadow(0 0 6px hsla(187, 100%, 50%, 0.3))',
+            }}
+          />
+        ))}
+        <style>{`
+          @keyframes float-icon {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.03; }
+            50% { opacity: 0.06; }
+            100% { transform: translateY(-20px) rotate(15deg); opacity: 0.03; }
+          }
+        `}</style>
       </div>
 
       <div className="w-full max-w-lg relative z-10">
@@ -279,21 +308,25 @@ export default function Checkout() {
           Voltar
         </button>
 
+        {/* Glassmorphism Card */}
         <div
-          className="rounded-2xl border border-border/20 overflow-hidden"
-          style={{ background: 'linear-gradient(160deg, hsl(240 5% 12%) 0%, hsl(240 5% 7%) 100%)', boxShadow: '0 25px 60px hsla(0,0%,0%,0.5)' }}
+          className="rounded-2xl border border-white/[0.08] overflow-hidden backdrop-blur-xl"
+          style={{
+            background: 'linear-gradient(160deg, hsla(240, 5%, 15%, 0.6) 0%, hsla(240, 5%, 8%, 0.7) 100%)',
+            boxShadow: '0 25px 60px hsla(0,0%,0%,0.5), inset 0 1px 0 hsla(0,0%,100%,0.05), 0 0 80px hsla(187, 100%, 50%, 0.03)',
+          }}
         >
           <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 text-center border-b border-border/10">
-            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3" />
+          <div className="px-6 pt-6 pb-4 text-center border-b border-white/[0.05]">
+            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3 drop-shadow-[0_0_12px_hsla(187,100%,50%,0.3)]" />
             <h1 className="text-lg font-display font-bold text-foreground">Checkout Seguro</h1>
             <p className="text-sm text-muted-foreground/50 mt-1">Finalize sua assinatura</p>
           </div>
 
           {/* Plan Summary */}
-          <div className="px-6 py-4 border-b border-border/10" style={{ background: 'hsla(240, 5%, 8%, 0.5)' }}>
+          <div className="px-6 py-4 border-b border-white/[0.05]" style={{ background: 'hsla(187, 100%, 50%, 0.02)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/10 border border-primary/20' : 'bg-emerald-400/10 border border-emerald-400/20'}`}>
@@ -312,7 +345,7 @@ export default function Checkout() {
 
           {/* Payment Method Tabs */}
           <div className="px-6 pt-5">
-            <div className="flex gap-2 p-1 rounded-xl border border-border/15" style={{ background: 'hsla(240, 5%, 6%, 0.8)' }}>
+            <div className="flex gap-2 p-1.5 rounded-xl border border-white/[0.06] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.5)' }}>
               <button
                 onClick={() => { setPaymentMethod('pix'); setPixGenerated(false); }}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-semibold transition-all ${
