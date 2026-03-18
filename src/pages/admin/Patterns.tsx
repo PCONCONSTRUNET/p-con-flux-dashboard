@@ -290,7 +290,7 @@ const Patterns = () => {
                     return (
                       <button
                         key={ct.id}
-                        onClick={() => toggleColor(ct.id)}
+                        onClick={() => addColor(ct.id)}
                         className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                           isSelected
                             ? `${ct.border} ring-2 ring-primary/40 scale-110`
