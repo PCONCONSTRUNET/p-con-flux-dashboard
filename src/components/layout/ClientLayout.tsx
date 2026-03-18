@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Zap, LayoutGrid, Clock, User, LogOut, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -17,6 +17,14 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
+  const [clock, setClock] = useState(() => new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setClock(new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -149,6 +157,14 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
 
         {/* Main content */}
         <main className="flex-1 p-4 lg:p-6 pb-20 lg:pb-6 overflow-auto relative">
+          {/* Top bar with clock */}
+          <div className="hidden lg:flex items-center justify-end mb-6">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-2xl font-display font-bold text-primary tracking-wider">{clock}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest ml-1">Brasília</span>
+            </div>
+          </div>
           <div className="absolute inset-0 pointer-events-none opacity-30"
             style={{ background: 'radial-gradient(ellipse at 80% 20%, hsla(187,100%,50%,0.04) 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, hsla(345,100%,50%,0.04) 0%, transparent 50%)' }}
           />
