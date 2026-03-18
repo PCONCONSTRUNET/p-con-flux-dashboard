@@ -29,7 +29,7 @@ const signalPerformanceData = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card/95 backdrop-blur-xl border border-border/30 rounded-xl px-3 py-2 shadow-xl">
+      <div className="bg-card border border-border/30 rounded-xl px-3 py-2 shadow-xl" style={{ background: 'hsl(240, 6%, 10%)' }}>
         <p className="text-[10px] text-muted-foreground/60 font-semibold mb-1">{label}</p>
         {payload.map((p: any, i: number) => (
           <p key={i} className="text-xs font-bold" style={{ color: p.color }}>
@@ -174,7 +174,7 @@ const AdminDashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="hsla(240,6%,30%,0.2)" />
               <XAxis dataKey="day" tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsla(240,6%,50%,0.1)' }} />
               <Area type="monotone" dataKey="revenue" name="Receita" stroke="hsl(187, 100%, 50%)" strokeWidth={2.5} fill="url(#revenueGradient)" />
             </AreaChart>
           </ResponsiveContainer>
@@ -243,7 +243,7 @@ const AdminDashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="hsla(240,6%,30%,0.2)" />
               <XAxis dataKey="hour" tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsla(240,6%,50%,0.1)' }} />
               <Bar dataKey="greens" name="Greens" fill="url(#greenGrad)" radius={[4, 4, 0, 0]} />
               <Bar dataKey="losses" name="Losses" fill="url(#lossGrad)" radius={[4, 4, 0, 0]} />
             </BarChart>
