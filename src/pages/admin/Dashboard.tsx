@@ -29,7 +29,7 @@ const signalPerformanceData = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card/95 backdrop-blur-xl border border-border/30 rounded-xl px-3 py-2 shadow-xl">
+      <div className="bg-card border border-border/30 rounded-xl px-3 py-2 shadow-xl" style={{ background: 'hsl(240, 6%, 10%)' }}>
         <p className="text-[10px] text-muted-foreground/60 font-semibold mb-1">{label}</p>
         {payload.map((p: any, i: number) => (
           <p key={i} className="text-xs font-bold" style={{ color: p.color }}>
