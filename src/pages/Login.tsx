@@ -159,45 +159,45 @@ const Login = () => {
           {mode === 'register' && (
             <form onSubmit={handleRegister} className="space-y-5">
               <div>
-                <label className="block text-sm text-muted-foreground mb-1.5">Nome completo</label>
+                <label className="block text-sm font-semibold text-foreground mb-2">Nome completo</label>
                 <input
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full bg-muted border border-border rounded-md px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Seu nome"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-muted-foreground mb-1.5">Email</label>
+                <label className="block text-sm font-semibold text-foreground mb-2">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-muted border border-border rounded-md px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="seu@email.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-muted-foreground mb-1.5">Senha</label>
+                <label className="block text-sm font-semibold text-foreground mb-2">Senha</label>
                 <input
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-muted border border-border rounded-md px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Mínimo 6 caracteres"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-muted-foreground mb-1.5">Confirmar senha</label>
+                <label className="block text-sm font-semibold text-foreground mb-2">Confirmar senha</label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  className="w-full bg-muted border border-border rounded-md px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Repita a senha"
                 />
               </div>
