@@ -335,7 +335,7 @@ const LiveCatalog = () => {
                     if (!r) {
                       return (
                         <div key={`empty-${rowIdx}-${col}-${slot}`} className="flex-1">
-                          <div className="w-full aspect-square rounded-lg border border-border/20 bg-muted/8" />
+                          <div className="w-full aspect-square rounded-md border border-border/20 bg-muted/8" />
                           {showTimestamps && <div className="h-[14px]" />}
                         </div>
                       );
@@ -348,7 +348,7 @@ const LiveCatalog = () => {
                       <div key={r.id} className="flex-1 flex flex-col items-center">
                         <div
                           onClick={() => handleClickRound(r)}
-                          className={`w-full aspect-square rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                          className={`w-full aspect-square rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
                             dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                           } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                         >
@@ -373,8 +373,8 @@ const LiveCatalog = () => {
             <div className="grid gap-1 mt-1" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
               {Array.from({ length: 10 }, (_, col) => (
                 <div key={`empty-row-${col}`} className="flex gap-1 items-stretch">
-                  <div className="flex-1 aspect-square rounded-lg border border-border/20 bg-muted/8" />
-                  <div className="flex-1 aspect-square rounded-lg border border-border/20 bg-muted/8" />
+                  <div className="flex-1 aspect-square rounded-md border border-border/20 bg-muted/8" />
+                  <div className="flex-1 aspect-square rounded-md border border-border/20 bg-muted/8" />
                 </div>
               ))}
             </div>
@@ -395,7 +395,7 @@ const LiveCatalog = () => {
                   className="flex flex-col items-center cursor-pointer group"
                 >
                   <div
-                    className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
+                    className={`w-9 h-9 rounded-md ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
                       dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                     } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                   >
