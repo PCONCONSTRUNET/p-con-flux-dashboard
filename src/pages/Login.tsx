@@ -128,7 +128,7 @@ const Login = () => {
                     onChange={e => setRemember(e.target.checked)}
                     className="w-3.5 h-3.5 rounded border-border bg-muted accent-primary"
                   />
-                  <span className="text-sm text-muted-foreground">Lembrar acesso</span>
+                  <span className="text-xs text-muted-foreground">Lembrar acesso</span>
                 </label>
                 <button
                   type="button"
