@@ -94,7 +94,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
           {/* Collapse toggle */}
           <button
             onClick={() => setDesktopCollapsed(!desktopCollapsed)}
-            className="absolute -right-3 top-7 z-20 w-6 h-6 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all shadow-md"
+            className={`absolute top-5 z-20 w-6 h-6 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all shadow-md ${desktopCollapsed ? 'right-2' : 'right-3'}`}
           >
             {desktopCollapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
           </button>
