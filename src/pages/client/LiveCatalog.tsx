@@ -65,32 +65,43 @@ const LiveCatalog = () => {
   }, [rounds, limit]);
 
   const FIXED_ROWS = 22;
-  const MINUTE_COLUMNS = 10;
 
-  // Group rounds by minute window (ex: 00-09, 10-19...) for fixed-column mode
-  const minuteColumns = useMemo(() => {
-    const newestDate = displayed[0] ? new Date(displayed[0].timestamp) : new Date();
-    const currentMinute = newestDate.getMinutes();
-    const windowStart = Math.floor(currentMinute / 10) * 10;
+  // Group rounds into 10-minute blocks (e.g. 03:00-03:09, 03:10-03:19...)
+  // Each block has 10 columns (digits 0-9), blocks go side by side horizontally
+  const minuteBlocks = useMemo(() => {
+    type Block = { key: string; label: string; columns: BlazeRound[][] };
 
-    const labels = Array.from({ length: MINUTE_COLUMNS }, (_, index) => {
-      const minuteValue = (windowStart + index) % 60;
-      return String(minuteValue).padStart(2, '0');
-    });
+    const blockMap = new Map<string, Block>();
 
-    const columnMap = new Map<string, BlazeRound[]>();
-    labels.forEach(label => columnMap.set(label, []));
-
+    // Process chronologically (oldest first so they stack top-down)
     const chronological = [...displayed].reverse();
+
     chronological.forEach(round => {
-      const minuteLabel = String(new Date(round.timestamp).getMinutes()).padStart(2, '0');
-      const target = columnMap.get(minuteLabel);
-      if (target && target.length < FIXED_ROWS) {
-        target.push(round);
+      const d = new Date(round.timestamp);
+      const hour = d.getHours();
+      const minute = d.getMinutes();
+      const decade = Math.floor(minute / 10); // 0,1,2,3,4,5
+      const digitInBlock = minute % 10; // 0-9
+
+      const blockKey = `${String(hour).padStart(2, '0')}:${decade}`;
+      const blockLabel = `${String(hour).padStart(2, '0')}:${decade}0`;
+
+      if (!blockMap.has(blockKey)) {
+        blockMap.set(blockKey, {
+          key: blockKey,
+          label: blockLabel,
+          columns: Array.from({ length: 10 }, () => []),
+        });
+      }
+
+      const block = blockMap.get(blockKey)!;
+      if (block.columns[digitInBlock].length < FIXED_ROWS) {
+        block.columns[digitInBlock].push(round);
       }
     });
 
-    return labels.map(label => ({ label, rounds: columnMap.get(label) ?? [] }));
+    // Sort blocks chronologically (newest first for display)
+    return Array.from(blockMap.values()).reverse();
   }, [displayed]);
 
   const handleClickRound = useCallback((round: BlazeRound) => {
