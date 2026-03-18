@@ -111,9 +111,3 @@ export const mockAlerts: AlertEvent[] = [
   { id: '8', patternId: '1', patternName: 'Sequência Alpha-7', status: 'analyzing', timestamp: '2026-03-18T11:50:00', details: '2 ocorrências identificadas. Monitorando para a 3ª.' },
 ];
 
-export const mockUsers: ClientUser[] = [
-  { id: '1', name: 'Carlos Silva', email: 'carlos@empresa.com', status: 'active', role: 'client', createdAt: '2026-02-15' },
-  { id: '2', name: 'Ana Rodrigues', email: 'ana@empresa.com', status: 'active', role: 'client', createdAt: '2026-02-20' },
-  { id: '3', name: 'Bruno Costa', email: 'bruno@startup.io', status: 'inactive', role: 'client', createdAt: '2026-03-01' },
-  { id: '4', name: 'Mariana Santos', email: 'mariana@corp.com', status: 'active', role: 'client', createdAt: '2026-03-05' },
-];
