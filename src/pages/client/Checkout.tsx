@@ -585,7 +585,7 @@ export default function Checkout() {
                           type="text"
                           readOnly
                           value={pixQrCode}
-                          className="w-full h-11 px-4 pr-12 rounded-xl border border-border/20 bg-background/40 text-[10px] font-mono text-foreground/60 focus:outline-none truncate"
+                          className="w-full h-12 px-4 pr-12 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-[10px] font-mono text-white/60 focus:outline-none truncate"
                         />
                         <button
                           onClick={copyPixCode}
