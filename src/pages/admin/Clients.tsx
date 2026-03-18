@@ -37,7 +37,7 @@ const ClientsPage = () => {
     setLoading(true);
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, name, email, created_at');
+      .select('id, name, email, created_at, whatsapp, telegram');
 
     if (profilesError) {
       console.error('Error fetching profiles:', profilesError);
