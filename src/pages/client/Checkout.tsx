@@ -226,14 +226,16 @@ export default function Checkout() {
         return;
       }
 
-      setSuccess(true);
-      toast.success('Assinatura realizada com sucesso!');
-      setTimeout(() => navigate('/client'), 3000);
+      // Card payment sent - now wait for webhook confirmation
+      setProcessing(false);
+      setAwaitingConfirmation(true);
+      toast.info('Pagamento enviado! Aguardando confirmação...');
+      startPolling('card');
     } catch (err: any) {
       console.error('Checkout error:', err);
       toast.error(err?.message || 'Erro ao processar pagamento.');
+      setProcessing(false);
     }
-    setProcessing(false);
   };
 
   if (loading) {
