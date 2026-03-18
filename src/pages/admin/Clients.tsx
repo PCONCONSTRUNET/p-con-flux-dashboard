@@ -68,6 +68,8 @@ const ClientsPage = () => {
         started_at: sub?.started_at || p.created_at,
         expires_at: sub?.expires_at || new Date().toISOString(),
         is_active: sub?.is_active ?? true,
+        whatsapp: (p as any).whatsapp || '',
+        telegram: (p as any).telegram || '',
       };
     });
 
