@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radio } from 'lucide-react';
 import { mockSignals, type Signal } from '@/data/mockData';
 import flameIcon from '@/assets/flame-icon.png';
-import BlazeRoulette from '@/components/BlazeRoulette';
+import BlazeRouletteStrip from '@/components/BlazeRouletteStrip';
 
 type AnalysisState = 'scanning' | 'pattern_found' | 'confirmed' | 'idle';
 
@@ -171,12 +171,9 @@ const ClientDashboard = () => {
           'bg-gradient-to-r from-transparent via-secondary/60 to-transparent'
         }`} />
 
-        {/* Roulette */}
-        <div className="flex justify-center mb-4">
-          <BlazeRoulette
-            spinning={analysisState === 'scanning'}
-            size={140}
-          />
+        {/* Roulette Strip */}
+        <div className="mb-4">
+          <BlazeRouletteStrip spinning={analysisState === 'scanning'} />
         </div>
 
         {/* Status */}
