@@ -424,25 +424,27 @@ export default function Checkout() {
 
           {/* Payment Method Tabs */}
           <div className="px-6 pt-5">
-            <div className="flex gap-2 p-1.5 rounded-xl border border-white/[0.06] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.5)' }}>
+            <div className="flex gap-2 p-1.5 rounded-xl border border-white/[0.08] backdrop-blur-sm" style={{ background: 'hsla(240, 5%, 10%, 0.4)' }}>
               <button
                 onClick={() => { setPaymentMethod('pix'); setPixGenerated(false); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-semibold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
                   paymentMethod === 'pix'
-                    ? 'bg-primary/15 text-primary border border-primary/25'
-                    : 'text-muted-foreground/50 hover:text-muted-foreground/70'
+                    ? 'text-white border border-primary/30'
+                    : 'text-white/40 hover:text-white/60'
                 }`}
+                style={paymentMethod === 'pix' ? { background: 'linear-gradient(135deg, hsla(187,100%,50%,0.2), hsla(187,100%,50%,0.08))', boxShadow: '0 0 15px hsla(187,100%,50%,0.1)' } : {}}
               >
                 <img src={iconPix} alt="PIX" className="w-5 h-5" />
                 PIX
               </button>
               <button
                 onClick={() => setPaymentMethod('card')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-semibold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
                   paymentMethod === 'card'
-                    ? 'bg-primary/15 text-primary border border-primary/25'
-                    : 'text-muted-foreground/50 hover:text-muted-foreground/70'
+                    ? 'text-white border border-primary/30'
+                    : 'text-white/40 hover:text-white/60'
                 }`}
+                style={paymentMethod === 'card' ? { background: 'linear-gradient(135deg, hsla(187,100%,50%,0.2), hsla(187,100%,50%,0.08))', boxShadow: '0 0 15px hsla(187,100%,50%,0.1)' } : {}}
               >
                 <img src={iconCard} alt="Cartão" className="w-5 h-5" />
                 Cartão
