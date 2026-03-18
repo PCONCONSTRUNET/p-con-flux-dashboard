@@ -158,7 +158,11 @@ const LiveCatalog = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col items-end">
+            <span className="text-sm font-bold font-mono text-primary tracking-wider">{clock}</span>
+            <span className="text-[9px] text-muted-foreground uppercase tracking-widest">Brasília</span>
+          </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-3 py-2 rounded-xl border transition-all ${
@@ -168,7 +172,6 @@ const LiveCatalog = () => {
             <Filter size={12} />
             Filtros
           </button>
-        
         </div>
       </div>
 
