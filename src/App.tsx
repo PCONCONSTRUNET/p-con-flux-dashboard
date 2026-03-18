@@ -39,6 +39,7 @@ const App = () => (
             <Route path="/" element={<AuthRedirect />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
 
             {/* Client routes */}
             <Route path="/client" element={<ProtectedRoute role="client"><ClientLayout><ClientDashboard /></ClientLayout></ProtectedRoute>} />
