@@ -330,7 +330,7 @@ const LiveCatalog = () => {
           {fixedGrid.map((block, rowIdx) => (
             <div key={`block-${rowIdx}`} className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, minmax(74px, 1fr))' }}>
               {block.rounds.map((cell, col) => (
-                <div key={`cell-${rowIdx}-${col}`} className="flex gap-0.5 items-start justify-center">
+                <div key={`cell-${rowIdx}-${col}`} className="flex gap-0 items-start justify-center py-0.5">
                   {cell.map((r, slot) => {
                     if (!r) {
                       return (
