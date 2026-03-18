@@ -1,21 +1,48 @@
-import { useState, useMemo } from 'react';
-import { Filter, Clock, RefreshCw, ChevronDown } from 'lucide-react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { Filter, Clock, RefreshCw, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { mockBlazeRounds, type BlazeColor, type BlazeRound } from '@/data/mockData';
 import blazeIcon from '@/assets/blaze-icon.png';
 
-const colorMap: Record<BlazeColor, { bg: string; border: string; label: string }> = {
-  red: { bg: 'bg-red-600', border: 'border-red-500/50', label: 'Vermelho' },
-  black: { bg: 'bg-zinc-900', border: 'border-zinc-600/50', label: 'Preto' },
-  white: { bg: 'bg-emerald-100', border: 'border-emerald-300/50', label: 'Branco' },
+const colorStyles: Record<BlazeColor, { bg: string; ring: string; text: string; label: string }> = {
+  red: { bg: 'bg-secondary', ring: 'ring-secondary/40', text: 'text-white', label: 'Vermelho' },
+  black: { bg: 'bg-[hsl(240_6%_15%)]', ring: 'ring-[hsl(240_6%_25%)]/40', text: 'text-muted-foreground', label: 'Preto' },
+  white: { bg: 'bg-[hsl(0_0%_90%)]', ring: 'ring-[hsl(0_0%_80%)]/40', text: 'text-[hsl(240_6%_10%)]', label: 'Branco' },
 };
 
-const roundLimits = [20, 50, 100, 200];
+const ROUND_LIMITS = [100, 200, 500] as const;
+const COLOR_FILTERS = ['all', 'red', 'black', 'white'] as const;
 
 const LiveCatalog = () => {
-  const [rounds] = useState<BlazeRound[]>(mockBlazeRounds);
-  const [limit, setLimit] = useState(50);
+  const [rounds, setRounds] = useState<BlazeRound[]>(mockBlazeRounds);
+  const [limit, setLimit] = useState<number>(200);
   const [colorFilter, setColorFilter] = useState<BlazeColor | 'all'>('all');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
+  const [realtime, setRealtime] = useState(true);
+  const [showTimestamps, setShowTimestamps] = useState(true);
+  const [showNumbers, setShowNumbers] = useState(true);
+  const [highlighted, setHighlighted] = useState<string | null>(null);
+  const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
+
+  // Simulate real-time incoming rounds
+  useEffect(() => {
+    if (!realtime) return;
+    const interval = setInterval(() => {
+      const roll = Math.floor(Math.random() * 15);
+      let color: BlazeColor = 'black';
+      if (roll === 0) color = 'white';
+      else if (roll <= 7) color = 'red';
+
+      const newRound: BlazeRound = {
+        id: `br-rt-${Date.now()}`,
+        number: rounds.length + 1,
+        color,
+        timestamp: new Date().toISOString(),
+        roll,
+      };
+      setRounds(prev => [newRound, ...prev]);
+    }, 8000 + Math.random() * 12000);
+    return () => clearInterval(interval);
+  }, [realtime, rounds.length]);
 
   const displayed = useMemo(() => {
     let data = rounds.slice(0, limit);
@@ -27,146 +54,247 @@ const LiveCatalog = () => {
 
   const stats = useMemo(() => {
     const slice = rounds.slice(0, limit);
+    const total = slice.length;
     return {
       red: slice.filter(r => r.color === 'red').length,
       black: slice.filter(r => r.color === 'black').length,
       white: slice.filter(r => r.color === 'white').length,
-      total: slice.length,
+      total,
     };
   }, [rounds, limit]);
 
+  const handleClickRound = useCallback((round: BlazeRound) => {
+    if (highlighted === round.id) {
+      setHighlighted(null);
+    } else {
+      setHighlighted(round.id);
+    }
+  }, [highlighted]);
+
+  const isHighlighted = useCallback((round: BlazeRound) => {
+    if (!highlighted) return false;
+    const target = rounds.find(r => r.id === highlighted);
+    if (!target) return false;
+    if (highlightMode === 'same_color') return round.color === target.color;
+    return round.roll === target.roll;
+  }, [highlighted, highlightMode, rounds]);
+
+  const formatTime = (ts: string) => {
+    return new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  };
+
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-1.5 rounded-xl bg-secondary/10 border border-secondary/20">
-            <img src={blazeIcon} alt="Blaze" className="w-7 h-7 object-contain" />
+            <img src={blazeIcon} alt="Blaze" className="w-6 h-6 object-contain" />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-display font-bold text-foreground tracking-wide">Double</h1>
-            <div className="flex items-center gap-2 mt-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse-glow" />
-              <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">Tempo real</span>
+            <h1 className="text-lg font-bold text-foreground tracking-tight">Catalogador</h1>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <div className={`w-1.5 h-1.5 rounded-full ${realtime ? 'bg-emerald-400 animate-pulse' : 'bg-muted-foreground/30'}`} />
+              <span className="text-[10px] text-muted-foreground tracking-widest uppercase font-semibold">
+                {realtime ? 'Tempo real' : 'Pausado'}
+              </span>
             </div>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border transition-all ${
-              showFilters ? 'bg-primary/10 text-primary border-primary/30' : 'bg-muted/50 text-muted-foreground border-transparent hover:text-foreground'
+            className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-3 py-2 rounded-xl border transition-all ${
+              showFilters ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
             }`}
           >
-            <Filter size={14} />
-            <span className="hidden sm:inline">Filtros</span>
-          </button>
-          <button className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition-all">
-            <RefreshCw size={14} />
+            <Filter size={12} />
+            Filtros
           </button>
         </div>
       </div>
 
-      {/* Color strip - last 20 results */}
-      <div className="rounded-xl p-3 border border-border/50 bg-card/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-secondary/30 via-transparent to-primary/30" />
-        <div className="text-[10px] text-muted-foreground font-display tracking-widest uppercase mb-2">Últimas rodadas</div>
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {rounds.slice(0, 30).map((r) => (
-            <div
-              key={r.id}
-              className={`w-8 h-8 shrink-0 rounded-lg ${colorMap[r.color].bg} ${colorMap[r.color].border} border flex items-center justify-center text-[10px] font-bold ${r.color === 'white' ? 'text-zinc-800' : 'text-white'} transition-transform hover:scale-110`}
-              title={`#${r.number} - ${r.roll} (${colorMap[r.color].label}) - ${new Date(r.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`}
-            >
-              {r.roll}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Filters panel */}
+      {/* Filters */}
       {showFilters && (
-        <div className="rounded-xl p-4 border border-border/50 bg-card/50 animate-slide-up space-y-4">
+        <div className="rounded-2xl p-4 border border-border/50 bg-card/80 backdrop-blur-sm animate-slide-up space-y-4">
+          {/* Quick filters row */}
+          <div className="flex flex-wrap gap-2">
+            {ROUND_LIMITS.map(l => (
+              <button
+                key={l}
+                onClick={() => setLimit(l)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-semibold transition-all ${
+                  limit === l ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted/30 text-muted-foreground border border-transparent hover:text-foreground'
+                }`}
+              >
+                {l} rodadas
+              </button>
+            ))}
+          </div>
+
+          {/* Color filter */}
           <div>
-            <div className="text-[10px] text-muted-foreground font-display tracking-widest uppercase mb-2">Quantidade de rodadas</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-2">Por cores</div>
             <div className="flex gap-2">
-              {roundLimits.map(l => (
+              {COLOR_FILTERS.map(c => (
                 <button
-                  key={l}
-                  onClick={() => setLimit(l)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-display transition-all ${
-                    limit === l ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted/50 text-muted-foreground border border-transparent'
+                  key={c}
+                  onClick={() => setColorFilter(c)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-semibold transition-all ${
+                    colorFilter === c ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted/30 text-muted-foreground border border-transparent'
                   }`}
                 >
-                  {l}
+                  {c !== 'all' && <div className={`w-2.5 h-2.5 rounded-full ${colorStyles[c].bg}`} />}
+                  {c === 'all' ? 'Todas' : colorStyles[c].label}
                 </button>
               ))}
             </div>
           </div>
+
+          {/* Toggles */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={realtime}
+                onChange={() => setRealtime(!realtime)}
+                className="sr-only peer"
+              />
+              <div className="w-8 h-4 rounded-full bg-muted/50 peer-checked:bg-primary/30 relative transition-all">
+                <div className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${realtime ? 'left-[18px] bg-primary' : 'left-0.5 bg-muted-foreground/50'}`} />
+              </div>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Tempo real</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showTimestamps}
+                onChange={() => setShowTimestamps(!showTimestamps)}
+                className="sr-only peer"
+              />
+              <div className="w-8 h-4 rounded-full bg-muted/50 peer-checked:bg-primary/30 relative transition-all">
+                <div className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${showTimestamps ? 'left-[18px] bg-primary' : 'left-0.5 bg-muted-foreground/50'}`} />
+              </div>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Horário</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showNumbers}
+                onChange={() => setShowNumbers(!showNumbers)}
+                className="sr-only peer"
+              />
+              <div className="w-8 h-4 rounded-full bg-muted/50 peer-checked:bg-primary/30 relative transition-all">
+                <div className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${showNumbers ? 'left-[18px] bg-primary' : 'left-0.5 bg-muted-foreground/50'}`} />
+              </div>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Numerado</span>
+            </label>
+          </div>
+
+          {/* Highlight mode */}
           <div>
-            <div className="text-[10px] text-muted-foreground font-display tracking-widest uppercase mb-2">Filtrar por cor</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-2">No clique, destacar</div>
             <div className="flex gap-2">
-              {(['all', 'red', 'black', 'white'] as const).map(c => (
+              <button
+                onClick={() => setHighlightMode('same_color')}
+                className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-semibold transition-all ${
+                  highlightMode === 'same_color' ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted/30 text-muted-foreground border border-transparent'
+                }`}
+              >
+                Mesma cor
+              </button>
+              <button
+                onClick={() => setHighlightMode('same_number')}
+                className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-semibold transition-all ${
+                  highlightMode === 'same_number' ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted/30 text-muted-foreground border border-transparent'
+                }`}
+              >
+                Mesmo número
+              </button>
+              {highlighted && (
                 <button
-                  key={c}
-                  onClick={() => setColorFilter(c)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-display transition-all ${
-                    colorFilter === c ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted/50 text-muted-foreground border border-transparent'
-                  }`}
+                  onClick={() => setHighlighted(null)}
+                  className="px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-semibold bg-secondary/10 text-secondary border border-secondary/30"
                 >
-                  {c !== 'all' && <div className={`w-3 h-3 rounded ${colorMap[c].bg}`} />}
-                  {c === 'all' ? 'TODAS' : colorMap[c].label.toUpperCase()}
+                  <Trash2 size={12} className="inline mr-1" />
+                  Limpar
                 </button>
-              ))}
+              )}
             </div>
           </div>
         </div>
       )}
 
       {/* Stats bar */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl p-3 border border-red-500/20 bg-red-500/5 text-center">
-          <div className="text-lg font-display font-bold text-red-500">{stats.red}</div>
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Vermelho</div>
-          <div className="text-[10px] text-red-400/60">{stats.total > 0 ? Math.round((stats.red / stats.total) * 100) : 0}%</div>
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-xl p-2.5 border border-secondary/20 bg-secondary/5 text-center">
+          <div className="text-base font-bold text-secondary">{stats.red}</div>
+          <div className="text-[9px] text-muted-foreground uppercase tracking-wider">Vermelho</div>
+          <div className="text-[9px] text-secondary/50">{stats.total > 0 ? Math.round((stats.red / stats.total) * 100) : 0}%</div>
         </div>
-        <div className="rounded-xl p-3 border border-zinc-500/20 bg-zinc-500/5 text-center">
-          <div className="text-lg font-display font-bold text-zinc-300">{stats.black}</div>
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Preto</div>
-          <div className="text-[10px] text-zinc-400/60">{stats.total > 0 ? Math.round((stats.black / stats.total) * 100) : 0}%</div>
+        <div className="rounded-xl p-2.5 border border-border/30 bg-muted/10 text-center">
+          <div className="text-base font-bold text-muted-foreground">{stats.black}</div>
+          <div className="text-[9px] text-muted-foreground uppercase tracking-wider">Preto</div>
+          <div className="text-[9px] text-muted-foreground/50">{stats.total > 0 ? Math.round((stats.black / stats.total) * 100) : 0}%</div>
         </div>
-        <div className="rounded-xl p-3 border border-emerald-300/20 bg-emerald-100/5 text-center">
-          <div className="text-lg font-display font-bold text-emerald-200">{stats.white}</div>
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Branco</div>
-          <div className="text-[10px] text-emerald-300/60">{stats.total > 0 ? Math.round((stats.white / stats.total) * 100) : 0}%</div>
+        <div className="rounded-xl p-2.5 border border-emerald-300/20 bg-emerald-100/5 text-center">
+          <div className="text-base font-bold text-emerald-200">{stats.white}</div>
+          <div className="text-[9px] text-muted-foreground uppercase tracking-wider">Branco</div>
+          <div className="text-[9px] text-emerald-300/50">{stats.total > 0 ? Math.round((stats.white / stats.total) * 100) : 0}%</div>
         </div>
       </div>
 
-      {/* Rounds table */}
-      <div className="rounded-xl border border-border/50 bg-card/30 overflow-hidden">
-        <div className="p-3 border-b border-border/50 flex items-center justify-between">
-          <span className="text-[10px] font-display tracking-widest uppercase text-muted-foreground">
-            Histórico — {displayed.length} rodada{displayed.length !== 1 ? 's' : ''}
+      {/* Histórico header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-sm font-bold text-foreground">Histórico</h2>
+          <span className="text-[10px] text-muted-foreground">
+            Exibindo <span className="text-primary font-bold">{displayed.length}</span> rodadas
           </span>
         </div>
-        <div className="divide-y divide-border/30 max-h-[400px] overflow-y-auto">
+        <div className="flex items-center gap-1.5 text-muted-foreground/50">
+          <Clock size={12} />
+          <span className="text-[10px] font-mono">
+            {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </span>
+        </div>
+      </div>
+
+      {/* Rounds grid — like Blaze cataloger */}
+      <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[500px]">
+        <div className="flex flex-wrap gap-1.5">
           {displayed.map((r) => {
-            const time = new Date(r.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const style = colorStyles[r.color];
+            const active = highlighted ? isHighlighted(r) : true;
+            const dimmed = highlighted && !active;
+            const time = formatTime(r.timestamp);
+
             return (
-              <div key={r.id} className="flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg ${colorMap[r.color].bg} ${colorMap[r.color].border} border flex items-center justify-center text-xs font-bold ${r.color === 'white' ? 'text-zinc-800' : 'text-white'}`}>
-                    {r.roll}
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-foreground">Rodada #{r.number}</div>
-                    <div className="text-[10px] text-muted-foreground">{colorMap[r.color].label}</div>
-                  </div>
+              <div
+                key={r.id}
+                onClick={() => handleClickRound(r)}
+                className="flex flex-col items-center cursor-pointer group"
+              >
+                <div
+                  className={`w-9 h-9 rounded-full ${style.bg} ring-2 ${style.ring} flex items-center justify-center transition-all duration-200 ${
+                    dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                  } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                >
+                  {showNumbers && (
+                    <span className={`text-[11px] font-bold ${style.text}`}>
+                      {r.roll}
+                    </span>
+                  )}
+                  {!showNumbers && r.color === 'white' && (
+                    <div className="w-2 h-2 rounded-full bg-secondary/60" />
+                  )}
                 </div>
-                <div className="flex items-center gap-1.5 text-muted-foreground/60">
-                  <Clock size={12} />
-                  <span className="text-xs font-mono">{time}</span>
-                </div>
+                {showTimestamps && (
+                  <span className={`text-[8px] mt-0.5 font-mono transition-opacity ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                    {time}
+                  </span>
+                )}
               </div>
             );
           })}
