@@ -336,7 +336,7 @@ const LiveCatalog = () => {
 
           {/* Data rows — each row = 10-min block */}
           {fixedGrid.map((block, rowIdx) => (
-            <div key={`block-${rowIdx}`} className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, 108px)' }}>
+            <div key={`block-${rowIdx}`} className="grid gap-2" style={{ gridTemplateColumns: 'repeat(10, 108px)' }}>
               {block.rounds.map((cell, col) => (
                 <div key={`cell-${rowIdx}-${col}`} className="flex gap-1 items-start justify-center">
                   {cell.map((r, slot) => {
