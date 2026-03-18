@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { mockPatterns, Pattern } from '@/data/mockData';
 import { Plus, Search, Edit, Power, X, Minus, Layers, Trash2, Copy, Eye, ChevronDown } from 'lucide-react';
 
-type ColorToken = 'blue' | 'red' | 'white' | 'blaze' | 'red-blue' | 'blue-red' | 'red-white' | 'blue-white';
+type ColorToken = 'black' | 'red' | 'white';
 
 interface PatternConfig {
   name: string;
@@ -15,15 +15,10 @@ interface PatternConfig {
   victoryTarget: 'reds' | 'blacks' | 'whites' | 'blacks-whites' | 'reds-whites' | 'any';
 }
 
-const colorTokens: { id: ColorToken; border: string; bg: string; inner?: string; split?: [string, string] }[] = [
-  { id: 'blue', border: 'border-primary', bg: 'bg-primary' },
+const colorTokens: { id: ColorToken; border: string; bg: string }[] = [
+  { id: 'black', border: 'border-zinc-500', bg: 'bg-zinc-900' },
   { id: 'red', border: 'border-secondary', bg: 'bg-secondary' },
   { id: 'white', border: 'border-border', bg: 'bg-white' },
-  { id: 'blaze', border: 'border-secondary', bg: 'bg-secondary', inner: '🔥' },
-  { id: 'red-blue', border: 'border-secondary', bg: '', split: ['bg-secondary', 'bg-primary'] },
-  { id: 'blue-red', border: 'border-primary', bg: '', split: ['bg-primary', 'bg-secondary'] },
-  { id: 'red-white', border: 'border-secondary', bg: '', split: ['bg-secondary', 'bg-white'] },
-  { id: 'blue-white', border: 'border-primary', bg: '', split: ['bg-primary', 'bg-white'] },
 ];
 
 const numberColors: Record<number, { bg: string; text: string }> = {
@@ -273,18 +268,7 @@ const Patterns = () => {
                             : 'border-border/30 hover:border-border/60'
                         }`}
                       >
-                        {ct.split ? (
-                          <div className="w-full h-full rounded-full overflow-hidden flex">
-                            <div className={`w-1/2 h-full ${ct.split[0]}`} />
-                            <div className={`w-1/2 h-full ${ct.split[1]}`} />
-                          </div>
-                        ) : ct.inner ? (
-                          <div className={`w-full h-full rounded-full ${ct.bg} flex items-center justify-center text-sm`}>
-                            {ct.inner}
-                          </div>
-                        ) : (
-                          <div className={`w-7 h-7 rounded-full ${ct.bg}`} />
-                        )}
+                        <div className={`w-7 h-7 rounded-full ${ct.bg}`} />
                       </button>
                     );
                   })}
@@ -379,16 +363,7 @@ const Patterns = () => {
                           return (
                             <div key={i} className="relative group">
                               <div className={`w-8 h-8 rounded-full border ${ct.border} flex items-center justify-center overflow-hidden`}>
-                                {ct.split ? (
-                                  <div className="w-full h-full flex">
-                                    <div className={`w-1/2 h-full ${ct.split[0]}`} />
-                                    <div className={`w-1/2 h-full ${ct.split[1]}`} />
-                                  </div>
-                                ) : ct.inner ? (
-                                  <div className={`w-full h-full ${ct.bg} flex items-center justify-center text-xs`}>{ct.inner}</div>
-                                ) : (
-                                  <div className={`w-6 h-6 rounded-full ${ct.bg}`} />
-                                )}
+                                <div className={`w-6 h-6 rounded-full ${ct.bg}`} />
                               </div>
                               <button
                                 onClick={() => removeColorAt(i)}
