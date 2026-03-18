@@ -321,7 +321,7 @@ export default function Checkout() {
                     : 'text-muted-foreground/50 hover:text-muted-foreground/70'
                 }`}
               >
-                <QrCode size={16} />
+                <img src={iconPix} alt="PIX" className="w-5 h-5" />
                 PIX
               </button>
               <button
