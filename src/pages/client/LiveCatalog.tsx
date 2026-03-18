@@ -294,7 +294,7 @@ const LiveCatalog = () => {
         {/* 2 stones per minute side by side (horizontal) */}
         <div className="grid grid-cols-10 gap-1">
           {minuteDigitColumns.map((colRounds, col) => (
-            <div key={`minute-col-${col}`} className="flex items-start justify-center gap-1">
+            <div key={`minute-col-${col}`} className="flex items-start justify-center gap-1.5">
               {Array.from({ length: MAX_PER_MINUTE }, (_, slot) => {
                 const r = colRounds[slot];
 
@@ -306,11 +306,11 @@ const LiveCatalog = () => {
                     <div key={`${col}-${slot}`} className="flex flex-col items-center">
                       <div
                         onClick={() => handleClickRound(r)}
-                        className={`w-full aspect-square max-w-[42px] rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                        className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
                           dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
                         } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
                       >
-                        {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
+                        {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
                         {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
                       </div>
                       {showTimestamps && (
@@ -324,7 +324,7 @@ const LiveCatalog = () => {
 
                 return (
                   <div key={`${col}-${slot}`} className="flex items-center justify-center">
-                    <div className="w-full aspect-square max-w-[42px] rounded-lg border border-border/15 bg-muted/5" />
+                    <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
                   </div>
                 );
               })}
