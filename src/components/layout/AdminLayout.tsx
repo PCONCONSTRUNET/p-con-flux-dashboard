@@ -10,6 +10,7 @@ const navItems = [
   { label: 'Fluxo', icon: Activity, path: '/admin/pattern-flow' },
   { label: 'Clientes', icon: UserCheck, path: '/admin/clients' },
   { label: 'Pagamentos', icon: CreditCard, path: '/admin/payments' },
+  { label: 'Integrações', icon: Plug, path: '/admin/integrations' },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
