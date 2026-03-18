@@ -23,6 +23,7 @@ export default function Checkout() {
 
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [success, setSuccess] = useState(false);
   const [publicKey, setPublicKey] = useState('');
   const [price, setPrice] = useState('');
