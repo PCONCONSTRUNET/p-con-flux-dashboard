@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import blazeDice from '@/assets/blaze-dice.png';
+import flameIcon from '@/assets/flame-icon.png';
 
 const LoginBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -13,7 +13,7 @@ const LoginBackground = () => {
 
     // Load dice image
     const img = new Image();
-    img.src = blazeDice;
+    img.src = flameIcon;
     imageRef.current = img;
 
     let animationId: number;
