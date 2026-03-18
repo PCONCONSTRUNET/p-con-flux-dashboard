@@ -19,6 +19,7 @@ import AdminDashboard from "@/pages/admin/Dashboard";
 import Patterns from "@/pages/admin/Patterns";
 import UsersPage from "@/pages/admin/Users";
 import ClientsPage from "@/pages/admin/Clients";
+import PaymentsPage from "@/pages/admin/Payments";
 import NotFound from "@/pages/NotFound";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import UpgradeModal from "@/components/UpgradeModal";
