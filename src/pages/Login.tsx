@@ -26,9 +26,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-20 blur-[120px]" style={{ background: 'hsl(187 100% 50%)' }} />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full opacity-15 blur-[120px]" style={{ background: 'hsl(345 100% 50%)' }} />
+      <LoginBackground />
 
       <div className="w-full max-w-md animate-slide-up">
         <div className="flex flex-col items-center mb-8">
