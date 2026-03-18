@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Eye, EyeOff, Save, ShieldCheck, ExternalLink, CheckCircle2, AlertCircle, RefreshCw, Key, Link2, FileText, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Integrations() {
   const [showAccessToken, setShowAccessToken] = useState(false);
@@ -32,28 +33,48 @@ export default function Integrations() {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('mp_config');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
+    const loadSettings = async () => {
+      const { data } = await supabase
+        .from('platform_settings')
+        .select('key, value')
+        .in('key', ['mp_access_token', 'mp_public_key', 'mp_monthly_price', 'mp_annual_price']);
+
+      if (data && data.length > 0) {
+        const settings: Record<string, string> = {};
+        data.forEach(row => { settings[row.key] = row.value; });
         setConfig({
-          accessToken: parsed.accessToken || '',
-          publicKey: parsed.publicKey || '',
-          monthlyPrice: parsed.monthlyPrice || '',
-          annualPrice: parsed.annualPrice || '',
+          accessToken: settings.mp_access_token || '',
+          publicKey: settings.mp_public_key || '',
+          monthlyPrice: settings.mp_monthly_price || '',
+          annualPrice: settings.mp_annual_price || '',
         });
-        // Restore connection status if credentials were saved
-        if (parsed.accessToken && parsed.publicKey) {
+        if (settings.mp_access_token && settings.mp_public_key) {
           setConnectionStatus('success');
         }
-      } catch { /* ignore */ }
-    }
+      }
+    };
+    loadSettings();
   }, []);
 
   const handleSave = async () => {
     setIsSaving(true);
+    
+    const entries = [
+      { key: 'mp_access_token', value: config.accessToken },
+      { key: 'mp_public_key', value: config.publicKey },
+      { key: 'mp_monthly_price', value: config.monthlyPrice },
+      { key: 'mp_annual_price', value: config.annualPrice },
+    ];
+
+    for (const entry of entries) {
+      await supabase
+        .from('platform_settings')
+        .upsert({ key: entry.key, value: entry.value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    }
+
+    // Also keep localStorage for the upgrade modal on client side
     localStorage.setItem('mp_config', JSON.stringify(config));
-    await new Promise(r => setTimeout(r, 600));
+
     setIsSaving(false);
     if (config.accessToken && config.publicKey) {
       setConnectionStatus('success');
