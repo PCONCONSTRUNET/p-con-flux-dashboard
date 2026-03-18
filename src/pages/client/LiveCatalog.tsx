@@ -64,14 +64,33 @@ const LiveCatalog = () => {
     };
   }, [rounds, limit]);
 
-  // Group rounds by roll number for column view (0-14)
-  const columnData = useMemo(() => {
-    const columns: Record<number, BlazeRound[]> = {};
-    for (let i = 0; i <= 14; i++) columns[i] = [];
-    displayed.forEach(r => {
-      columns[r.roll].push(r);
+  const FIXED_ROWS = 22;
+  const MINUTE_COLUMNS = 10;
+
+  // Group rounds by minute window (ex: 00-09, 10-19...) for fixed-column mode
+  const minuteColumns = useMemo(() => {
+    const newestDate = displayed[0] ? new Date(displayed[0].timestamp) : new Date();
+    const currentMinute = newestDate.getMinutes();
+    const windowStart = Math.floor(currentMinute / 10) * 10;
+
+    const labels = Array.from({ length: MINUTE_COLUMNS }, (_, index) => {
+      const minuteValue = (windowStart + index) % 60;
+      return String(minuteValue).padStart(2, '0');
     });
-    return columns;
+
+    const columnMap = new Map<string, BlazeRound[]>();
+    labels.forEach(label => columnMap.set(label, []));
+
+    const chronological = [...displayed].reverse();
+    chronological.forEach(round => {
+      const minuteLabel = String(new Date(round.timestamp).getMinutes()).padStart(2, '0');
+      const target = columnMap.get(minuteLabel);
+      if (target && target.length < FIXED_ROWS) {
+        target.push(round);
+      }
+    });
+
+    return labels.map(label => ({ label, rounds: columnMap.get(label) ?? [] }));
   }, [displayed]);
 
   const handleClickRound = useCallback((round: BlazeRound) => {
