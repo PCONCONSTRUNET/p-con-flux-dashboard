@@ -304,58 +304,57 @@ const LiveCatalog = () => {
       {columnView ? (
         /* Column view — fixed 22 slots per column */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto overflow-y-auto max-h-[500px]">
-          {(() => {
-            const fixedRows = 22;
-            const totalColumns = 15;
-
-            return (
-              <div className="grid gap-x-1 gap-y-1" style={{ gridTemplateColumns: `repeat(${totalColumns}, minmax(42px, 1fr))` }}>
-                {/* Headers */}
-                {Array.from({ length: totalColumns }, (_, col) => (
-                  <div key={`h-${col}`} className="text-center text-[10px] font-bold text-muted-foreground/60 pb-1 font-mono sticky top-0 z-10 bg-card/90 backdrop-blur-sm">
-                    {String(col).padStart(2, '0')}
-                  </div>
-                ))}
-
-                {/* Fixed rows (22) */}
-                {Array.from({ length: fixedRows }, (_, row) =>
-                  Array.from({ length: totalColumns }, (_, col) => {
-                    const colRounds = columnData[col].slice(0, fixedRows);
-                    const r = colRounds[row];
-
-                    if (r) {
-                      const style = colorStyles[r.color];
-                      const dimmed = highlighted && !isHighlighted(r);
-
-                      return (
-                        <div key={`${col}-${row}`} className="flex flex-col items-center">
-                          <div
-                            onClick={() => handleClickRound(r)}
-                            className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                              dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                            } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                          >
-                            <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>
-                          </div>
-                          {showTimestamps && (
-                            <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                              {formatTime(r.timestamp)}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div key={`${col}-${row}`} className="flex items-center justify-center">
-                        <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/10" />
-                      </div>
-                    );
-                  })
-                )}
+          <div
+            className="grid gap-x-1 gap-y-1 min-w-fit"
+            style={{ gridTemplateColumns: `repeat(${minuteColumns.length}, minmax(42px, 1fr))` }}
+          >
+            {/* Headers: minute labels */}
+            {minuteColumns.map((column) => (
+              <div
+                key={`h-${column.label}`}
+                className="text-center text-[10px] font-bold text-muted-foreground/70 pb-1 font-mono sticky top-0 z-10 bg-card/90 backdrop-blur-sm"
+              >
+                {column.label}
               </div>
-            );
-          })()}
+            ))}
+
+            {/* Fixed rows (22) per minute column */}
+            {Array.from({ length: FIXED_ROWS }, (_, row) =>
+              minuteColumns.map((column, colIndex) => {
+                const r = column.rounds[row];
+
+                if (r) {
+                  const style = colorStyles[r.color];
+                  const dimmed = highlighted && !isHighlighted(r);
+
+                  return (
+                    <div key={`${column.label}-${row}-${colIndex}`} className="flex flex-col items-center">
+                      <div
+                        onClick={() => handleClickRound(r)}
+                        className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                          dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                        } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                      >
+                        {showNumbers && <span className={`text-[10px] font-bold ${style.text}`}>{r.roll}</span>}
+                        {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+                      </div>
+                      {showTimestamps && (
+                        <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                          {formatTime(r.timestamp)}
+                        </span>
+                      )}
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={`${column.label}-${row}-${colIndex}`} className="flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/10" />
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       ) : (
         /* Grid view — 22 per row */
