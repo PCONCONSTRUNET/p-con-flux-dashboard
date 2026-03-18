@@ -214,8 +214,8 @@ const LiveCatalog = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      {showFilters && (
+      {/* Filters - only for active subscriptions */}
+      {showFilters && hasActiveSubscription && (
         <div className="rounded-2xl p-3 lg:p-4 border border-border/50 bg-card/80 backdrop-blur-sm animate-slide-up flex flex-col lg:flex-row gap-4">
           <div className="flex-1 space-y-3 lg:space-y-4">
             {/* Round limits */}
