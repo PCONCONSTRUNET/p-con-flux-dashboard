@@ -34,13 +34,19 @@ export default function UpgradeModal() {
     navigate(`/client/checkout?plan=${plan}`);
   };
 
+  const handleCloseModal = () => setShowUpgradeModal(false);
+
   if (!showUpgradeModal) return null;
 
   const canDismiss = true;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center p-4"
+      onClick={handleCloseModal}
+    >
       <div
+        onClick={(e) => e.stopPropagation()}
         className="w-full max-w-md rounded-3xl border border-border/20 animate-scale-in relative overflow-hidden"
         style={{
           background: 'linear-gradient(180deg, hsla(240,6%,13%,0.99) 0%, hsla(240,6%,7%,1) 100%)',
@@ -58,7 +64,8 @@ export default function UpgradeModal() {
 
         {canDismiss && (
           <button
-            onClick={() => setShowUpgradeModal(false)}
+            type="button"
+            onClick={handleCloseModal}
             className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-muted/10 border border-border/20 flex items-center justify-center text-muted-foreground/40 hover:text-foreground hover:bg-muted/20 transition-all z-10"
           >
             <X size={16} />

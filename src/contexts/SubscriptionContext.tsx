@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, useRef, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -26,10 +26,12 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [userDismissed, setUserDismissed] = useState(false);
+  const userDismissedRef = useRef(false);
 
   const handleSetShowUpgradeModal = (show: boolean) => {
-    if (!show) setUserDismissed(true);
+    if (!show) {
+      userDismissedRef.current = true;
+    }
     setShowUpgradeModal(show);
   };
 
@@ -75,11 +77,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
         setSubscription(sub);
 
-        if (isExpired && !userDismissed) {
+        if (isExpired && !userDismissedRef.current) {
           setShowUpgradeModal(true);
         }
       } else {
-        if (!userDismissed) {
+        if (!userDismissedRef.current) {
           setShowUpgradeModal(true);
         }
       }
