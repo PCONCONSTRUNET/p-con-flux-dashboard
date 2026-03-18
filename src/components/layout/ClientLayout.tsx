@@ -179,8 +179,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Bottom nav - mobile */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-border/50 flex justify-around py-1.5 z-40 backdrop-blur-xl"
-        style={{ background: 'linear-gradient(180deg, hsla(240,6%,7%,0.92) 0%, hsla(240,6%,5%,0.98) 100%)' }}>
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-border/50 flex justify-around py-2 z-40 backdrop-blur-xl"
+        style={{ background: 'linear-gradient(180deg, hsla(240,6%,7%,0.95) 0%, hsla(240,6%,5%,0.98) 100%)', paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         {navItems.map(item => {
           const locked = item.requiresSub && !hasActiveSubscription;
