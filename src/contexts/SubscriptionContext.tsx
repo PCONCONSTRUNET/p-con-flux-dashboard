@@ -93,7 +93,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const hasActiveSubscription = !!subscription && !subscription.isExpired && subscription.is_active;
 
   return (
-    <SubscriptionContext.Provider value={{ subscription, loading, showUpgradeModal, setShowUpgradeModal, hasActiveSubscription }}>
+    <SubscriptionContext.Provider value={{ subscription, loading, showUpgradeModal, setShowUpgradeModal: handleSetShowUpgradeModal, hasActiveSubscription }}>
       {children}
     </SubscriptionContext.Provider>
   );
