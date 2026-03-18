@@ -217,7 +217,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-md bg-primary text-primary-foreground font-display font-semibold text-sm tracking-wider hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 glow-primary"
+                className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-display font-semibold text-sm tracking-wider hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 glow-primary"
               >
                 {loading ? 'CADASTRANDO...' : 'CADASTRAR'}
               </button>
