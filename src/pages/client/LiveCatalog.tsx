@@ -148,10 +148,10 @@ const LiveCatalog = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold text-foreground tracking-tight">Catalogador</h1>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className={`w-1.5 h-1.5 rounded-full ${realtime ? 'bg-emerald-400 animate-pulse' : 'bg-muted-foreground/30'}`} />
+             <div className="flex items-center gap-1.5 mt-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[10px] text-muted-foreground tracking-widest uppercase font-semibold">
-                {realtime ? 'Tempo real' : 'Pausado'}
+                Tempo real
               </span>
             </div>
           </div>
