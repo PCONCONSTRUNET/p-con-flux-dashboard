@@ -3,6 +3,7 @@ import { Crown, Zap, X, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import fluxFlame from '@/assets/flux-flame.png';
 import pconLogo from '@/assets/pcon-flux-logo.png';
 
 export default function UpgradeModal() {
@@ -92,7 +93,7 @@ export default function UpgradeModal() {
                 className="w-11 h-11 shrink-0 rounded-xl border border-primary/25 flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.15) 0%, hsla(187,100%,50%,0.05) 100%)' }}
               >
-                <Zap size={20} className="text-primary" />
+                <img src={fluxFlame} alt="" className="w-6 h-6 object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX MENSAL</p>
@@ -122,7 +123,7 @@ export default function UpgradeModal() {
                 className="w-11 h-11 shrink-0 rounded-xl border border-emerald-400/25 flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, hsla(155,80%,50%,0.15) 0%, hsla(155,80%,50%,0.05) 100%)' }}
               >
-                <Crown size={20} className="text-emerald-400" />
+                <img src={fluxFlame} alt="" className="w-6 h-6 object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX ANUAL</p>
