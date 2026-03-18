@@ -64,42 +64,16 @@ const LiveCatalog = () => {
     };
   }, [rounds, limit]);
 
-  const MAX_PER_MINUTE = 2; // ~2 results per minute column
-
-  // Group rounds into 10-minute blocks, each block = horizontal strip
-  // Newest block on top, older blocks push down
-  const minuteBlocks = useMemo(() => {
-    type Block = { key: string; label: string; columns: BlazeRound[][] };
-
-    const blockMap = new Map<string, Block>();
-
-    // Process oldest first so they fill top-down within each column
+  // Group rounds by last digit of minute (columns 00-09)
+  const minuteDigitColumns = useMemo(() => {
+    const columns: BlazeRound[][] = Array.from({ length: 10 }, () => []);
+    // Oldest first so they stack top-down
     const chronological = [...displayed].reverse();
-
     chronological.forEach(round => {
-      const d = new Date(round.timestamp);
-      const hour = d.getHours();
-      const minute = d.getMinutes();
-      const decade = Math.floor(minute / 10);
-      const digitInBlock = minute % 10;
-
-      const blockKey = `${String(hour).padStart(2, '0')}:${decade}`;
-      const blockLabel = `${String(hour).padStart(2, '0')}:${decade}0`;
-
-      if (!blockMap.has(blockKey)) {
-        blockMap.set(blockKey, {
-          key: blockKey,
-          label: blockLabel,
-          columns: Array.from({ length: 10 }, () => []),
-        });
-      }
-
-      const block = blockMap.get(blockKey)!;
-      block.columns[digitInBlock].push(round);
+      const digit = new Date(round.timestamp).getMinutes() % 10;
+      columns[digit].push(round);
     });
-
-    // Newest first
-    return Array.from(blockMap.values()).reverse();
+    return columns;
   }, [displayed]);
 
   const handleClickRound = useCallback((round: BlazeRound) => {
