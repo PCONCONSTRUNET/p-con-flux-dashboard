@@ -181,26 +181,38 @@ export default function Integrations() {
                   <div className="space-y-2">
                     <Label className="text-[11px] font-display font-semibold text-muted-foreground/60">
                       Plano Mensal
-                      <span className="text-muted-foreground/30 ml-1 font-normal">(preapproval_plan_id)</span>
+                      <span className="text-muted-foreground/30 ml-1 font-normal">(valor em R$)</span>
                     </Label>
-                    <Input
-                      placeholder="2c93808494..."
-                      value={config.monthlyPlanId}
-                      onChange={(e) => setConfig(prev => ({ ...prev, monthlyPlanId: e.target.value }))}
-                      className="bg-background/40 border-border/15 text-xs font-mono placeholder:text-muted-foreground/15 focus:border-primary/30 focus:bg-background/60 h-11 rounded-xl transition-all"
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground/40 font-display font-bold">R$</span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="49.90"
+                        value={config.monthlyPrice}
+                        onChange={(e) => setConfig(prev => ({ ...prev, monthlyPrice: e.target.value }))}
+                        className="bg-background/40 border-border/15 text-xs pl-10 font-mono placeholder:text-muted-foreground/15 focus:border-primary/30 focus:bg-background/60 h-11 rounded-xl transition-all"
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[11px] font-display font-semibold text-muted-foreground/60">
                       Plano Anual
-                      <span className="text-muted-foreground/30 ml-1 font-normal">(preapproval_plan_id)</span>
+                      <span className="text-muted-foreground/30 ml-1 font-normal">(valor em R$)</span>
                     </Label>
-                    <Input
-                      placeholder="2c93808494..."
-                      value={config.annualPlanId}
-                      onChange={(e) => setConfig(prev => ({ ...prev, annualPlanId: e.target.value }))}
-                      className="bg-background/40 border-border/15 text-xs font-mono placeholder:text-muted-foreground/15 focus:border-primary/30 focus:bg-background/60 h-11 rounded-xl transition-all"
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground/40 font-display font-bold">R$</span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="399.90"
+                        value={config.annualPrice}
+                        onChange={(e) => setConfig(prev => ({ ...prev, annualPrice: e.target.value }))}
+                        className="bg-background/40 border-border/15 text-xs pl-10 font-mono placeholder:text-muted-foreground/15 focus:border-primary/30 focus:bg-background/60 h-11 rounded-xl transition-all"
+                      />
+                    </div>
                   </div>
                 </div>
               </section>
