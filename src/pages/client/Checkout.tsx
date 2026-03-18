@@ -478,8 +478,11 @@ export default function Checkout() {
                   <button
                     onClick={handleGeneratePix}
                     disabled={processing}
-                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-display font-bold tracking-wide text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                    style={{ boxShadow: '0 4px 20px hsla(187, 100%, 50%, 0.25)' }}
+                    className="w-full h-12 rounded-xl font-display font-bold tracking-wide text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+                    style={{
+                      background: 'linear-gradient(135deg, hsl(187, 100%, 45%), hsl(187, 100%, 35%))',
+                      boxShadow: '0 4px 25px hsla(187, 100%, 50%, 0.35), inset 0 1px 0 hsla(0,0%,100%,0.15)',
+                    }}
                   >
                     {processing ? (
                       <>
