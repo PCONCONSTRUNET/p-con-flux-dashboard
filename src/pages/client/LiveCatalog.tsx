@@ -63,6 +63,7 @@ const Stone = ({
 };
 
 const LiveCatalog = () => {
+  const { hasActiveSubscription, setShowUpgradeModal } = useSubscription();
   const [rounds, setRounds] = useState<BlazeRound[]>(mockBlazeRounds);
   const [limit, setLimit] = useState<number>(200);
   const [colorFilter, setColorFilter] = useState<BlazeColor | 'all'>('all');
