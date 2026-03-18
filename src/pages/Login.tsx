@@ -158,59 +158,59 @@ const Login = () => {
 
           {/* REGISTER FORM */}
           {mode === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-5">
+            <form onSubmit={handleRegister} className="space-y-3.5">
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Nome completo</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Nome completo</label>
                 <input
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Seu nome"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Email</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="seu@email.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Senha</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Senha</label>
                 <input
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Mínimo 6 caracteres"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Confirmar senha</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Confirmar senha</label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Repita a senha"
                 />
               </div>
 
               {error && (
-                <div className="text-sm text-secondary bg-secondary/10 border border-secondary/20 rounded-md px-3 py-2">
+                <div className="text-xs text-secondary bg-secondary/10 border border-secondary/20 rounded-md px-3 py-1.5">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="text-sm text-primary bg-primary/10 border border-primary/20 rounded-md px-3 py-2">
+                <div className="text-xs text-primary bg-primary/10 border border-primary/20 rounded-md px-3 py-1.5">
                   {success}
                 </div>
               )}
@@ -218,7 +218,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-[20px] text-white font-display font-semibold text-sm tracking-wider active:scale-[0.98] transition-all disabled:opacity-50 hover:animate-pulse-glow hover:bg-right"
+                className="w-full py-2.5 rounded-[16px] text-white font-display font-semibold text-xs tracking-wider active:scale-[0.98] transition-all disabled:opacity-50 hover:animate-pulse-glow hover:bg-right"
                 style={{ backgroundImage: 'linear-gradient(30deg, #0400ff, #4ce3f7)', backgroundSize: '100% auto', transition: 'background-size 0.3s, background-position 0.3s' }}
               >
                 {loading ? 'CADASTRANDO...' : 'CADASTRAR'}
