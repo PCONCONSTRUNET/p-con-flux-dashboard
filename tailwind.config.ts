@@ -14,10 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Rajdhani", "sans-serif"],
-        body: ["Plus Jakarta Sans", "sans-serif"],
-        sans: ["Plus Jakarta Sans", "sans-serif"],
-        mono: ["Plus Jakarta Sans", "sans-serif"],
+        display: ["Orbitron", "sans-serif"],
+        body: ["Inter", "sans-serif"],
+        sans: ["Inter", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
