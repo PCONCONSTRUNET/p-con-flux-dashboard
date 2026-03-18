@@ -374,7 +374,7 @@ export default function Checkout() {
                       </>
                     ) : (
                       <>
-                        <QrCode size={16} />
+                        <img src={iconPix} alt="PIX" className="w-5 h-5" />
                         Gerar PIX • R$ {price}
                       </>
                     )}
