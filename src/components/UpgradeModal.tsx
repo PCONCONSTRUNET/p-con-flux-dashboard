@@ -93,7 +93,7 @@ export default function UpgradeModal() {
                 className="w-11 h-11 shrink-0 rounded-xl border border-primary/25 flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.15) 0%, hsla(187,100%,50%,0.05) 100%)' }}
               >
-                <Zap size={20} className="text-primary" />
+                <img src={fluxFlame} alt="" className="w-6 h-6 object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX MENSAL</p>
