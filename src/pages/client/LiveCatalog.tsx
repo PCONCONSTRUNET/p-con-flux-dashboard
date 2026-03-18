@@ -22,7 +22,7 @@ const LiveCatalog = () => {
   const [showNumbers, setShowNumbers] = useState(true);
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [highlightMode, setHighlightMode] = useState<'same_number' | 'same_color'>('same_color');
-  
+  const [fixedColumns, setFixedColumns] = useState(false);
 
   // Simulate real-time incoming rounds
   useEffect(() => {
@@ -209,6 +209,18 @@ const LiveCatalog = () => {
               </div>
               <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Numerado</span>
             </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={fixedColumns}
+                onChange={() => setFixedColumns(!fixedColumns)}
+                className="sr-only peer"
+              />
+              <div className="w-8 h-4 rounded-full bg-muted/50 peer-checked:bg-primary/30 relative transition-all">
+                <div className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${fixedColumns ? 'left-[18px] bg-primary' : 'left-0.5 bg-muted-foreground/50'}`} />
+              </div>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Coluna fixa</span>
+            </label>
           </div>
 
           {/* Highlight mode */}
@@ -280,56 +292,83 @@ const LiveCatalog = () => {
         </div>
       </div>
 
-      {/* Fixed columns view — 10 columns (00-09), 2 stones per minute side by side */}
-      <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px]">
-        {/* All 20 stones in one row: header on top spanning each pair */}
-        <div className="flex items-start gap-0">
-          {minuteDigitColumns.map((colRounds, col) => (
-            <div key={`minute-col-${col}`} className="flex flex-col items-center">
-              {/* Minute header centered over the 2 stones */}
-              <div className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono mb-1 w-full">
-                {String(col).padStart(2, '0')}
-              </div>
-              {/* 2 stones side by side, no gap */}
-              <div className="flex items-start gap-0">
-                {Array.from({ length: MAX_PER_MINUTE }, (_, slot) => {
-                  const r = colRounds[slot];
-
-                  if (r) {
-                    const style = colorStyles[r.color];
-                    const dimmed = highlighted && !isHighlighted(r);
-
-                    return (
-                      <div key={`${col}-${slot}`} className="flex flex-col items-center">
-                        <div
-                          onClick={() => handleClickRound(r)}
-                          className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                            dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                          } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                        >
-                          {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
-                          {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+      {fixedColumns ? (
+        /* Fixed columns — 10 columns (00-09), 2 stones per minute side by side */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[600px]">
+          <div className="flex items-start gap-0">
+            {minuteDigitColumns.map((colRounds, col) => (
+              <div key={`minute-col-${col}`} className="flex flex-col items-center">
+                <div className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono mb-1 w-full">
+                  {String(col).padStart(2, '0')}
+                </div>
+                <div className="flex items-start gap-0">
+                  {Array.from({ length: MAX_PER_MINUTE }, (_, slot) => {
+                    const r = colRounds[slot];
+                    if (r) {
+                      const style = colorStyles[r.color];
+                      const dimmed = highlighted && !isHighlighted(r);
+                      return (
+                        <div key={`${col}-${slot}`} className="flex flex-col items-center">
+                          <div
+                            onClick={() => handleClickRound(r)}
+                            className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                              dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                            } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                          >
+                            {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
+                          </div>
+                          {showTimestamps && (
+                            <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                              {formatTime(r.timestamp)}
+                            </span>
+                          )}
                         </div>
-                        {showTimestamps && (
-                          <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                            {formatTime(r.timestamp)}
-                          </span>
-                        )}
+                      );
+                    }
+                    return (
+                      <div key={`${col}-${slot}`} className="flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
                       </div>
                     );
-                  }
-
-                  return (
-                    <div key={`${col}-${slot}`} className="flex items-center justify-center">
-                      <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
-                    </div>
-                  );
-                })}
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Grid view — 22 per row */
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-y-auto max-h-[500px] overflow-x-auto">
+          <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(22, minmax(0, 1fr))' }}>
+            {displayed.map((r) => {
+              const style = colorStyles[r.color];
+              const dimmed = highlighted && !isHighlighted(r);
+              const time = formatTime(r.timestamp);
+              return (
+                <div
+                  key={r.id}
+                  onClick={() => handleClickRound(r)}
+                  className="flex flex-col items-center cursor-pointer group"
+                >
+                  <div
+                    className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center transition-all duration-200 ${
+                      dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                    } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                  >
+                    {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
+                    {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+                  </div>
+                  {showTimestamps && (
+                    <span className={`text-[8px] mt-0.5 font-mono transition-opacity ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
+                      {time}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
