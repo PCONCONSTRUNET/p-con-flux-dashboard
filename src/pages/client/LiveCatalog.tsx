@@ -343,8 +343,8 @@ const LiveCatalog = () => {
                     if (!r) {
                       return (
                         <div key={`empty-${rowIdx}-${col}-${slot}`} className="flex-1">
-                          <div className="w-full aspect-square rounded-md border border-border/20 bg-muted/8" />
-                          {showTimestamps && <div className="h-[14px]" />}
+                          <div className="w-full rounded-md border border-border/20 bg-muted/8" style={{ height: '65px' }} />
+                          {showTimestamps && <div className="h-[18px]" />}
                         </div>
                       );
                     }
