@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { User, Mail, LogOut, Phone, Send, Save, Check, Clock, Crown, Zap, Calendar } from 'lucide-react';
+import { User, Mail, LogOut, Phone, Send, Save, Check, Clock, Crown, Zap, Calendar, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -104,33 +104,35 @@ const Profile = () => {
         </div>
 
         {/* Plan */}
-        <div className={`flex items-center gap-4 backdrop-blur-sm rounded-2xl p-4 border ${plan.border} ${plan.bg}`}>
-          <div className={`w-10 h-10 rounded-xl ${plan.bg} border ${plan.border} flex items-center justify-center`}>
-            <PlanIcon size={18} className={plan.color} />
+        <div className={`flex items-center gap-4 backdrop-blur-sm rounded-2xl p-4 border ${subscription?.isExpired ? 'border-secondary/20 bg-secondary/10' : `${plan.border} ${plan.bg}`}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${subscription?.isExpired ? 'bg-secondary/10 border border-secondary/20' : `${plan.bg} border ${plan.border}`}`}>
+            {subscription?.isExpired ? <AlertTriangle size={18} className="text-secondary" /> : <PlanIcon size={18} className={plan.color} />}
           </div>
           <div className="flex-1">
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold">Plano</p>
-            <p className={`text-sm font-bold mt-0.5 ${plan.color}`}>{plan.label}</p>
+            <p className={`text-sm font-bold mt-0.5 ${subscription?.isExpired ? 'text-secondary' : plan.color}`}>
+              {subscription?.isExpired ? `${plan.label} — Expirado` : plan.label}
+            </p>
           </div>
         </div>
 
         {/* Subscription Time */}
-        {subscription && (
-          <div className="flex items-center gap-4 bg-card/40 backdrop-blur-sm rounded-2xl p-4 border border-border/20">
-            <div className="w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
-              <Calendar size={18} className="text-muted-foreground/60" />
-            </div>
-            <div className="flex-1">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold">Tempo Restante</p>
-              <p className={`text-sm font-bold mt-0.5 ${subscription.isExpired ? 'text-secondary' : 'text-emerald-400'}`}>
-                {subscription.isExpired ? '⚠ Expirado' : `⏱ ${subscription.timeRemaining}`}
-              </p>
-              <p className="text-[10px] text-muted-foreground/40 mt-0.5">
-                Expira: {new Date(subscription.expires_at).toLocaleDateString('pt-BR')} às {new Date(subscription.expires_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-              </p>
-            </div>
+        <div className={`flex items-center gap-4 backdrop-blur-sm rounded-2xl p-4 border ${subscription?.isExpired ? 'border-secondary/20 bg-secondary/5' : 'border-border/20 bg-card/40'}`}>
+          <div className="w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
+            <Calendar size={18} className="text-muted-foreground/60" />
           </div>
-        )}
+          <div className="flex-1">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold">Tempo Restante</p>
+            <p className={`text-sm font-bold mt-0.5 ${subscription?.isExpired ? 'text-secondary' : 'text-emerald-400'}`}>
+              {subscription?.isExpired ? '⚠ Plano Expirado' : subscription ? `⏱ ${subscription.timeRemaining}` : '⚠ Sem plano ativo'}
+            </p>
+            {subscription && (
+              <p className="text-[10px] text-muted-foreground/40 mt-0.5">
+                {subscription.isExpired ? 'Expirou' : 'Expira'}: {new Date(subscription.expires_at).toLocaleDateString('pt-BR')} às {new Date(subscription.expires_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Contacts */}
