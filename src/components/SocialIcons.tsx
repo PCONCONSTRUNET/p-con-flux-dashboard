@@ -14,6 +14,7 @@ const socials = [
   {
     name: 'Instagram',
     key: 'instagram',
+    link: '#',
     color: 'rgba(228, 64, 95, 0.6)',
     gradient: 'linear-gradient(135deg, #3d0a1a, #833ab4, #e4405f, #fcaf45)',
     icon: (
