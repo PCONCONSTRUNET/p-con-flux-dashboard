@@ -1,30 +1,58 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, CheckCircle2, XCircle, Clock, TrendingUp } from 'lucide-react';
-import { mockSignals, mockBlazeRounds, type SignalResult } from '@/data/mockData';
+import { mockBlazeRounds, type SignalResult, type Signal } from '@/data/mockData';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import LockedFeature from '@/components/LockedFeature';
+import { supabase } from '@/integrations/supabase/client';
 
 const History = () => {
   const { hasActiveSubscription } = useSubscription();
   const [tab, setTab] = useState<'signals' | 'rounds'>('signals');
   const [search, setSearch] = useState('');
   const [resultFilter, setResultFilter] = useState<'all' | SignalResult>('all');
+  const [allSignals, setAllSignals] = useState<Signal[]>([]);
+
+  // Load all signals (including archived) from DB
+  useEffect(() => {
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('signals')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(500);
+
+      if (!error && data) {
+        const mapped: Signal[] = data.map((s: any) => ({
+          id: s.id,
+          type: s.signal_type,
+          entry: s.entry,
+          protection: s.protection,
+          result: s.result,
+          timestamp: s.created_at,
+          rounds: s.rounds,
+          target: s.target,
+        }));
+        setAllSignals(mapped);
+      }
+    };
+    load();
+  }, []);
 
   const filteredSignals = useMemo(() => {
-    return mockSignals.filter(s => {
+    return allSignals.filter(s => {
       if (resultFilter !== 'all' && s.result !== resultFilter) return false;
       if (search && !s.entry.toLowerCase().includes(search.toLowerCase()) && !s.type.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [search, resultFilter]);
+  }, [search, resultFilter, allSignals]);
 
   const filteredRounds = useMemo(() => {
     return mockBlazeRounds.slice(0, 100);
   }, []);
 
-  const greenCount = mockSignals.filter(s => s.result === 'green').length;
-  const lossCount = mockSignals.filter(s => s.result === 'loss').length;
-  const winRate = mockSignals.length > 0 ? Math.round((greenCount / mockSignals.length) * 100) : 0;
+  const greenCount = allSignals.filter(s => s.result === 'green').length;
+  const lossCount = allSignals.filter(s => s.result === 'loss').length;
+  const winRate = allSignals.length > 0 ? Math.round((greenCount / allSignals.length) * 100) : 0;
 
   if (!hasActiveSubscription) {
     return <LockedFeature feature="Histórico de sinais e rodadas" />;
