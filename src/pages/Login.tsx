@@ -101,6 +101,24 @@ const Login = () => {
           </p>
         </div>
       </div>
+
+      {/* Legal Banner +18 */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 flex justify-center pb-4 px-4">
+        <div className="inline-flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 rounded-lg border border-foreground/20 backdrop-blur-sm bg-background/30">
+          <div className="flex-shrink-0">
+            <svg width="40" height="40" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="30" cy="30" r="28" stroke="hsl(var(--foreground))" strokeWidth="3" fill="none" />
+              <text x="30" y="34" textAnchor="middle" dominantBaseline="middle" fill="hsl(var(--foreground))" fontSize="20" fontWeight="700" fontFamily="sans-serif">18</text>
+              <text x="47" y="14" textAnchor="middle" dominantBaseline="middle" fill="hsl(var(--foreground))" fontSize="14" fontWeight="700" fontFamily="sans-serif">+</text>
+            </svg>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs sm:text-[13px] text-foreground/85">Promoções sujeitas a termos e condições</p>
+            <p className="text-xs sm:text-[13px] text-foreground font-bold">Jogue com responsabilidade, não há garantia de ganhos.</p>
+            <p className="text-xs sm:text-[13px] text-foreground/85">Apenas para maiores de 18 anos.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
