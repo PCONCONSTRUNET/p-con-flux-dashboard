@@ -103,18 +103,20 @@ const Patterns = () => {
     setShowForm(false);
   };
 
-  const toggleColor = (c: ColorToken) => {
-    setConfig(prev => ({
-      ...prev,
-      colors: prev.colors.includes(c) ? prev.colors.filter(x => x !== c) : [...prev.colors, c],
-    }));
+  const addColor = (c: ColorToken) => {
+    setConfig(prev => ({ ...prev, colors: [...prev.colors, c] }));
   };
 
-  const toggleNumber = (n: number) => {
-    setConfig(prev => ({
-      ...prev,
-      numbers: prev.numbers.includes(n) ? prev.numbers.filter(x => x !== n) : [...prev.numbers, n],
-    }));
+  const removeColorAt = (index: number) => {
+    setConfig(prev => ({ ...prev, colors: prev.colors.filter((_, i) => i !== index) }));
+  };
+
+  const addNumber = (n: number) => {
+    setConfig(prev => ({ ...prev, numbers: [...prev.numbers, n] }));
+  };
+
+  const removeNumberAt = (index: number) => {
+    setConfig(prev => ({ ...prev, numbers: prev.numbers.filter((_, i) => i !== index) }));
   };
 
   const toggleStatus = (id: string) => {
