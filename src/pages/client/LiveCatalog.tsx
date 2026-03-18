@@ -301,50 +301,49 @@ const LiveCatalog = () => {
       </div>
 
       {fixedColumns ? (
-        /* Fixed columns — 10 columns (00-09), slots fill top-to-bottom */
+        /* Fixed columns — table style, 10 columns (00-09) with persistent slots */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
-          <div className="inline-flex items-start gap-1">
-            {minuteDigitColumns.map((colRounds, col) => {
-              const totalRows = Math.max(FIXED_ROWS, colRounds.length);
-              return (
-                <div key={`minute-col-${col}`} className="flex flex-col items-center flex-shrink-0">
-                  <div className="text-center text-[10px] font-bold text-muted-foreground/60 font-mono mb-1 w-9">
-                    {String(col).padStart(2, '0')}
-                  </div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    {Array.from({ length: totalRows }, (_, row) => {
-                      const r = colRounds[row];
-                      if (r) {
-                        const style = colorStyles[r.color];
-                        const dimmed = highlighted && !isHighlighted(r);
-                        return (
-                          <div key={`${col}-${row}`} className="flex flex-col items-center">
-                            <div
-                              onClick={() => handleClickRound(r)}
-                              className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                                dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
-                              } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
-                            >
-                              {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
-                            </div>
-                            {showTimestamps && (
-                              <span className={`text-[7px] font-mono ${dimmed ? 'opacity-10' : 'text-muted-foreground/40'}`}>
-                                {formatTime(r.timestamp)}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      }
-                      return (
-                        <div key={`${col}-${row}`}>
-                          <div className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
-                        </div>
-                      );
-                    })}
-                  </div>
+          <div className="min-w-max">
+            <div className="grid grid-cols-10 gap-1.5 mb-1.5">
+              {Array.from({ length: 10 }, (_, col) => (
+                <div
+                  key={`minute-head-${col}`}
+                  className="w-9 text-center text-[10px] font-bold text-muted-foreground/60 font-mono"
+                >
+                  {String(col).padStart(2, '0')}
                 </div>
-              );
-            })}
+              ))}
+            </div>
+
+            <div className="grid grid-cols-10 gap-1.5">
+              {Array.from({ length: fixedRowsCount }, (_, row) =>
+                Array.from({ length: 10 }, (_, col) => {
+                  const r = minuteDigitColumns[col][row];
+
+                  if (!r) {
+                    return (
+                      <div key={`slot-${col}-${row}`} className="w-9 h-9 rounded-lg border border-border/15 bg-muted/5" />
+                    );
+                  }
+
+                  const style = colorStyles[r.color];
+                  const dimmed = highlighted && !isHighlighted(r);
+
+                  return (
+                    <div
+                      key={r.id}
+                      onClick={() => handleClickRound(r)}
+                      className={`w-9 h-9 rounded-lg ${style.bg} ring-1 ${style.ring} flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                        dimmed ? 'opacity-20 scale-90' : 'opacity-100 hover:scale-110'
+                      } ${r.id === highlighted ? 'ring-primary ring-2 scale-110' : ''}`}
+                    >
+                      {showNumbers && <span className={`text-[11px] font-bold ${style.text}`}>{r.roll}</span>}
+                      {!showNumbers && r.color === 'white' && <div className="w-2 h-2 rounded-full bg-secondary/60" />}
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       ) : (
