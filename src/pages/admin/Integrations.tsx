@@ -17,8 +17,8 @@ export default function Integrations() {
     accessToken: '',
     publicKey: '',
     webhookUrl: '',
-    monthlyPlanId: '',
-    annualPlanId: '',
+    monthlyPrice: '',
+    annualPrice: '',
   });
 
   useEffect(() => {
