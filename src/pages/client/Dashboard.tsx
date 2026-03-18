@@ -86,25 +86,26 @@ const ClientDashboard = () => {
         setCurrentEntry(entry);
         setAnalysisState('pattern_found');
 
-        timeout = setTimeout(() => {
-          // Phase 3: Confirmed
-          setAnalysisState('confirmed');
-
           timeout = setTimeout(() => {
-            // Phase 4: Resolve and add to history
-            const isGreen = Math.random() > 0.25;
-            const newSignal: Signal = {
-              id: `s-${Date.now()}`,
-              type: 'Auto',
-              entry,
-              protection: `${maxGale} Gale${maxGale > 1 ? 's' : ''}`,
-              result: isGreen ? 'green' : 'loss',
-              timestamp: new Date().toISOString(),
-              rounds: Math.ceil(Math.random() * (maxGale + 1)),
-              target: 'Double'
-            };
-            setSignals((prev) => [newSignal, ...prev]);
-            setAnalysisState('idle');
+            // Phase 3: Confirmed
+            setAnalysisState('confirmed');
+
+            timeout = setTimeout(() => {
+              // Phase 4: Resolve and add to history + save to DB
+              const isGreen = Math.random() > 0.25;
+              const newSignal: Signal = {
+                id: `s-${Date.now()}`,
+                type: 'Auto',
+                entry,
+                protection: `${maxGale} Gale${maxGale > 1 ? 's' : ''}`,
+                result: isGreen ? 'green' : 'loss',
+                timestamp: new Date().toISOString(),
+                rounds: Math.ceil(Math.random() * (maxGale + 1)),
+                target: 'Double'
+              };
+              setSignals((prev) => [newSignal, ...prev]);
+              saveSignalToDB(newSignal);
+              setAnalysisState('idle');
 
             // Restart cycle
             timeout = setTimeout(cycle, 2000);
