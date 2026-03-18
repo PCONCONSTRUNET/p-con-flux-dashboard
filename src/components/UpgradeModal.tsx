@@ -123,7 +123,7 @@ export default function UpgradeModal() {
                 className="w-11 h-11 shrink-0 rounded-xl border border-emerald-400/25 flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, hsla(155,80%,50%,0.15) 0%, hsla(155,80%,50%,0.05) 100%)' }}
               >
-                <Crown size={20} className="text-emerald-400" />
+                <img src={fluxFlame} alt="" className="w-6 h-6 object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX ANUAL</p>
