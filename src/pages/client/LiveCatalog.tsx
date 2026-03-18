@@ -283,25 +283,31 @@ const LiveCatalog = () => {
 
       {/* Rounds display */}
       {columnView ? (
-        /* Column view — fixed grid with empty slots like Blaze reference */
+        /* Column view — fixed 22 slots per column */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-x-auto overflow-y-auto max-h-[500px]">
           {(() => {
-            const maxRows = Math.max(...Object.values(columnData).map(c => c.length), 1);
+            const fixedRows = 22;
+            const totalColumns = 15;
+
             return (
-              <div className="grid gap-x-1 gap-y-1" style={{ gridTemplateColumns: 'repeat(15, minmax(42px, 1fr))' }}>
+              <div className="grid gap-x-1 gap-y-1" style={{ gridTemplateColumns: `repeat(${totalColumns}, minmax(42px, 1fr))` }}>
                 {/* Headers */}
-                {Array.from({ length: 15 }, (_, col) => (
-                  <div key={`h-${col}`} className="text-center text-[10px] font-bold text-muted-foreground/60 pb-1 font-mono">
+                {Array.from({ length: totalColumns }, (_, col) => (
+                  <div key={`h-${col}`} className="text-center text-[10px] font-bold text-muted-foreground/60 pb-1 font-mono sticky top-0 z-10 bg-card/90 backdrop-blur-sm">
                     {String(col).padStart(2, '0')}
                   </div>
                 ))}
-                {/* Grid cells row by row */}
-                {Array.from({ length: maxRows }, (_, row) =>
-                  Array.from({ length: 15 }, (_, col) => {
-                    const r = columnData[col][row];
+
+                {/* Fixed rows (22) */}
+                {Array.from({ length: fixedRows }, (_, row) =>
+                  Array.from({ length: totalColumns }, (_, col) => {
+                    const colRounds = columnData[col].slice(0, fixedRows);
+                    const r = colRounds[row];
+
                     if (r) {
                       const style = colorStyles[r.color];
                       const dimmed = highlighted && !isHighlighted(r);
+
                       return (
                         <div key={`${col}-${row}`} className="flex flex-col items-center">
                           <div
@@ -320,9 +326,10 @@ const LiveCatalog = () => {
                         </div>
                       );
                     }
+
                     return (
                       <div key={`${col}-${row}`} className="flex items-center justify-center">
-                        <div className="w-9 h-9 rounded-lg border border-border/20 bg-[hsl(240_6%_10%)]" />
+                        <div className="w-9 h-9 rounded-lg border border-border/20 bg-muted/10" />
                       </div>
                     );
                   })
