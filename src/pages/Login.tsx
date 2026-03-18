@@ -53,22 +53,22 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4 pb-24 relative overflow-hidden">
       <LoginBackground />
 
-      <div className="w-full max-w-md animate-slide-up relative z-10">
-        <div className="flex flex-col items-center mb-8">
-          <img src={logo} alt="P-CON FLUX" className="w-40 h-40 object-contain mb-2" />
+      <div className="w-full max-w-sm animate-slide-up relative z-10">
+        <div className="flex flex-col items-center mb-5">
+          <img src={logo} alt="P-CON FLUX" className="w-28 h-28 object-contain mb-1" />
         </div>
 
-        <div className="rounded-3xl p-8 border border-foreground/15 backdrop-blur-2xl shadow-[0_0_40px_hsla(345,100%,50%,0.25),0_0_80px_hsla(187,100%,50%,0.08)] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsla(345, 100%, 50%, 0.22) 0%, hsla(240, 6%, 10%, 0.7) 35%, hsla(240, 6%, 12%, 0.65) 65%, hsla(187, 100%, 50%, 0.08) 100%)' }}>
+        <div className="rounded-2xl p-6 border border-foreground/15 backdrop-blur-2xl shadow-[0_0_40px_hsla(345,100%,50%,0.25),0_0_80px_hsla(187,100%,50%,0.08)] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsla(345, 100%, 50%, 0.22) 0%, hsla(240, 6%, 10%, 0.7) 35%, hsla(240, 6%, 12%, 0.65) 65%, hsla(187, 100%, 50%, 0.08) 100%)' }}>
           {/* Glass shine effect */}
-          <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{ background: 'linear-gradient(105deg, hsla(0, 0%, 100%, 0.08) 0%, transparent 40%, transparent 60%, hsla(0, 0%, 100%, 0.04) 100%)' }} />
+          <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: 'linear-gradient(105deg, hsla(0, 0%, 100%, 0.08) 0%, transparent 40%, transparent 60%, hsla(0, 0%, 100%, 0.04) 100%)' }} />
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
           <div className="relative z-10">
           {/* Tabs */}
-          <div className="flex mb-6 border-b border-border">
+          <div className="flex mb-4 border-b border-border">
             <button
               type="button"
               onClick={() => switchMode('login')}
-              className={`flex-1 pb-3 text-sm font-display font-semibold tracking-wider transition-colors relative ${
+              className={`flex-1 pb-2 text-xs font-display font-semibold tracking-wider transition-colors relative ${
                 mode === 'login'
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
@@ -82,7 +82,7 @@ const Login = () => {
             <button
               type="button"
               onClick={() => switchMode('register')}
-              className={`flex-1 pb-3 text-sm font-display font-semibold tracking-wider transition-colors relative ${
+              className={`flex-1 pb-2 text-xs font-display font-semibold tracking-wider transition-colors relative ${
                 mode === 'register'
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
@@ -97,25 +97,25 @@ const Login = () => {
 
           {/* LOGIN FORM */}
           {mode === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-5">
+            <form onSubmit={handleLogin} className="space-y-3.5">
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Email</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="seu@email.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Senha</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Senha</label>
                 <input
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="••••••••"
                 />
               </div>
@@ -126,14 +126,14 @@ const Login = () => {
                     type="checkbox"
                     checked={remember}
                     onChange={e => setRemember(e.target.checked)}
-                    className="w-4 h-4 rounded border-border bg-muted accent-primary"
+                    className="w-3.5 h-3.5 rounded border-border bg-muted accent-primary"
                   />
-                  <span className="text-sm text-muted-foreground">Lembrar acesso</span>
+                  <span className="text-xs text-muted-foreground">Lembrar acesso</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => navigate('/forgot-password')}
-                  className="text-sm text-primary hover:underline"
+                  className="text-xs text-primary hover:underline"
                 >
                   Esqueci a senha
                 </button>
@@ -148,7 +148,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-[20px] text-white font-display font-semibold text-sm tracking-wider active:scale-[0.98] transition-all disabled:opacity-50 hover:animate-pulse-glow hover:bg-right"
+                className="w-full py-2.5 rounded-[16px] text-white font-display font-semibold text-xs tracking-wider active:scale-[0.98] transition-all disabled:opacity-50 hover:animate-pulse-glow hover:bg-right"
                 style={{ backgroundImage: 'linear-gradient(30deg, #0400ff, #4ce3f7)', backgroundSize: '100% auto', transition: 'background-size 0.3s, background-position 0.3s' }}
               >
                 {loading ? 'ENTRANDO...' : 'ENTRAR'}
@@ -158,59 +158,59 @@ const Login = () => {
 
           {/* REGISTER FORM */}
           {mode === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-5">
+            <form onSubmit={handleRegister} className="space-y-3.5">
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Nome completo</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Nome completo</label>
                 <input
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Seu nome"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Email</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="seu@email.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Senha</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Senha</label>
                 <input
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Mínimo 6 caracteres"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Confirmar senha</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Confirmar senha</label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  className="w-full bg-muted/60 border border-border/60 rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+                  className="w-full bg-muted/60 border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
                   placeholder="Repita a senha"
                 />
               </div>
 
               {error && (
-                <div className="text-sm text-secondary bg-secondary/10 border border-secondary/20 rounded-md px-3 py-2">
+                <div className="text-xs text-secondary bg-secondary/10 border border-secondary/20 rounded-md px-3 py-1.5">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="text-sm text-primary bg-primary/10 border border-primary/20 rounded-md px-3 py-2">
+                <div className="text-xs text-primary bg-primary/10 border border-primary/20 rounded-md px-3 py-1.5">
                   {success}
                 </div>
               )}
@@ -218,7 +218,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-[20px] text-white font-display font-semibold text-sm tracking-wider active:scale-[0.98] transition-all disabled:opacity-50 hover:animate-pulse-glow hover:bg-right"
+                className="w-full py-2.5 rounded-[16px] text-white font-display font-semibold text-xs tracking-wider active:scale-[0.98] transition-all disabled:opacity-50 hover:animate-pulse-glow hover:bg-right"
                 style={{ backgroundImage: 'linear-gradient(30deg, #0400ff, #4ce3f7)', backgroundSize: '100% auto', transition: 'background-size 0.3s, background-position 0.3s' }}
               >
                 {loading ? 'CADASTRANDO...' : 'CADASTRAR'}
