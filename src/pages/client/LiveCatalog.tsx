@@ -318,9 +318,9 @@ const LiveCatalog = () => {
         /* Fixed columns — horizontal grid: rows = 10-min blocks, cols = 00-09, 2 stones per cell */
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 overflow-auto max-h-[600px]">
           {/* Header row */}
-          <div className="grid gap-2 mb-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 1fr))' }}>
+          <div className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, minmax(74px, 1fr))' }}>
             {Array.from({ length: 10 }, (_, col) => (
-              <div key={`head-${col}`} className="text-center text-[11px] font-bold text-muted-foreground/70 font-mono py-1.5 rounded-lg border border-border/30 bg-muted/15">
+              <div key={`head-${col}`} className="text-center text-[11px] font-bold text-muted-foreground/70 font-mono py-1.5 border border-border/30 bg-muted/15">
                 {String(col).padStart(2, '0')}
               </div>
             ))}
@@ -328,7 +328,7 @@ const LiveCatalog = () => {
 
           {/* Data rows — each row = 10-min block */}
           {fixedGrid.map((block, rowIdx) => (
-            <div key={`block-${rowIdx}`} className="grid gap-2 mb-2" style={{ gridTemplateColumns: 'repeat(10, minmax(80px, 1fr))' }}>
+            <div key={`block-${rowIdx}`} className="grid gap-0" style={{ gridTemplateColumns: 'repeat(10, minmax(74px, 1fr))' }}>
               {block.rounds.map((cell, col) => (
                 <div key={`cell-${rowIdx}-${col}`} className="flex gap-0.5 items-start justify-center">
                   {cell.map((r, slot) => {
