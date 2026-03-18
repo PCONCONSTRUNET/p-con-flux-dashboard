@@ -289,7 +289,7 @@ const LiveCatalog = () => {
         <div>
           <h2 className="text-sm font-bold text-foreground">Histórico</h2>
           <span className="text-[10px] text-muted-foreground">
-            Exibindo <span className="text-primary font-bold">{displayed.length}</span> rodadas
+            Exibindo <span className="text-primary font-bold">{fixedColumns ? fixedColumnSource.length : displayed.length}</span> rodadas
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground/50">
