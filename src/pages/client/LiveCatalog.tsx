@@ -195,13 +195,21 @@ const LiveCatalog = () => {
             <span className="text-xs font-bold text-primary">{clock}</span>
           </div>
           <button
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => {
+              if (!hasActiveSubscription) {
+                setShowUpgradeModal(true);
+                return;
+              }
+              setShowFilters(!showFilters);
+            }}
             className={`flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold px-2.5 lg:px-3 py-1.5 lg:py-2 rounded-xl border transition-all ${
-              showFilters ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
+              !hasActiveSubscription
+                ? 'bg-muted/20 text-muted-foreground/40 border-border/30 cursor-not-allowed'
+                : showFilters ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card/80 text-muted-foreground border-border/50 hover:text-foreground'
             }`}
           >
-            <Filter size={12} />
-            <span className="hidden sm:inline">Filtros</span>
+            {!hasActiveSubscription ? <Lock size={12} /> : <Filter size={12} />}
+            <span className="hidden sm:inline">{!hasActiveSubscription ? 'Bloqueado' : 'Filtros'}</span>
           </button>
         </div>
       </div>

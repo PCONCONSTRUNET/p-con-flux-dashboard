@@ -1,7 +1,8 @@
 import { ReactNode, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Zap, LayoutGrid, Clock, User, LogOut, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { Zap, LayoutGrid, Clock, User, LogOut, Menu, X, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const navItems = [
