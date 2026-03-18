@@ -58,7 +58,7 @@ const Login = () => {
           <img src={logo} alt="P-CON FLUX" className="w-40 h-40 object-contain mb-2" />
         </div>
 
-        <div className="rounded-2xl p-8 border border-foreground/15 backdrop-blur-2xl shadow-[0_0_40px_hsla(345,100%,50%,0.25),0_0_80px_hsla(187,100%,50%,0.08)] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsla(345, 100%, 50%, 0.22) 0%, hsla(240, 6%, 10%, 0.7) 35%, hsla(240, 6%, 12%, 0.65) 65%, hsla(187, 100%, 50%, 0.08) 100%)' }}>
+        <div className="rounded-3xl p-8 border border-foreground/15 backdrop-blur-2xl shadow-[0_0_40px_hsla(345,100%,50%,0.25),0_0_80px_hsla(187,100%,50%,0.08)] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsla(345, 100%, 50%, 0.22) 0%, hsla(240, 6%, 10%, 0.7) 35%, hsla(240, 6%, 12%, 0.65) 65%, hsla(187, 100%, 50%, 0.08) 100%)' }}>
           {/* Glass shine effect */}
           <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: 'linear-gradient(105deg, hsla(0, 0%, 100%, 0.08) 0%, transparent 40%, transparent 60%, hsla(0, 0%, 100%, 0.04) 100%)' }} />
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
