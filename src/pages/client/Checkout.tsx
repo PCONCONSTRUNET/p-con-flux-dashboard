@@ -432,7 +432,7 @@ export default function Checkout() {
   const planColor = plan === 'monthly' ? 'text-primary' : 'text-emerald-400';
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] bg-background flex items-start sm:items-center justify-center p-4 py-6 relative overflow-auto">
       <LoginBackground />
 
       <div className="w-full max-w-lg relative z-10">
