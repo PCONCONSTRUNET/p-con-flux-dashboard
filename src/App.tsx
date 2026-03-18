@@ -15,6 +15,7 @@ import ClientDashboard from "@/pages/client/Dashboard";
 import LiveCatalog from "@/pages/client/LiveCatalog";
 import History from "@/pages/client/History";
 import Profile from "@/pages/client/Profile";
+import Checkout from "@/pages/client/Checkout";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import Patterns from "@/pages/admin/Patterns";
 import PatternFlow from "@/pages/admin/PatternFlow";
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/client/catalog" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><LiveCatalog /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
             <Route path="/client/history" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><History /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
             <Route path="/client/profile" element={<ProtectedRoute role="client"><SubscriptionProvider><ClientLayout><UpgradeModal /><Profile /></ClientLayout></SubscriptionProvider></ProtectedRoute>} />
+            <Route path="/client/checkout" element={<ProtectedRoute role="client"><Checkout /></ProtectedRoute>} />
 
             {/* Admin routes */}
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout><AdminDashboard /></AdminLayout></ProtectedRoute>} />

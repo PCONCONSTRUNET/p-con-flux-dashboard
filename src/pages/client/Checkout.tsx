@@ -1,0 +1,330 @@
+import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { CreditCard, Lock, ArrowLeft, Loader2, CheckCircle2, Shield, Zap, Crown } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import pconLogo from '@/assets/pcon-flux-logo.png';
+
+declare global {
+  interface Window {
+    MercadoPago: any;
+  }
+}
+
+export default function Checkout() {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const plan = params.get('plan') as 'monthly' | 'annual' | null;
+
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [publicKey, setPublicKey] = useState('');
+  const [price, setPrice] = useState('');
+
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [docNumber, setDocNumber] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    if (!plan || !['monthly', 'annual'].includes(plan)) {
+      navigate('/client');
+      return;
+    }
+
+    const loadConfig = async () => {
+      const { data } = await supabase
+        .from('platform_settings')
+        .select('key, value')
+        .in('key', ['mp_public_key', 'mp_monthly_price', 'mp_annual_price']);
+
+      if (data) {
+        data.forEach(row => {
+          if (row.key === 'mp_public_key') setPublicKey(row.value);
+          if (row.key === 'mp_monthly_price' && plan === 'monthly') setPrice(row.value);
+          if (row.key === 'mp_annual_price' && plan === 'annual') setPrice(row.value);
+        });
+      }
+
+      // Get user email
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) setEmail(user.email);
+
+      setLoading(false);
+    };
+
+    loadConfig();
+  }, [plan, navigate]);
+
+  // Load MP SDK
+  useEffect(() => {
+    if (!publicKey) return;
+    const script = document.createElement('script');
+    script.src = 'https://sdk.mercadopago.com/js/v2';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, [publicKey]);
+
+  const formatCardNumber = (val: string) => {
+    const nums = val.replace(/\D/g, '').slice(0, 16);
+    return nums.replace(/(\d{4})(?=\d)/g, '$1 ');
+  };
+
+  const formatExpiry = (val: string) => {
+    const nums = val.replace(/\D/g, '').slice(0, 4);
+    if (nums.length >= 3) return `${nums.slice(0, 2)}/${nums.slice(2)}`;
+    return nums;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!plan) return;
+
+    const cleanCard = cardNumber.replace(/\s/g, '');
+    if (cleanCard.length < 13) { toast.error('Número do cartão inválido'); return; }
+    if (!cardName.trim()) { toast.error('Nome no cartão obrigatório'); return; }
+    if (expiry.length < 5) { toast.error('Validade inválida'); return; }
+    if (cvv.length < 3) { toast.error('CVV inválido'); return; }
+    if (docNumber.length < 11) { toast.error('CPF inválido'); return; }
+
+    setProcessing(true);
+
+    try {
+      // Create card token with MP SDK
+      const mp = new window.MercadoPago(publicKey);
+      const [expiryMonth, expiryYear] = expiry.split('/');
+
+      const tokenResponse = await mp.createCardToken({
+        cardNumber: cleanCard,
+        cardholderName: cardName,
+        cardExpirationMonth: expiryMonth,
+        cardExpirationYear: `20${expiryYear}`,
+        securityCode: cvv,
+        identificationType: 'CPF',
+        identificationNumber: docNumber.replace(/\D/g, ''),
+      });
+
+      if (!tokenResponse || !tokenResponse.id) {
+        toast.error('Erro ao processar cartão. Verifique os dados.');
+        setProcessing(false);
+        return;
+      }
+
+      // Send token to edge function
+      const { data, error } = await supabase.functions.invoke('create-subscription', {
+        body: {
+          plan,
+          card_token: tokenResponse.id,
+          email,
+          doc_number: docNumber.replace(/\D/g, ''),
+        },
+      });
+
+      if (error || data?.error) {
+        toast.error(data?.error || 'Erro ao processar pagamento.');
+        setProcessing(false);
+        return;
+      }
+
+      setSuccess(true);
+      toast.success('Assinatura realizada com sucesso!');
+
+      setTimeout(() => navigate('/client'), 3000);
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      toast.error(err?.message || 'Erro ao processar pagamento.');
+    }
+    setProcessing(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 size={32} className="text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="w-20 h-20 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center mx-auto">
+            <CheckCircle2 size={40} className="text-emerald-400" />
+          </div>
+          <h2 className="text-2xl font-display font-bold text-foreground">Pagamento Confirmado!</h2>
+          <p className="text-muted-foreground">Sua assinatura {plan === 'monthly' ? 'mensal' : 'anual'} foi ativada.</p>
+          <p className="text-sm text-muted-foreground/50">Redirecionando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const planLabel = plan === 'monthly' ? 'P-CON FLUX Mensal' : 'P-CON FLUX Anual';
+  const planDuration = plan === 'monthly' ? '30 dias' : '365 dias';
+  const PlanIcon = plan === 'monthly' ? Zap : Crown;
+  const planColor = plan === 'monthly' ? 'text-primary' : 'text-emerald-400';
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full opacity-[0.03] blur-[150px]" style={{ background: 'hsl(187, 100%, 50%)' }} />
+        <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] rounded-full opacity-[0.03] blur-[120px]" style={{ background: 'hsl(345, 100%, 50%)' }} />
+      </div>
+
+      <div className="w-full max-w-lg relative z-10">
+        {/* Back button */}
+        <button
+          onClick={() => navigate('/client')}
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+        >
+          <ArrowLeft size={16} />
+          Voltar
+        </button>
+
+        {/* Main Card */}
+        <div
+          className="rounded-2xl border border-border/20 overflow-hidden"
+          style={{ background: 'linear-gradient(160deg, hsl(240 5% 12%) 0%, hsl(240 5% 7%) 100%)', boxShadow: '0 25px 60px hsla(0,0%,0%,0.5)' }}
+        >
+          {/* Top glow */}
+          <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent" />
+
+          {/* Header */}
+          <div className="px-6 pt-6 pb-4 text-center border-b border-border/10">
+            <img src={pconLogo} alt="P-CON FLUX" className="w-16 h-16 object-contain mx-auto mb-3" />
+            <h1 className="text-lg font-display font-bold text-foreground">Checkout Seguro</h1>
+            <p className="text-sm text-muted-foreground/50 mt-1">Finalize sua assinatura</p>
+          </div>
+
+          {/* Plan Summary */}
+          <div className="px-6 py-4 border-b border-border/10" style={{ background: 'hsla(240, 5%, 8%, 0.5)' }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan === 'monthly' ? 'bg-primary/10 border border-primary/20' : 'bg-emerald-400/10 border border-emerald-400/20'}`}>
+                  <PlanIcon size={18} className={planColor} />
+                </div>
+                <div>
+                  <p className="text-sm font-display font-bold text-foreground">{planLabel}</p>
+                  <p className="text-xs text-muted-foreground/40">{planDuration}</p>
+                </div>
+              </div>
+              <p className={`text-xl font-display font-bold ${planColor}`}>
+                R$ {price}
+              </p>
+            </div>
+          </div>
+
+          {/* Card Form */}
+          <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+            {/* Card Number */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-display font-semibold text-muted-foreground/60">Número do Cartão</label>
+              <div className="relative">
+                <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/30" />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0000 0000 0000 0000"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                  className="w-full h-11 pl-10 pr-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Card Name */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-display font-semibold text-muted-foreground/60">Nome no Cartão</label>
+              <input
+                type="text"
+                placeholder="NOME COMO ESTÁ NO CARTÃO"
+                value={cardName}
+                onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* Expiry + CVV */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-display font-semibold text-muted-foreground/60">Validade</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="MM/AA"
+                  value={expiry}
+                  onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                  className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-display font-semibold text-muted-foreground/60">CVV</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="000"
+                    maxLength={4}
+                    value={cvv}
+                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    className="w-full h-11 px-4 pr-10 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+                  />
+                  <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/20" />
+                </div>
+              </div>
+            </div>
+
+            {/* CPF */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-display font-semibold text-muted-foreground/60">CPF do Titular</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="000.000.000-00"
+                value={docNumber}
+                onChange={(e) => {
+                  const nums = e.target.value.replace(/\D/g, '').slice(0, 11);
+                  const formatted = nums.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, (_, a, b, c, d) => d ? `${a}.${b}.${c}-${d}` : c ? `${a}.${b}.${c}` : b ? `${a}.${b}` : a);
+                  setDocNumber(formatted);
+                }}
+                className="w-full h-11 px-4 rounded-xl border border-border/20 bg-background/40 text-sm font-mono text-foreground placeholder:text-muted-foreground/20 focus:border-primary/40 focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* Security badge */}
+            <div className="flex items-center gap-2 py-2">
+              <Shield size={14} className="text-emerald-400/60" />
+              <p className="text-[11px] text-muted-foreground/40">Pagamento seguro processado pelo Mercado Pago</p>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={processing}
+              className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-display font-bold tracking-wide text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              style={{ boxShadow: '0 4px 20px hsla(187, 100%, 50%, 0.25)' }}
+            >
+              {processing ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                <>
+                  <Lock size={16} />
+                  Pagar R$ {price}
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}

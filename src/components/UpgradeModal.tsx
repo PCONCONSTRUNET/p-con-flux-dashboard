@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Crown, Zap, X, Sparkles, Loader2 } from 'lucide-react';
+import { Crown, Zap, X, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import pconLogo from '@/assets/pcon-flux-logo.png';
 
 export default function UpgradeModal() {
   const { showUpgradeModal, setShowUpgradeModal, subscription } = useSubscription();
   const [monthlyPrice, setMonthlyPrice] = useState('--');
   const [annualPrice, setAnnualPrice] = useState('--');
-  const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'annual' | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!showUpgradeModal) return;
@@ -28,38 +28,9 @@ export default function UpgradeModal() {
     loadPrices();
   }, [showUpgradeModal]);
 
-  const handleSubscribe = async (plan: 'monthly' | 'annual') => {
-    setLoadingPlan(plan);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error('Você precisa estar logado para assinar.');
-        setLoadingPlan(null);
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('create-subscription', {
-        body: { plan },
-      });
-
-      if (error) {
-        console.error('Subscription error:', error);
-        toast.error('Erro ao criar assinatura. Tente novamente.');
-        setLoadingPlan(null);
-        return;
-      }
-
-      if (data?.checkout_url) {
-        window.open(data.checkout_url, '_blank');
-        toast.success('Redirecionando para o checkout do Mercado Pago...');
-      } else {
-        toast.error(data?.error || 'Erro ao gerar link de pagamento.');
-      }
-    } catch (err) {
-      console.error('Error:', err);
-      toast.error('Erro inesperado. Tente novamente.');
-    }
-    setLoadingPlan(null);
+  const handleSubscribe = (plan: 'monthly' | 'annual') => {
+    setShowUpgradeModal(false);
+    navigate(`/client/checkout?plan=${plan}`);
   };
 
   if (!showUpgradeModal) return null;
@@ -114,15 +85,14 @@ export default function UpgradeModal() {
             {/* Monthly */}
             <button
               onClick={() => handleSubscribe('monthly')}
-              disabled={loadingPlan !== null}
-              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-primary/15 transition-all hover:border-primary/35 group text-left disabled:opacity-50"
+              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-primary/15 transition-all hover:border-primary/35 group text-left"
               style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.04) 0%, hsla(187,100%,50%,0.01) 100%)' }}
             >
               <div
                 className="w-11 h-11 shrink-0 rounded-xl border border-primary/25 flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.15) 0%, hsla(187,100%,50%,0.05) 100%)' }}
               >
-                {loadingPlan === 'monthly' ? <Loader2 size={20} className="text-primary animate-spin" /> : <Zap size={20} className="text-primary" />}
+                <Zap size={20} className="text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX MENSAL</p>
@@ -131,7 +101,7 @@ export default function UpgradeModal() {
               <div className="text-right shrink-0">
                 <p className="text-lg font-bold text-primary">R$ {monthlyPrice}</p>
                 <span className="text-[10px] font-bold text-primary/60 tracking-widest group-hover:translate-x-0.5 transition-transform inline-block">
-                  {loadingPlan === 'monthly' ? 'AGUARDE...' : 'ASSINAR →'}
+                  ASSINAR →
                 </span>
               </div>
             </button>
@@ -139,8 +109,7 @@ export default function UpgradeModal() {
             {/* Annual */}
             <button
               onClick={() => handleSubscribe('annual')}
-              disabled={loadingPlan !== null}
-              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-emerald-400/20 transition-all hover:border-emerald-400/40 group text-left relative overflow-hidden disabled:opacity-50"
+              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-emerald-400/20 transition-all hover:border-emerald-400/40 group text-left relative overflow-hidden"
               style={{ background: 'linear-gradient(135deg, hsla(155,80%,50%,0.05) 0%, hsla(155,80%,50%,0.01) 100%)' }}
             >
               {/* Best option badge */}
@@ -153,7 +122,7 @@ export default function UpgradeModal() {
                 className="w-11 h-11 shrink-0 rounded-xl border border-emerald-400/25 flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, hsla(155,80%,50%,0.15) 0%, hsla(155,80%,50%,0.05) 100%)' }}
               >
-                {loadingPlan === 'annual' ? <Loader2 size={20} className="text-emerald-400 animate-spin" /> : <Crown size={20} className="text-emerald-400" />}
+                <Crown size={20} className="text-emerald-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX ANUAL</p>
@@ -162,7 +131,7 @@ export default function UpgradeModal() {
               <div className="text-right shrink-0 mt-2">
                 <p className="text-lg font-bold text-emerald-400">R$ {annualPrice}</p>
                 <span className="text-[10px] font-bold text-emerald-400/60 tracking-widest group-hover:translate-x-0.5 transition-transform inline-block">
-                  {loadingPlan === 'annual' ? 'AGUARDE...' : 'ASSINAR →'}
+                  ASSINAR →
                 </span>
               </div>
             </button>

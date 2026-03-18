@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify the user is authenticated
+    // Verify user
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Não autorizado" }), {
@@ -35,8 +35,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get request body
-    const { plan } = await req.json();
+    const body = await req.json();
+    const { plan, card_token, email, doc_number } = body;
+
     if (!plan || !["monthly", "annual"].includes(plan)) {
       return new Response(JSON.stringify({ error: "Plano inválido" }), {
         status: 400,
@@ -44,7 +45,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get MP access token from platform_settings
+    // Get MP config
     const { data: settings } = await supabase
       .from("platform_settings")
       .select("key, value")
@@ -64,7 +65,7 @@ Deno.serve(async (req) => {
 
     const accessToken = configMap.mp_access_token;
     if (!accessToken) {
-      return new Response(JSON.stringify({ error: "Access Token do Mercado Pago não configurado" }), {
+      return new Response(JSON.stringify({ error: "Access Token não configurado" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -81,18 +82,82 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get user profile for payer info
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("name, email")
-      .eq("id", user.id)
-      .single();
-
     const frequency = plan === "monthly" ? 1 : 12;
-    const frequencyType = "months";
     const planTitle = plan === "monthly" ? "P-CON FLUX Mensal" : "P-CON FLUX Anual";
+    const payerEmail = email || user.email;
 
-    // Create Mercado Pago preapproval (subscription)
+    // If card_token provided, create preapproval with card
+    if (card_token) {
+      const mpResponse = await fetch("https://api.mercadopago.com/preapproval", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: planTitle,
+          auto_recurring: {
+            frequency: frequency,
+            frequency_type: "months",
+            transaction_amount: price,
+            currency_id: "BRL",
+          },
+          back_url: `${req.headers.get("origin") || "https://pconflux.lovable.app"}/client`,
+          payer_email: payerEmail,
+          card_token_id: card_token,
+          external_reference: JSON.stringify({
+            user_id: user.id,
+            plan: plan,
+          }),
+          notification_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/mp-webhook`,
+          status: "authorized",
+        }),
+      });
+
+      const mpData = await mpResponse.json();
+
+      if (!mpResponse.ok) {
+        console.error("MP API Error:", JSON.stringify(mpData));
+        const errorMsg = mpData?.message || mpData?.cause?.[0]?.description || "Erro ao processar pagamento";
+        return new Response(JSON.stringify({ error: errorMsg, details: mpData }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log("MP Subscription created with card:", mpData.id, "status:", mpData.status);
+
+      // Update subscription in database
+      const now = new Date();
+      const expiresAt = plan === "monthly"
+        ? new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+        : new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+
+      await supabase
+        .from("subscriptions")
+        .upsert({
+          user_id: user.id,
+          plan: plan,
+          started_at: now.toISOString(),
+          expires_at: expiresAt.toISOString(),
+          is_active: true,
+          updated_at: now.toISOString(),
+        }, { onConflict: "user_id" });
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          subscription_id: mpData.id,
+          status: mpData.status,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Fallback: create checkout URL (redirect mode)
     const mpResponse = await fetch("https://api.mercadopago.com/preapproval", {
       method: "POST",
       headers: {
@@ -103,12 +168,12 @@ Deno.serve(async (req) => {
         reason: planTitle,
         auto_recurring: {
           frequency: frequency,
-          frequency_type: frequencyType,
+          frequency_type: "months",
           transaction_amount: price,
           currency_id: "BRL",
         },
         back_url: `${req.headers.get("origin") || "https://pconflux.lovable.app"}/client`,
-        payer_email: profile?.email || user.email,
+        payer_email: payerEmail,
         external_reference: JSON.stringify({
           user_id: user.id,
           plan: plan,
@@ -120,14 +185,12 @@ Deno.serve(async (req) => {
     const mpData = await mpResponse.json();
 
     if (!mpResponse.ok) {
-      console.error("MP API Error:", mpData);
-      return new Response(JSON.stringify({ error: "Erro ao criar assinatura no Mercado Pago", details: mpData }), {
+      console.error("MP API Error:", JSON.stringify(mpData));
+      return new Response(JSON.stringify({ error: "Erro ao criar assinatura", details: mpData }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    console.log("MP Subscription created:", mpData.id);
 
     return new Response(
       JSON.stringify({
@@ -140,7 +203,7 @@ Deno.serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("Error creating subscription:", error);
+    console.error("Error:", error);
     return new Response(
       JSON.stringify({ error: "Erro interno do servidor" }),
       {
