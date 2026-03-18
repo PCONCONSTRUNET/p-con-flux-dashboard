@@ -55,6 +55,9 @@ export default function Integrations() {
     localStorage.setItem('mp_config', JSON.stringify(config));
     await new Promise(r => setTimeout(r, 600));
     setIsSaving(false);
+    if (config.accessToken && config.publicKey) {
+      setConnectionStatus('success');
+    }
     toast.success('Configurações salvas com sucesso!');
   };
 
