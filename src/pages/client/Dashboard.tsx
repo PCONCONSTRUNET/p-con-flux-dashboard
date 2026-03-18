@@ -51,8 +51,6 @@ const ClientDashboard = () => {
           target: s.target,
         }));
         setSignals(mapped);
-      }
-        setSignals(mapped);
 
         // Se o sinal mais recente ainda estiver como pending, ativa a telinha de "Entrada confirmada"
         if (mapped.length > 0 && mapped[0].result === 'pending') {
