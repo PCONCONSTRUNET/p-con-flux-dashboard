@@ -85,15 +85,14 @@ export default function UpgradeModal() {
             {/* Monthly */}
             <button
               onClick={() => handleSubscribe('monthly')}
-              disabled={loadingPlan !== null}
-              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-primary/15 transition-all hover:border-primary/35 group text-left disabled:opacity-50"
+              className="w-full flex items-center gap-4 p-4 rounded-2xl border border-primary/15 transition-all hover:border-primary/35 group text-left"
               style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.04) 0%, hsla(187,100%,50%,0.01) 100%)' }}
             >
               <div
                 className="w-11 h-11 shrink-0 rounded-xl border border-primary/25 flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, hsla(187,100%,50%,0.15) 0%, hsla(187,100%,50%,0.05) 100%)' }}
               >
-                {loadingPlan === 'monthly' ? <Loader2 size={20} className="text-primary animate-spin" /> : <Zap size={20} className="text-primary" />}
+                <Zap size={20} className="text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground tracking-wide">P-CON FLUX MENSAL</p>
@@ -102,7 +101,7 @@ export default function UpgradeModal() {
               <div className="text-right shrink-0">
                 <p className="text-lg font-bold text-primary">R$ {monthlyPrice}</p>
                 <span className="text-[10px] font-bold text-primary/60 tracking-widest group-hover:translate-x-0.5 transition-transform inline-block">
-                  {loadingPlan === 'monthly' ? 'AGUARDE...' : 'ASSINAR →'}
+                  ASSINAR →
                 </span>
               </div>
             </button>
