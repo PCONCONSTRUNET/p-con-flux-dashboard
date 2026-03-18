@@ -174,7 +174,7 @@ const AdminDashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="hsla(240,6%,30%,0.2)" />
               <XAxis dataKey="day" tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'hsla(240,6%,60%,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsla(240,6%,50%,0.1)' }} />
               <Area type="monotone" dataKey="revenue" name="Receita" stroke="hsl(187, 100%, 50%)" strokeWidth={2.5} fill="url(#revenueGradient)" />
             </AreaChart>
           </ResponsiveContainer>
