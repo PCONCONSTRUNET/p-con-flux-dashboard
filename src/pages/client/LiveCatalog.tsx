@@ -17,7 +17,7 @@ const LiveCatalog = () => {
   const [limit, setLimit] = useState<number>(200);
   const [colorFilter, setColorFilter] = useState<BlazeColor | 'all'>('all');
   const [showFilters, setShowFilters] = useState(true);
-  const [realtime, setRealtime] = useState(true);
+  
   const [showTimestamps, setShowTimestamps] = useState(true);
   const [showNumbers, setShowNumbers] = useState(true);
   const [highlighted, setHighlighted] = useState<string | null>(null);
@@ -37,7 +37,6 @@ const LiveCatalog = () => {
   roundsRef.current = rounds;
 
   useEffect(() => {
-    if (!realtime) return;
     const interval = setInterval(() => {
       const roll = Math.floor(Math.random() * 15);
       let color: BlazeColor = 'black';
@@ -54,7 +53,7 @@ const LiveCatalog = () => {
       setRounds(prev => [newRound, ...prev].slice(0, 600));
     }, 8000 + Math.random() * 12000);
     return () => clearInterval(interval);
-  }, [realtime]);
+  }, []);
 
   const displayed = useMemo(() => {
     let data = rounds.slice(0, limit);
@@ -149,10 +148,10 @@ const LiveCatalog = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold text-foreground tracking-tight">Catalogador</h1>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className={`w-1.5 h-1.5 rounded-full ${realtime ? 'bg-emerald-400 animate-pulse' : 'bg-muted-foreground/30'}`} />
+             <div className="flex items-center gap-1.5 mt-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[10px] text-muted-foreground tracking-widest uppercase font-semibold">
-                {realtime ? 'Tempo real' : 'Pausado'}
+                Tempo real
               </span>
             </div>
           </div>
@@ -214,18 +213,6 @@ const LiveCatalog = () => {
 
           {/* Toggles */}
           <div className="flex flex-wrap gap-x-5 gap-y-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={realtime}
-                onChange={() => setRealtime(!realtime)}
-                className="sr-only peer"
-              />
-              <div className="w-8 h-4 rounded-full bg-muted/50 peer-checked:bg-primary/30 relative transition-all">
-                <div className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${realtime ? 'left-[18px] bg-primary' : 'left-0.5 bg-muted-foreground/50'}`} />
-              </div>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Tempo real</span>
-            </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
