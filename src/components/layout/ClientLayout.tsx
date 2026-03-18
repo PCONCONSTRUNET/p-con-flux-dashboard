@@ -14,12 +14,21 @@ const navItems = [
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
+  const { hasActiveSubscription, setShowUpgradeModal } = useSubscription();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.requiresSub && !hasActiveSubscription) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    navigate(item.path);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
