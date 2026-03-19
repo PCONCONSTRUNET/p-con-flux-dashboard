@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Search, CheckCircle2, XCircle, Clock, TrendingUp } from 'lucide-react';
-import { mockBlazeRounds, type SignalResult, type Signal } from '@/data/mockData';
+import { type SignalResult, type Signal, type BlazeRound } from '@/data/mockData';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import LockedFeature from '@/components/LockedFeature';
 import { supabase } from '@/integrations/supabase/client';
+import { useBlazeDouble } from '@/hooks/useBlazeDouble';
 
 const History = () => {
   const { hasActiveSubscription } = useSubscription();
