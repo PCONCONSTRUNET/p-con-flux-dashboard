@@ -8,6 +8,7 @@ import { useBlazeDouble } from '@/hooks/useBlazeDouble';
 
 const History = () => {
   const { hasActiveSubscription } = useSubscription();
+  const { results: apiResults } = useBlazeDouble();
   const [tab, setTab] = useState<'signals' | 'rounds'>('signals');
   const [search, setSearch] = useState('');
   const [resultFilter, setResultFilter] = useState<'all' | SignalResult>('all');
