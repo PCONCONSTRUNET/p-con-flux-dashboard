@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Zap, Trophy, XCircle, Percent, ChevronDown, Loader2, CheckCircle2, Radio, Lock, Shield } from 'lucide-react';
-import { mockBlazeRounds, type Signal, type BlazeColor } from '@/data/mockData';
+import { type Signal, type BlazeColor } from '@/data/mockData';
 import { useBlazeDouble } from '@/hooks/useBlazeDouble';
 import flameIcon from '@/assets/flame-icon.png';
 import BlazeRouletteStrip from '@/components/BlazeRouletteStrip';
