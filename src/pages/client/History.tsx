@@ -49,8 +49,14 @@ const History = () => {
   }, [search, resultFilter, allSignals]);
 
   const filteredRounds = useMemo(() => {
-    return mockBlazeRounds.slice(0, 100);
-  }, []);
+    return apiResults.slice(0, 100).map((r, idx) => ({
+      id: r.id,
+      number: apiResults.length - idx,
+      color: r.color,
+      timestamp: r.createdAt,
+      roll: r.roll,
+    }));
+  }, [apiResults]);
 
   const greenCount = allSignals.filter(s => s.result === 'green').length;
   const lossCount = allSignals.filter(s => s.result === 'loss').length;
