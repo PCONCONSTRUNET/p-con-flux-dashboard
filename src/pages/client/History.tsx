@@ -1,12 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Search, CheckCircle2, XCircle, Clock, TrendingUp } from 'lucide-react';
-import { mockBlazeRounds, type SignalResult, type Signal } from '@/data/mockData';
+import { type SignalResult, type Signal, type BlazeRound } from '@/data/mockData';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import LockedFeature from '@/components/LockedFeature';
 import { supabase } from '@/integrations/supabase/client';
+import { useBlazeDouble } from '@/hooks/useBlazeDouble';
 
 const History = () => {
   const { hasActiveSubscription } = useSubscription();
+  const { results: apiResults } = useBlazeDouble();
   const [tab, setTab] = useState<'signals' | 'rounds'>('signals');
   const [search, setSearch] = useState('');
   const [resultFilter, setResultFilter] = useState<'all' | SignalResult>('all');
@@ -47,8 +49,14 @@ const History = () => {
   }, [search, resultFilter, allSignals]);
 
   const filteredRounds = useMemo(() => {
-    return mockBlazeRounds.slice(0, 100);
-  }, []);
+    return apiResults.slice(0, 100).map((r, idx) => ({
+      id: r.id,
+      number: apiResults.length - idx,
+      color: r.color,
+      timestamp: r.createdAt,
+      roll: r.roll,
+    }));
+  }, [apiResults]);
 
   const greenCount = allSignals.filter(s => s.result === 'green').length;
   const lossCount = allSignals.filter(s => s.result === 'loss').length;
